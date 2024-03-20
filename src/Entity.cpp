@@ -1,46 +1,23 @@
 #include "Entity.hpp"
 
-#include "glm/geometric.hpp"
 #include "GLObject.hpp"
 #include "Shader.hpp"
 
 #include <optional>
 #include <utility>
 
-BaseEntity::BaseEntity(std::vector<float> vertices,
-                       std::optional<std::vector<GLuint>> indices,
-                       glm::vec3 pos, glm::vec4 color)
-    : shader_("../resources/shaders/shader.vert",
-              "../resources/shaders/shader.frag")
-    , glObject_(vertices, indices)
-    , pos_(pos)
-    , color_(color)
+CollisionBox::CollisionBox(const glm::vec3& pos)
+    : pos_(pos)
 {
     this->aabb_[0] = pos - glm::vec3(0.5, 0.5, 0.5);
     this->aabb_[1] = pos + glm::vec3(0.5, 0.5, 0.5);
 }
 
-const Shader& BaseEntity::getShader() const
-{
-    return this->shader_;
-}
-
-const glm::vec3& BaseEntity::getPos() const
-{
-    return this->pos_;
-}
-
-const glm::vec4& BaseEntity::getColor() const
-{
-    return this->color_;
-}
-
-IntersectionResult BaseEntity::isIntersectedByLine(const glm::vec3& eyePos,
-                                                   const glm::vec3& eyeDir)
+IntersectionResult CollisionBox::isIntersectedByLine(const glm::vec3& eyePos,
+                                                     const glm::vec3& eyeDir)
 {
     IntersectionResult result = std::nullopt;
     float closestDist = FLT_MAX;
-    bool intersects = false;
 
     for (const auto& vertex : this->aabb_)
     {
@@ -60,8 +37,6 @@ IntersectionResult BaseEntity::isIntersectedByLine(const glm::vec3& eyePos,
                 continue;
             }
 
-            intersects = true;
-
             float dist = glm::distance(intersection, eyePos);
             if (dist < closestDist)
             {
@@ -74,23 +49,103 @@ IntersectionResult BaseEntity::isIntersectedByLine(const glm::vec3& eyePos,
     return result;
 }
 
-void BaseEntity::move(const glm::vec3& newPos)
+bool CollisionBox::isPointInPlaneSection(const glm::vec3& point)
+{
+    return (point.x <= this->aabb_[1].x && point.x >= this->aabb_[0].x &&
+            point.y <= this->aabb_[1].y && point.y >= this->aabb_[0].y &&
+            point.z <= this->aabb_[1].z && point.z >= this->aabb_[0].z);
+}
+
+void CollisionBox::move(const glm::vec3& newPos)
 {
     this->pos_ = newPos;
     this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5);
     this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5);
 }
 
-void BaseEntity::render()
+Entity::Entity(std::vector<float> vertices,
+               std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
+               glm::vec4 color)
+    : shader_("../resources/shaders/shader.vert",
+              "../resources/shaders/shader.frag")
+    , glObject_(vertices, indices)
+    , referentialPos_(pos)
+    , currentPos_(pos)
+    , color_(color)
+{
+}
+
+const Shader& Entity::getShader() const
+{
+    return this->shader_;
+}
+
+const glm::vec3& Entity::getReferentialPos() const
+{
+    return this->referentialPos_;
+}
+
+const glm::vec3& Entity::getCurrentPos() const
+{
+    return this->currentPos_;
+}
+
+const glm::vec4& Entity::getColor() const
+{
+    return this->color_;
+}
+
+EntityType Entity::getType() const
+{
+    return this->type_;
+}
+
+void Entity::addCollisionBox()
+{
+    if (this->collisionBox_.has_value())
+    {
+        return;
+    }
+
+    this->collisionBox_ = CollisionBox(this->currentPos_);
+}
+
+void Entity::move(const glm::vec3& newPos)
+{
+    this->currentPos_ = newPos;
+    if (this->collisionBox_.has_value())
+    {
+        this->collisionBox_->move(newPos);
+    }
+}
+
+void Entity::moveReferential(const glm::vec3& newPos)
+{
+    this->referentialPos_ = newPos;
+    this->move(newPos);
+}
+
+void Entity::moveRelative(const glm::vec3& newPos)
+{
+    this->move(this->referentialPos_ + newPos);
+}
+
+void Entity::render()
 {
     this->glObject_.render();
 }
 
-bool BaseEntity::isPointInPlaneSection(const glm::vec3& point)
+std::optional<CollisionBox>& Entity::getCollisionBox()
 {
-    return (point.x <= this->aabb_[1].x && point.x >= this->aabb_[0].x &&
-            point.y <= this->aabb_[1].y && point.y >= this->aabb_[0].y &&
-            point.z <= this->aabb_[1].z && point.z >= this->aabb_[0].z);
+    return this->collisionBox_;
+}
+
+Obstacle::Obstacle(std::vector<float> vertices,
+                   std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
+                   glm::vec4 color)
+    : Entity(std::move(vertices), std::move(indices), pos, color)
+{
+    this->type_ = EntityType::OBSTACLE;
 }
 
 void Obstacle::onHit()
@@ -101,9 +156,11 @@ void Obstacle::onHit()
 Target::Target(std::vector<float> vertices,
                std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
                glm::vec4 color)
-    : BaseEntity(std::move(vertices), std::move(indices), pos, color)
+    : Entity(std::move(vertices), std::move(indices), pos, color)
     , health_(1)
 {
+    this->type_ = EntityType::TARGET;
+    this->addCollisionBox();
 }
 
 void Target::onHit()
@@ -111,6 +168,13 @@ void Target::onHit()
     this->health_--;
     if (this->health_ <= 0)
     {
-        this->move({0.0, 0.0, 15.0});
+        this->moveReferential({0.0, 0.0, 15.0});
     }
+}
+
+Sprite::Sprite(std::vector<float> vertices,
+               std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
+               glm::vec4 color)
+    : Entity(std::move(vertices), std::move(indices), pos, color)
+{
 }

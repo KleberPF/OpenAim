@@ -15,7 +15,6 @@ set(SOURCES
     src/Camera.cpp
     src/Entity.cpp
     src/Game.cpp
-    src/Sprite.cpp
     # Add more source files here as needed
 )
 
@@ -27,6 +26,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw)
 
 # Add GLM submodule
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
+
+# Add assimp submodule
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
 
 # Add an executable target
 add_executable(${PROJECT_NAME} ${SOURCES})
@@ -50,6 +52,7 @@ target_link_libraries(${PROJECT_NAME}
     PRIVATE
         glfw
         glm
+        assimp
         # Add more libraries here as needed
 )
 

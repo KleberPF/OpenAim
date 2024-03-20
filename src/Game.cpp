@@ -2,10 +2,10 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "GLFW/glfw3.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "objects.hpp"
-#include "Sprite.hpp"
 #include "Window.hpp"
 
 #include <iostream>
@@ -41,8 +41,9 @@ Game::Game()
     }
 
     // crosshair
-    this->sprites_.push_back(std::make_unique<Sprite>(
-        SQUARE, std::nullopt, glm::vec3(0.0, 0.0, 1.0)));
+    this->sprites_.push_back(
+        std::make_unique<Sprite>(SQUARE, std::nullopt, glm::vec3(0.0, 0.0, 1.0),
+                                 glm::vec4(0.0, 1.0, 0.0, 1.0)));
 }
 
 void Game::mainLoop()
@@ -131,38 +132,57 @@ void Game::processInput()
 
 void Game::updateEntities()
 {
-    if (this->mouseButtons_[0].current == GLFW_PRESS &&
-        this->mouseButtons_[0].prev == GLFW_RELEASE)
+    this->updateShotEntities();
+
+    // move targets so they oscilate around their original position
+    // on the x axis
+    for (auto& entity : this->entities_)
     {
-        BaseEntity* closestEntity = nullptr;
-        float closestDist = FLT_MAX;
+        float offset = 5 * sin(glfwGetTime());  // [-5, 5]
+        entity->moveRelative(glm::vec3(offset, 0.0, 0.0));
+    }
+}
 
-        for (auto& entity : this->entities_)
+void Game::updateShotEntities()
+{
+    if (this->mouseButtons_[0].current != GLFW_PRESS ||
+        this->mouseButtons_[0].prev != GLFW_RELEASE)
+    {
+        return;
+    }
+
+    Entity* closestEntity = nullptr;
+    float closestDist = FLT_MAX;
+
+    for (auto& entity : this->entities_)
+    {
+        if (!entity->getCollisionBox().has_value())
         {
-            bool intersects = false;
-            auto intersection = entity->isIntersectedByLine(
-                this->camera_.getPosition(), this->camera_.getFront());
+            continue;
+        }
 
-            if (intersection.has_value())
+        auto intersection = entity->getCollisionBox()->isIntersectedByLine(
+            this->camera_.getPosition(), this->camera_.getFront());
+
+        if (intersection.has_value())
+        {
+            float dist =
+                glm::distance(this->camera_.getPosition(), *intersection);
+            if (dist < closestDist)
             {
-                float dist =
-                    glm::distance(this->camera_.getPosition(), *intersection);
-                if (dist < closestDist)
-                {
-                    closestDist = dist;
-                    closestEntity = entity.get();
-                }
+                closestDist = dist;
+                closestEntity = entity.get();
             }
         }
-
-        if (closestEntity != nullptr)
-        {
-            closestEntity->onHit();
-            this->shotsHit_++;
-        }
-
-        this->totalShots_++;
     }
+
+    if (closestEntity != nullptr)
+    {
+        closestEntity->onHit();
+        this->shotsHit_++;
+    }
+
+    this->totalShots_++;
 }
 
 void Game::render()
@@ -175,7 +195,7 @@ void Game::render()
         entity->getShader().use();
 
         glm::mat4 model =
-            glm::translate(glm::identity<glm::mat4>(), entity->getPos());
+            glm::translate(glm::identity<glm::mat4>(), entity->getCurrentPos());
         entity->getShader().setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
@@ -209,7 +229,7 @@ void Game::render()
         auto view = glm::identity<glm::mat4>();
         sprite->getShader().setMat4("view", view);
 
-        sprite->getShader().setVec4("color", {0.0, 1.0, 0.0, 1.0});
+        sprite->getShader().setVec4("color", sprite->getColor());
 
         sprite->render();
     }

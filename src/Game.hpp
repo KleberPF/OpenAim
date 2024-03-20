@@ -2,15 +2,14 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
-#include "Sprite.hpp"
 #include "Window.hpp"
 
 #include <memory>
 
 // settings
-constexpr auto SCR_WIDTH = 1920;
-constexpr auto SCR_HEIGHT = 1080;
-constexpr auto FULLSCREEN = true;
+constexpr auto SCR_WIDTH = 800;
+constexpr auto SCR_HEIGHT = 600;
+constexpr auto FULLSCREEN = false;
 
 struct MouseButton {
     int prev;
@@ -28,12 +27,13 @@ private:
     void processTiming();
     void processInput();
     void updateEntities();
+    void updateShotEntities();
     void render();
     void updateGlfw();
 
     Window window_;
     Camera camera_;
-    std::vector<std::unique_ptr<BaseEntity>> entities_;
+    std::vector<std::unique_ptr<Entity>> entities_;
     std::vector<std::unique_ptr<Sprite>> sprites_;
 
     // mouse input

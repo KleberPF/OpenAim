@@ -5,9 +5,12 @@
 #include "GLFW/glfw3.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "objects.hpp"
+#include "Shader.hpp"
 #include "Window.hpp"
 
+#include <stb_image.h>
+
+#include <cstdlib>
 #include <iostream>
 #include <memory>
 #include <optional>
@@ -15,7 +18,6 @@
 Game::Game()
     : window_(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
     , camera_({0.0, 1.5, 1.0}, {0.0, 1.0, 0.0}, -90.0, 0.0)
-    , mouseButtons_()
     , lastX_((float)this->window_.getWidth() / 2)
     , lastY_((float)this->window_.getHeight() / 2)
 {
@@ -28,22 +30,39 @@ Game::Game()
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
+    stbi_set_flip_vertically_on_load(true);
     this->mouseButtons_.fill({GLFW_RELEASE, GLFW_RELEASE});
 
-    for (int i = -1; i <= 1; i++)
+    this->resourceManager_.addShader("sprite",
+                                     "../resources/shaders/sprite.vert",
+                                     "../resources/shaders/sprite.frag");
+    this->resourceManager_.addShader("entity",
+                                     "../resources/shaders/model.vert",
+                                     "../resources/shaders/color.frag");
+
+    this->resourceManager_.addModel(
+        "backpack", "../resources/objects/backpack/backpack.obj");
+    this->resourceManager_.addModel("ball",
+                                    "../resources/objects/ball/ball.obj");
+
+    this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
+        this->resourceManager_.getShader("sprite"));
+
+    for (int i = -10; i <= 10; i++)
     {
-        for (int j = -1; j <= 1; j++)
+        for (int j = -10; j <= 10; j++)
         {
             this->entities_.push_back(std::make_unique<Target>(
-                CUBE, std::nullopt, glm::vec3(2 * i, 2 * j + 5.0, -15.0),
+                this->resourceManager_.getModel("ball"),
+                glm::vec3(2 * i, 2 * j + 5.0, -15.0),
                 glm::vec4(0.2, 0.0, 1.0, 1.0)));
         }
     }
 
     // crosshair
-    this->sprites_.push_back(
-        std::make_unique<Sprite>(SQUARE, std::nullopt, glm::vec3(0.0, 0.0, 1.0),
-                                 glm::vec4(0.0, 1.0, 0.0, 1.0)));
+    // this->sprites_.push_back(
+    //     std::make_unique<Sprite>(SQUARE, std::nullopt, glm::vec3(0.0, 0.0, 1.0),
+    //                              glm::vec4(0.0, 1.0, 0.0, 1.0)));
 }
 
 void Game::mainLoop()
@@ -136,11 +155,11 @@ void Game::updateEntities()
 
     // move targets so they oscilate around their original position
     // on the x axis
-    for (auto& entity : this->entities_)
-    {
-        float offset = 5 * sin(glfwGetTime());  // [-5, 5]
-        entity->moveRelative(glm::vec3(offset, 0.0, 0.0));
-    }
+    // for (auto& entity : this->entities_)
+    // {
+    //     float offset = 5 * sin(glfwGetTime());  // [-5, 5]
+    //     entity->moveRelative(glm::vec3(offset, 0.0, 0.0));
+    // }
 }
 
 void Game::updateShotEntities()
@@ -190,49 +209,65 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+    const Shader& entityShader = this->resourceManager_.getShader("entity");
+    entityShader.use();
+
+    glm::mat4 view = this->camera_.getViewMatrix();
+    entityShader.setMat4("view", view);
+
     for (auto& entity : this->entities_)
     {
-        entity->getShader().use();
-
-        glm::mat4 model =
-            glm::translate(glm::identity<glm::mat4>(), entity->getCurrentPos());
-        entity->getShader().setMat4("model", model);
+        auto model = glm::identity<glm::mat4>();
+        model = glm::translate(model, entity->getCurrentPos());
+        model = glm::scale(model, glm::vec3(0.3, 0.3, 0.3));
+        entityShader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
             glm::radians(this->camera_.getZoom()),
             (float)this->window_.getWidth() / this->window_.getHeight(), 0.1F,
             100.0F);
-        entity->getShader().setMat4("projection", projection);
+        entityShader.setMat4("projection", projection);
 
-        glm::mat4 view = this->camera_.getViewMatrix();
-        entity->getShader().setMat4("view", view);
+        entityShader.setVec4("color", entity->getColor());
 
-        entity->getShader().setVec4("color", entity->getColor());
-
-        entity->render();
+        entity->render(entityShader);
     }
 
-    for (auto& sprite : this->sprites_)
-    {
-        sprite->getShader().use();
+    const Shader& spriteShader = this->resourceManager_.getShader("sprite");
+    spriteShader.use();
 
-        glm::mat4 model =
-            glm::scale(glm::identity<glm::mat4>(), {0.015, 0.015, 1.0});
-        sprite->getShader().setMat4("model", model);
+    glm::mat4 projection = glm::ortho(
+        -this->window_.getWidth() / 2.0f, this->window_.getWidth() / 2.0f,
+        -this->window_.getHeight() / 2.0f, this->window_.getHeight() / 2.0f,
+        -1.0f, 1.0f);
+    spriteShader.setMat4("projection", projection);
 
-        float aspectRatio =
-            (float)this->window_.getWidth() / this->window_.getHeight();
-        glm::mat4 projection =
-            glm::ortho(-aspectRatio, aspectRatio, -1.0F, 1.0F);
-        sprite->getShader().setMat4("projection", projection);
+    this->spriteRenderer_->render(
+        glm::vec2(-CROSSHAIR_SIZE_PX / 2, CROSSHAIR_SIZE_PX / 2), 0.0f,
+        glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
+        glm::vec3(0.0f, 1.0f, 0.0f));
 
-        auto view = glm::identity<glm::mat4>();
-        sprite->getShader().setMat4("view", view);
+    // for (auto& sprite : this->sprites_)
+    // {
+    //     sprite->getShader().use();
 
-        sprite->getShader().setVec4("color", sprite->getColor());
+    //     glm::mat4 model =
+    //         glm::scale(glm::identity<glm::mat4>(), {0.015, 0.015, 1.0});
+    //     sprite->getShader().setMat4("model", model);
 
-        sprite->render();
-    }
+    //     float aspectRatio =
+    //         (float)this->window_.getWidth() / this->window_.getHeight();
+    //     glm::mat4 projection =
+    //         glm::ortho(-aspectRatio, aspectRatio, -1.0F, 1.0F);
+    //     sprite->getShader().setMat4("projection", projection);
+
+    //     auto view = glm::identity<glm::mat4>();
+    //     sprite->getShader().setMat4("view", view);
+
+    //     sprite->getShader().setVec4("color", sprite->getColor());
+
+    //     sprite->render();
+    // }
 }
 
 void Game::updateGlfw()

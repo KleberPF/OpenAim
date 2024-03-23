@@ -26,12 +26,16 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime)
     {
         case CameraMovement::FORWARD:
             this->position_ += this->front_ * velocity;
+            break;
         case CameraMovement::BACKWARD:
             this->position_ -= this->front_ * velocity;
+            break;
         case CameraMovement::LEFT:
             this->position_ -= this->right_ * velocity;
+            break;
         case CameraMovement::RIGHT:
             this->position_ += this->right_ * velocity;
+            break;
     }
 }
 

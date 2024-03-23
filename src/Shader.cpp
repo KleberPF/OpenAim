@@ -29,11 +29,6 @@ Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
     glDeleteShader(fragmentShader);
 }
 
-Shader::~Shader()
-{
-    glDeleteProgram(this->id_);
-}
-
 void Shader::use() const
 {
     glUseProgram(this->id_);

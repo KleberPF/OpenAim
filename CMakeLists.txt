@@ -11,10 +11,14 @@ set(SOURCES
     src/Window.cpp
     src/filereader.cpp
     src/Shader.cpp
-    src/GLObject.cpp
     src/Camera.cpp
     src/Entity.cpp
     src/Game.cpp
+    src/Mesh.cpp
+    src/Model.cpp
+    src/stb_image.c
+    src/SpriteRenderer.cpp
+    src/ResourceManager.cpp
     # Add more source files here as needed
 )
 
@@ -60,10 +64,11 @@ target_link_libraries(${PROJECT_NAME}
 # include(CMakeModuleFile.cmake)
 
 # Optionally, you can add additional compiler flags or definitions
-# target_compile_options(YourExecutableName
-#     PRIVATE
-#         -Wall
-# )
+target_compile_options(${PROJECT_NAME}
+    PRIVATE
+        -Wall
+        -Wextra
+)
 
 # Optionally, set C++ standard
 set(CMAKE_CXX_STANDARD 20)

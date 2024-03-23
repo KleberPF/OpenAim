@@ -4,11 +4,17 @@
 
 #include <glad/glad.h>
 
+static void framebufferSizeCallback(GLFWwindow* /*unused*/, int width,
+                                    int height)
+{
+    glViewport(0, 0, width, height);
+}
+
 Window::Window(int width, int height, std::string title, bool fullscreen)
-    : width_(width)
+    : title_(std::move(title))
+    , width_(width)
     , height_(height)
     , fullscreen_(fullscreen)
-    , title_(std::move(title))
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -69,10 +75,4 @@ int Window::getHeight() const
 GLFWwindow* Window::getPtr() const
 {
     return this->ptr_;
-}
-
-static void framebufferSizeCallback(GLFWwindow* /*unused*/, int width,
-                                    int height)
-{
-    glViewport(0, 0, width, height);
 }

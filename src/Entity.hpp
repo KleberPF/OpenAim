@@ -1,6 +1,6 @@
 #pragma once
 
-#include "GLObject.hpp"
+#include "Model.hpp"
 #include "Shader.hpp"
 
 #include <glm/glm.hpp>
@@ -41,18 +41,9 @@ private:
 class Entity
 {
 public:
-    Entity(std::vector<float> vertices,
-           std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-           glm::vec4 color);
-
-    Entity(const Entity& entity) = default;
-    Entity& operator=(const Entity& entity) = default;
-
-    Entity(Entity&& entity) = default;
-    Entity& operator=(Entity&& entity) = default;
+    Entity(Model model, glm::vec3 pos, glm::vec4 color);
     virtual ~Entity() = default;
 
-    const Shader& getShader() const;
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
     const glm::vec4& getColor() const;
@@ -69,7 +60,7 @@ public:
     // Moves relative to the referential
     // Position after this should be referentialPos_ + newPos
     void moveRelative(const glm::vec3& newPos);
-    void render();
+    void render(const Shader& shader);
 
     std::optional<CollisionBox>& getCollisionBox();
 
@@ -85,16 +76,13 @@ protected:
     glm::vec3 referentialPos_;
 
 private:
-    Shader shader_;
-    GLObject glObject_;
+    Model model_;
     glm::vec4 color_;
 };
 
 class Obstacle : public Entity
 {
-    Obstacle(std::vector<float> vertices,
-             std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-             glm::vec4 color);
+    Obstacle(Model model, glm::vec3 pos, glm::vec4 color);
 
     void onHit() override;
 };
@@ -102,20 +90,10 @@ class Obstacle : public Entity
 class Target : public Entity
 {
 public:
-    Target(std::vector<float> vertices,
-           std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-           glm::vec4 color);
+    Target(Model model, glm::vec3 pos, glm::vec4 color);
 
     void onHit() override;
 
 private:
     int health_;
-};
-
-class Sprite : public Entity
-{
-public:
-    Sprite(std::vector<float> vertices,
-           std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-           glm::vec4 color);
 };

@@ -25,5 +25,3 @@ private:
     int height_;
     bool fullscreen_;
 };
-
-static void framebufferSizeCallback(GLFWwindow*, int width, int height);

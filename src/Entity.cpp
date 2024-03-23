@@ -1,6 +1,6 @@
 #include "Entity.hpp"
 
-#include "GLObject.hpp"
+#include "Model.hpp"
 #include "Shader.hpp"
 
 #include <optional>
@@ -63,21 +63,12 @@ void CollisionBox::move(const glm::vec3& newPos)
     this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5);
 }
 
-Entity::Entity(std::vector<float> vertices,
-               std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-               glm::vec4 color)
-    : shader_("../resources/shaders/shader.vert",
-              "../resources/shaders/shader.frag")
-    , glObject_(vertices, indices)
+Entity::Entity(Model model, glm::vec3 pos, glm::vec4 color)
+    : currentPos_(pos)
     , referentialPos_(pos)
-    , currentPos_(pos)
+    , model_(std::move(model))
     , color_(color)
 {
-}
-
-const Shader& Entity::getShader() const
-{
-    return this->shader_;
 }
 
 const glm::vec3& Entity::getReferentialPos() const
@@ -130,9 +121,9 @@ void Entity::moveRelative(const glm::vec3& newPos)
     this->move(this->referentialPos_ + newPos);
 }
 
-void Entity::render()
+void Entity::render(const Shader& shader)
 {
-    this->glObject_.render();
+    this->model_.render(shader);
 }
 
 std::optional<CollisionBox>& Entity::getCollisionBox()
@@ -140,10 +131,8 @@ std::optional<CollisionBox>& Entity::getCollisionBox()
     return this->collisionBox_;
 }
 
-Obstacle::Obstacle(std::vector<float> vertices,
-                   std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-                   glm::vec4 color)
-    : Entity(std::move(vertices), std::move(indices), pos, color)
+Obstacle::Obstacle(Model model, glm::vec3 pos, glm::vec4 color)
+    : Entity(std::move(model), pos, color)
 {
     this->type_ = EntityType::OBSTACLE;
 }
@@ -153,10 +142,8 @@ void Obstacle::onHit()
     // obstacles don't break when hit
 }
 
-Target::Target(std::vector<float> vertices,
-               std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-               glm::vec4 color)
-    : Entity(std::move(vertices), std::move(indices), pos, color)
+Target::Target(Model model, glm::vec3 pos, glm::vec4 color)
+    : Entity(std::move(model), pos, color)
     , health_(1)
 {
     this->type_ = EntityType::TARGET;
@@ -170,11 +157,4 @@ void Target::onHit()
     {
         this->moveReferential({0.0, 0.0, 15.0});
     }
-}
-
-Sprite::Sprite(std::vector<float> vertices,
-               std::optional<std::vector<GLuint>> indices, glm::vec3 pos,
-               glm::vec4 color)
-    : Entity(std::move(vertices), std::move(indices), pos, color)
-{
 }

@@ -2,6 +2,8 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "ResourceManager.hpp"
+#include "SpriteRenderer.hpp"
 #include "Window.hpp"
 
 #include <memory>
@@ -10,6 +12,7 @@
 constexpr auto SCR_WIDTH = 800;
 constexpr auto SCR_HEIGHT = 600;
 constexpr auto FULLSCREEN = false;
+constexpr auto CROSSHAIR_SIZE_PX = 4.0f;
 
 struct MouseButton {
     int prev;
@@ -34,7 +37,9 @@ private:
     Window window_;
     Camera camera_;
     std::vector<std::unique_ptr<Entity>> entities_;
-    std::vector<std::unique_ptr<Sprite>> sprites_;
+    // std::vector<std::unique_ptr<Sprite>> sprites_;
+    std::unique_ptr<SpriteRenderer> spriteRenderer_;
+    ResourceManager resourceManager_;
 
     // mouse input
     bool firstMouse_ = true;

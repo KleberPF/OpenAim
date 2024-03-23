@@ -9,13 +9,7 @@ class Shader
 {
 public:
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
-    ~Shader();
-
-    Shader(const Shader& shader) = default;
-    Shader& operator=(const Shader& shader) = default;
-
-    Shader(Shader&& shader) = default;
-    Shader& operator=(Shader&& shader) = default;
+    // glDeleteProgram will be done in ResourceManager if needed
 
     void use() const;
     void setInt(const std::string& name, int value) const;

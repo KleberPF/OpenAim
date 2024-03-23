@@ -6,16 +6,11 @@
 #include <glm/glm.hpp>
 
 #include <array>
+#include <climits>
 #include <optional>
 #include <vector>
 
 using IntersectionResult = std::optional<glm::vec3>;
-
-enum class EntityType {
-    TARGET,
-    OBSTACLE,
-    SPRITE,
-};
 
 class CollisionBox
 {
@@ -27,12 +22,12 @@ public:
     * the line described by eyePos and eyeDir
     */
     IntersectionResult isIntersectedByLine(const glm::vec3& eyePos,
-                                           const glm::vec3& eyeDir);
+                                           const glm::vec3& eyeDir) const;
 
     void move(const glm::vec3& newPos);
 
 private:
-    bool isPointInPlaneSection(const glm::vec3& point);
+    bool isPointInPlaneSection(const glm::vec3& point) const;
 
     std::array<glm::vec3, 2> aabb_;
     glm::vec3 pos_;
@@ -44,10 +39,18 @@ public:
     Entity(Model model, glm::vec3 pos, glm::vec4 color);
     virtual ~Entity() = default;
 
+    Entity(const Entity& entity) = default;
+    Entity& operator=(const Entity& entity) = default;
+
+    Entity(Entity&& entity) = default;
+    Entity& operator=(Entity&& entity) = default;
+
+    bool destroyable = false;
+    int health = INT_MAX;
+
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
     const glm::vec4& getColor() const;
-    EntityType getType() const;
 
     virtual void onHit()
     {
@@ -62,10 +65,9 @@ public:
     void moveRelative(const glm::vec3& newPos);
     void render(const Shader& shader);
 
-    std::optional<CollisionBox>& getCollisionBox();
+    const std::optional<CollisionBox>& getCollisionBox() const;
 
 protected:
-    EntityType type_;
     std::optional<CollisionBox> collisionBox_;
 
     // This holds the actual position the entity is in
@@ -78,22 +80,4 @@ protected:
 private:
     Model model_;
     glm::vec4 color_;
-};
-
-class Obstacle : public Entity
-{
-    Obstacle(Model model, glm::vec3 pos, glm::vec4 color);
-
-    void onHit() override;
-};
-
-class Target : public Entity
-{
-public:
-    Target(Model model, glm::vec3 pos, glm::vec4 color);
-
-    void onHit() override;
-
-private:
-    int health_;
 };

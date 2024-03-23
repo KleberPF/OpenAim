@@ -36,7 +36,7 @@ private:
 
     Window window_;
     Camera camera_;
-    std::vector<std::unique_ptr<Entity>> entities_;
+    std::vector<Entity> entities_;
     // std::vector<std::unique_ptr<Sprite>> sprites_;
     std::unique_ptr<SpriteRenderer> spriteRenderer_;
     ResourceManager resourceManager_;

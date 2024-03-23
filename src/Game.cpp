@@ -40,22 +40,23 @@ Game::Game()
                                      "../resources/shaders/model.vert",
                                      "../resources/shaders/color.frag");
 
-    this->resourceManager_.addModel(
-        "backpack", "../resources/objects/backpack/backpack.obj");
-    this->resourceManager_.addModel("ball",
-                                    "../resources/objects/ball/ball.obj");
+    this->resourceManager_.addModel("cube",
+                                    "../resources/objects/cube/cube.obj");
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
         this->resourceManager_.getShader("sprite"));
 
-    for (int i = -10; i <= 10; i++)
+    for (int i = -1; i <= 1; i++)
     {
-        for (int j = -10; j <= 10; j++)
+        for (int j = -1; j <= 1; j++)
         {
-            this->entities_.push_back(std::make_unique<Target>(
-                this->resourceManager_.getModel("ball"),
-                glm::vec3(2 * i, 2 * j + 5.0, -15.0),
-                glm::vec4(0.2, 0.0, 1.0, 1.0)));
+            Entity entity(this->resourceManager_.getModel("cube"),
+                          glm::vec3(2 * i, 2 * j + 5.0, -15.0),
+                          glm::vec4(0.2, 0.0, 1.0, 1.0));
+            entity.addCollisionBox();
+            entity.destroyable = true;
+            entity.health = 3;
+            this->entities_.push_back(std::move(entity));
         }
     }
 
@@ -170,17 +171,18 @@ void Game::updateShotEntities()
         return;
     }
 
-    Entity* closestEntity = nullptr;
+    auto closestEntityIt = this->entities_.end();
     float closestDist = FLT_MAX;
 
-    for (auto& entity : this->entities_)
+    for (auto it = this->entities_.begin(); it != this->entities_.end(); it++)
     {
-        if (!entity->getCollisionBox().has_value())
+        const auto& entity = *it;
+        if (!entity.getCollisionBox().has_value())
         {
             continue;
         }
 
-        auto intersection = entity->getCollisionBox()->isIntersectedByLine(
+        auto intersection = entity.getCollisionBox()->isIntersectedByLine(
             this->camera_.getPosition(), this->camera_.getFront());
 
         if (intersection.has_value())
@@ -190,14 +192,19 @@ void Game::updateShotEntities()
             if (dist < closestDist)
             {
                 closestDist = dist;
-                closestEntity = entity.get();
+                closestEntityIt = it;
             }
         }
     }
 
-    if (closestEntity != nullptr)
+    if (closestEntityIt != this->entities_.end() &&
+        closestEntityIt->destroyable)
     {
-        closestEntity->onHit();
+        closestEntityIt->health--;
+        if (closestEntityIt->health <= 0)
+        {
+            this->entities_.erase(closestEntityIt);
+        }
         this->shotsHit_++;
     }
 
@@ -218,8 +225,7 @@ void Game::render()
     for (auto& entity : this->entities_)
     {
         auto model = glm::identity<glm::mat4>();
-        model = glm::translate(model, entity->getCurrentPos());
-        model = glm::scale(model, glm::vec3(0.3, 0.3, 0.3));
+        model = glm::translate(model, entity.getCurrentPos());
         entityShader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
@@ -228,9 +234,9 @@ void Game::render()
             100.0F);
         entityShader.setMat4("projection", projection);
 
-        entityShader.setVec4("color", entity->getColor());
+        entityShader.setVec4("color", entity.getColor());
 
-        entity->render(entityShader);
+        entity.render(entityShader);
     }
 
     const Shader& spriteShader = this->resourceManager_.getShader("sprite");

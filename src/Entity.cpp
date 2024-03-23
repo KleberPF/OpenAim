@@ -13,8 +13,8 @@ CollisionBox::CollisionBox(const glm::vec3& pos)
     this->aabb_[1] = pos + glm::vec3(0.5, 0.5, 0.5);
 }
 
-IntersectionResult CollisionBox::isIntersectedByLine(const glm::vec3& eyePos,
-                                                     const glm::vec3& eyeDir)
+IntersectionResult CollisionBox::isIntersectedByLine(
+    const glm::vec3& eyePos, const glm::vec3& eyeDir) const
 {
     IntersectionResult result = std::nullopt;
     float closestDist = FLT_MAX;
@@ -49,7 +49,7 @@ IntersectionResult CollisionBox::isIntersectedByLine(const glm::vec3& eyePos,
     return result;
 }
 
-bool CollisionBox::isPointInPlaneSection(const glm::vec3& point)
+bool CollisionBox::isPointInPlaneSection(const glm::vec3& point) const
 {
     return (point.x <= this->aabb_[1].x && point.x >= this->aabb_[0].x &&
             point.y <= this->aabb_[1].y && point.y >= this->aabb_[0].y &&
@@ -84,11 +84,6 @@ const glm::vec3& Entity::getCurrentPos() const
 const glm::vec4& Entity::getColor() const
 {
     return this->color_;
-}
-
-EntityType Entity::getType() const
-{
-    return this->type_;
 }
 
 void Entity::addCollisionBox()
@@ -126,35 +121,7 @@ void Entity::render(const Shader& shader)
     this->model_.render(shader);
 }
 
-std::optional<CollisionBox>& Entity::getCollisionBox()
+const std::optional<CollisionBox>& Entity::getCollisionBox() const
 {
     return this->collisionBox_;
-}
-
-Obstacle::Obstacle(Model model, glm::vec3 pos, glm::vec4 color)
-    : Entity(std::move(model), pos, color)
-{
-    this->type_ = EntityType::OBSTACLE;
-}
-
-void Obstacle::onHit()
-{
-    // obstacles don't break when hit
-}
-
-Target::Target(Model model, glm::vec3 pos, glm::vec4 color)
-    : Entity(std::move(model), pos, color)
-    , health_(1)
-{
-    this->type_ = EntityType::TARGET;
-    this->addCollisionBox();
-}
-
-void Target::onHit()
-{
-    this->health_--;
-    if (this->health_ <= 0)
-    {
-        this->moveReferential({0.0, 0.0, 15.0});
-    }
 }

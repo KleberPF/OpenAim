@@ -56,8 +56,6 @@ public:
     {
     }
 
-    void addCollisionBox();
-
     void move(const glm::vec3& newPos);
     void moveReferential(const glm::vec3& newPos);
     // Moves relative to the referential
@@ -65,10 +63,10 @@ public:
     void moveRelative(const glm::vec3& newPos);
     void render(const Shader& shader);
 
-    const std::optional<CollisionBox>& getCollisionBox() const;
+    const CollisionBox& getCollisionBox() const;
 
 protected:
-    std::optional<CollisionBox> collisionBox_;
+    CollisionBox collisionBox_;
 
     // This holds the actual position the entity is in
     glm::vec3 currentPos_;

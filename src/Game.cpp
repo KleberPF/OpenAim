@@ -5,9 +5,13 @@
 #include "GLFW/glfw3.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "InputManager.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
 
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
 #include <stb_image.h>
 
 #include <cstdlib>
@@ -18,28 +22,35 @@
 Game::Game()
     : window_(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
     , camera_({0.0, 1.5, 1.0}, {0.0, 1.0, 0.0}, -90.0, 0.0)
+    , inputManager_(window_)
     , lastX_((float)this->window_.getWidth() / 2)
     , lastY_((float)this->window_.getHeight() / 2)
 {
-    // opengl stuff
+    // opengl initialization
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
-
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
-    stbi_set_flip_vertically_on_load(true);
-    this->mouseButtons_.fill({GLFW_RELEASE, GLFW_RELEASE});
+    InputManager::setupInputCallbacks(this->window_.getPtr());
 
+    // ImGui initialization
+    ImGui::CreateContext();
+    ImGui_ImplGlfw_InitForOpenGL(this->window_.getPtr(), true);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
+    // stb_image initialization
+    stbi_set_flip_vertically_on_load(true);
+
+    // load shaders and models
     this->resourceManager_.addShader("sprite",
                                      "../resources/shaders/sprite.vert",
                                      "../resources/shaders/sprite.frag");
     this->resourceManager_.addShader("entity",
                                      "../resources/shaders/model.vert",
                                      "../resources/shaders/color.frag");
-
     this->resourceManager_.addModel("cube",
                                     "../resources/objects/cube/cube.obj");
 
@@ -53,9 +64,8 @@ Game::Game()
             Entity entity(this->resourceManager_.getModel("cube"),
                           glm::vec3(2 * i, 2 * j + 5.0, -15.0),
                           glm::vec4(0.2, 0.0, 1.0, 1.0));
-            entity.addCollisionBox();
             entity.destroyable = true;
-            entity.health = 3;
+            entity.health = 1;
             this->entities_.push_back(std::move(entity));
         }
     }
@@ -87,12 +97,7 @@ void Game::processTiming()
 void Game::processInput()
 {
     // mouse input
-    double xposIn = 0;
-    double yposIn = 0;
-    glfwGetCursorPos(this->window_.getPtr(), &xposIn, &yposIn);
-
-    auto xpos = (float)xposIn;
-    auto ypos = (float)yposIn;
+    auto [xpos, ypos] = this->inputManager_.getCursorPos();
 
     if (this->firstMouse_)
     {
@@ -108,46 +113,61 @@ void Game::processInput()
     this->lastX_ = xpos;
     this->lastY_ = ypos;
 
-    this->mouseButtons_[0].current =
-        glfwGetMouseButton(this->window_.getPtr(), GLFW_MOUSE_BUTTON_LEFT);
-    this->mouseButtons_[1].current =
-        glfwGetMouseButton(this->window_.getPtr(), GLFW_MOUSE_BUTTON_RIGHT);
-
-    // notify entities when hit
-    this->updateEntities();
-
-    this->mouseButtons_[0].prev = this->mouseButtons_[0].current;
-    this->mouseButtons_[1].prev = this->mouseButtons_[1].current;
+    if (!this->paused_)
+    {
+        this->updateEntities();
+    }
 
     // camera mouse processing
-    this->camera_.processMouseMovement(xoffset, yoffset);
+    if (!this->paused_)
+    {
+        this->camera_.processMouseMovement(xoffset, yoffset);
+    }
 
     // generic processing
-    if (glfwGetKey(this->window_.getPtr(), GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if (this->inputManager_.isKeyToggled(GLFW_KEY_ESCAPE))
     {
         glfwSetWindowShouldClose(this->window_.getPtr(), true);
     }
 
+    if (this->inputManager_.isKeyToggled(GLFW_KEY_SPACE))
+    {
+        this->paused_ = !this->paused_;
+    }
+
+    if (this->paused_)
+    {
+        glfwSetInputMode(this->window_.getPtr(), GLFW_CURSOR,
+                         GLFW_CURSOR_NORMAL);
+    }
+    else
+    {
+        glfwSetInputMode(this->window_.getPtr(), GLFW_CURSOR,
+                         GLFW_CURSOR_DISABLED);
+    }
+
     // camera keyboard processing
     // uncomment this to allow flying around
-    if (glfwGetKey(this->window_.getPtr(), GLFW_KEY_W) == GLFW_PRESS)
+    if (this->inputManager_.isKeyPressed(GLFW_KEY_W))
     {
         this->camera_.processKeyboard(CameraMovement::FORWARD,
                                       this->deltaTime_);
     }
-    if (glfwGetKey(this->window_.getPtr(), GLFW_KEY_S) == GLFW_PRESS)
+    if (this->inputManager_.isKeyPressed(GLFW_KEY_S))
     {
         this->camera_.processKeyboard(CameraMovement::BACKWARD,
                                       this->deltaTime_);
     }
-    if (glfwGetKey(this->window_.getPtr(), GLFW_KEY_A) == GLFW_PRESS)
+    if (this->inputManager_.isKeyPressed(GLFW_KEY_A))
     {
         this->camera_.processKeyboard(CameraMovement::LEFT, this->deltaTime_);
     }
-    if (glfwGetKey(this->window_.getPtr(), GLFW_KEY_D) == GLFW_PRESS)
+    if (this->inputManager_.isKeyPressed(GLFW_KEY_D))
     {
         this->camera_.processKeyboard(CameraMovement::RIGHT, this->deltaTime_);
     }
+
+    this->inputManager_.consolidateKeyStates();
 }
 
 void Game::updateEntities()
@@ -165,8 +185,7 @@ void Game::updateEntities()
 
 void Game::updateShotEntities()
 {
-    if (this->mouseButtons_[0].current != GLFW_PRESS ||
-        this->mouseButtons_[0].prev != GLFW_RELEASE)
+    if (!this->inputManager_.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT))
     {
         return;
     }
@@ -177,12 +196,8 @@ void Game::updateShotEntities()
     for (auto it = this->entities_.begin(); it != this->entities_.end(); it++)
     {
         const auto& entity = *it;
-        if (!entity.getCollisionBox().has_value())
-        {
-            continue;
-        }
 
-        auto intersection = entity.getCollisionBox()->isIntersectedByLine(
+        auto intersection = entity.getCollisionBox().isIntersectedByLine(
             this->camera_.getPosition(), this->camera_.getFront());
 
         if (intersection.has_value())
@@ -252,6 +267,19 @@ void Game::render()
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, CROSSHAIR_SIZE_PX / 2), 0.0f,
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec3(0.0f, 1.0f, 0.0f));
+
+    // render ImGui stuff
+    if (this->paused_)
+    {
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::ShowDemoWindow();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    }
 
     // for (auto& sprite : this->sprites_)
     // {

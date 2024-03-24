@@ -2,6 +2,7 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "InputManager.hpp"
 #include "ResourceManager.hpp"
 #include "SpriteRenderer.hpp"
 #include "Window.hpp"
@@ -9,15 +10,10 @@
 #include <memory>
 
 // settings
-constexpr auto SCR_WIDTH = 800;
-constexpr auto SCR_HEIGHT = 600;
-constexpr auto FULLSCREEN = false;
+constexpr auto SCR_WIDTH = 1920;
+constexpr auto SCR_HEIGHT = 1080;
+constexpr auto FULLSCREEN = true;
 constexpr auto CROSSHAIR_SIZE_PX = 4.0f;
-
-struct MouseButton {
-    int prev;
-    int current;
-};
 
 class Game
 {
@@ -40,11 +36,10 @@ private:
     // std::vector<std::unique_ptr<Sprite>> sprites_;
     std::unique_ptr<SpriteRenderer> spriteRenderer_;
     ResourceManager resourceManager_;
+    InputManager inputManager_;
 
     // mouse input
     bool firstMouse_ = true;
-    std::array<MouseButton, 2>
-        mouseButtons_;  // store either GLFW_RELEASE or GLFW_PRESS
     float lastX_;
     float lastY_;
 
@@ -55,6 +50,9 @@ private:
     // objective related stuff
     int shotsHit_ = 0;
     int totalShots_ = 0;
+
+    // game state
+    bool paused_ = false;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

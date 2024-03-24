@@ -3,7 +3,6 @@
 #include "Model.hpp"
 #include "Shader.hpp"
 
-#include <optional>
 #include <utility>
 
 CollisionBox::CollisionBox(const glm::vec3& pos)
@@ -64,7 +63,8 @@ void CollisionBox::move(const glm::vec3& newPos)
 }
 
 Entity::Entity(Model model, glm::vec3 pos, glm::vec4 color)
-    : currentPos_(pos)
+    : collisionBox_(pos)
+    , currentPos_(pos)
     , referentialPos_(pos)
     , model_(std::move(model))
     , color_(color)
@@ -86,23 +86,10 @@ const glm::vec4& Entity::getColor() const
     return this->color_;
 }
 
-void Entity::addCollisionBox()
-{
-    if (this->collisionBox_.has_value())
-    {
-        return;
-    }
-
-    this->collisionBox_ = CollisionBox(this->currentPos_);
-}
-
 void Entity::move(const glm::vec3& newPos)
 {
     this->currentPos_ = newPos;
-    if (this->collisionBox_.has_value())
-    {
-        this->collisionBox_->move(newPos);
-    }
+    this->collisionBox_.move(newPos);
 }
 
 void Entity::moveReferential(const glm::vec3& newPos)
@@ -121,7 +108,7 @@ void Entity::render(const Shader& shader)
     this->model_.render(shader);
 }
 
-const std::optional<CollisionBox>& Entity::getCollisionBox() const
+const CollisionBox& Entity::getCollisionBox() const
 {
     return this->collisionBox_;
 }

@@ -1,15 +1,27 @@
 #include "Entity.hpp"
 
+#include "glm/geometric.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
 
+#include <cassert>
+#include <cmath>
+#include <iostream>
+#include <memory>
+#include <optional>
 #include <utility>
 
-CollisionBox::CollisionBox(const glm::vec3& pos)
+CollisionObject::CollisionObject(const glm::vec3& pos)
     : pos_(pos)
 {
-    this->aabb_[0] = pos - glm::vec3(0.5, 0.5, 0.5);
-    this->aabb_[1] = pos + glm::vec3(0.5, 0.5, 0.5);
+}
+
+CollisionBox::CollisionBox(const glm::vec3& pos, const glm::vec3& size)
+    : CollisionObject(pos)
+    , size_(size)
+{
+    this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5) * this->size_;
+    this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5) * this->size_;
 }
 
 IntersectionResult CollisionBox::isIntersectedByLine(
@@ -48,6 +60,13 @@ IntersectionResult CollisionBox::isIntersectedByLine(
     return result;
 }
 
+void CollisionBox::move(const glm::vec3& newPos)
+{
+    this->pos_ = newPos;
+    this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5) * this->size_;
+    this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5) * this->size_;
+}
+
 bool CollisionBox::isPointInPlaneSection(const glm::vec3& point) const
 {
     return (point.x <= this->aabb_[1].x && point.x >= this->aabb_[0].x &&
@@ -55,18 +74,47 @@ bool CollisionBox::isPointInPlaneSection(const glm::vec3& point) const
             point.z <= this->aabb_[1].z && point.z >= this->aabb_[0].z);
 }
 
-void CollisionBox::move(const glm::vec3& newPos)
+CollisionSphere::CollisionSphere(const glm::vec3& pos, float radius)
+    : CollisionObject(pos)
+    , radius_(radius)
 {
-    this->pos_ = newPos;
-    this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5);
-    this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5);
 }
 
-Entity::Entity(Model model, glm::vec3 pos, glm::vec4 color)
-    : collisionBox_(pos)
-    , currentPos_(pos)
+void CollisionSphere::move(const glm::vec3& newPos)
+{
+    this->pos_ = newPos;
+}
+
+// https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+IntersectionResult CollisionSphere::isIntersectedByLine(
+    const glm::vec3& eyePos, const glm::vec3& eyeDir) const
+{
+    glm::vec3 eyeDirNorm = glm::normalize(eyeDir);
+    float delta =
+        pow(glm::dot(eyeDirNorm, eyePos - this->pos_), 2) -
+        (pow(glm::length(eyePos - this->pos_), 2) - pow(this->radius_, 2));
+
+    if (delta < 0)
+    {
+        return std::nullopt;
+    }
+
+    float d = -(glm::dot(eyeDirNorm, eyePos - this->pos_)) - std::sqrt(delta);
+
+    if (d > 0)
+    {
+        return eyePos + eyeDir * d;
+    }
+
+    return std::nullopt;
+}
+
+Entity::Entity(Model model, const glm::vec3& pos, const glm::vec3& size,
+               const glm::vec4& color)
+    : currentPos_(pos)
     , referentialPos_(pos)
     , model_(std::move(model))
+    , size_(size)
     , color_(color)
 {
 }
@@ -86,10 +134,18 @@ const glm::vec4& Entity::getColor() const
     return this->color_;
 }
 
+const glm::vec3& Entity::getSize() const
+{
+    return this->size_;
+}
+
 void Entity::move(const glm::vec3& newPos)
 {
     this->currentPos_ = newPos;
-    this->collisionBox_.move(newPos);
+    if (this->collisionObject_ != nullptr)
+    {
+        this->collisionObject_->move(newPos);
+    }
 }
 
 void Entity::moveReferential(const glm::vec3& newPos)
@@ -108,7 +164,22 @@ void Entity::render(const Shader& shader)
     this->model_.render(shader);
 }
 
-const CollisionBox& Entity::getCollisionBox() const
+const CollisionObject* Entity::getCollisionObject() const
 {
-    return this->collisionBox_;
+    return this->collisionObject_.get();
+}
+
+void Entity::addCollisionObject(CollisionObjectType type)
+{
+    switch (type)
+    {
+        case CollisionObjectType::AABB:
+            this->collisionObject_ =
+                std::make_unique<CollisionBox>(this->currentPos_, this->size_);
+            break;
+        case CollisionObjectType::SPHERE:
+            this->collisionObject_ = std::make_unique<CollisionSphere>(
+                this->currentPos_, this->size_.x);
+            break;
+    }
 }

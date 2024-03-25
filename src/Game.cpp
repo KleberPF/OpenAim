@@ -53,6 +53,8 @@ Game::Game()
                                      "../resources/shaders/color.frag");
     this->resourceManager_.addModel("cube",
                                     "../resources/objects/cube/cube.obj");
+    this->resourceManager_.addModel("ball",
+                                    "../resources/objects/ball/ball.obj");
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
         this->resourceManager_.getShader("sprite"));
@@ -61,9 +63,10 @@ Game::Game()
     {
         for (int j = -1; j <= 1; j++)
         {
-            Entity entity(this->resourceManager_.getModel("cube"),
-                          glm::vec3(2 * i, 2 * j + 5.0, -15.0),
+            Entity entity(this->resourceManager_.getModel("ball"),
+                          glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
                           glm::vec4(0.2, 0.0, 1.0, 1.0));
+            entity.addCollisionObject(CollisionObjectType::SPHERE);
             entity.destroyable = true;
             entity.health = 1;
             this->entities_.push_back(std::move(entity));
@@ -197,7 +200,7 @@ void Game::updateShotEntities()
     {
         const auto& entity = *it;
 
-        auto intersection = entity.getCollisionBox().isIntersectedByLine(
+        auto intersection = entity.getCollisionObject()->isIntersectedByLine(
             this->camera_.getPosition(), this->camera_.getFront());
 
         if (intersection.has_value())
@@ -241,6 +244,7 @@ void Game::render()
     {
         auto model = glm::identity<glm::mat4>();
         model = glm::translate(model, entity.getCurrentPos());
+        model = glm::scale(model, entity.getSize());
         entityShader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(

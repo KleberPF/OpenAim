@@ -7,36 +7,72 @@
 
 #include <array>
 #include <climits>
+#include <memory>
 #include <optional>
 #include <vector>
 
 using IntersectionResult = std::optional<glm::vec3>;
 
-class CollisionBox
+enum class CollisionObjectType {
+    AABB,
+    SPHERE,
+};
+
+class CollisionObject
 {
 public:
-    CollisionBox(const glm::vec3& pos);
+    CollisionObject(const glm::vec3& pos);
+    virtual ~CollisionObject() = default;
+
+    virtual void move(const glm::vec3& newPos) = 0;
 
     /*
-    * Returns the closest intersection between this collision box and
-    * the line described by eyePos and eyeDir
+    * Returns the closest intersection between this collision object
+    * and the line described by eyePos and eyeDir
     */
-    IntersectionResult isIntersectedByLine(const glm::vec3& eyePos,
-                                           const glm::vec3& eyeDir) const;
+    virtual IntersectionResult isIntersectedByLine(
+        const glm::vec3& eyePos, const glm::vec3& eyeDir) const = 0;
 
-    void move(const glm::vec3& newPos);
+protected:
+    glm::vec3 pos_;
+};
+
+class CollisionBox : public CollisionObject
+{
+public:
+    CollisionBox(const glm::vec3& pos, const glm::vec3& size);
+
+    void move(const glm::vec3& newPos) override;
+
+    IntersectionResult isIntersectedByLine(
+        const glm::vec3& eyePos, const glm::vec3& eyeDir) const override;
 
 private:
     bool isPointInPlaneSection(const glm::vec3& point) const;
 
     std::array<glm::vec3, 2> aabb_;
-    glm::vec3 pos_;
+    glm::vec3 size_;
+};
+
+class CollisionSphere : public CollisionObject
+{
+public:
+    CollisionSphere(const glm::vec3& pos, float radius);
+
+    void move(const glm::vec3& newPos) override;
+
+    IntersectionResult isIntersectedByLine(
+        const glm::vec3& eyePos, const glm::vec3& eyeDir) const override;
+
+private:
+    float radius_;
 };
 
 class Entity
 {
 public:
-    Entity(Model model, glm::vec3 pos, glm::vec4 color);
+    Entity(Model model, const glm::vec3& pos, const glm::vec3& size,
+           const glm::vec4& color);
     virtual ~Entity() = default;
 
     Entity(const Entity& entity) = default;
@@ -51,6 +87,7 @@ public:
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
     const glm::vec4& getColor() const;
+    const glm::vec3& getSize() const;
 
     virtual void onHit()
     {
@@ -63,10 +100,12 @@ public:
     void moveRelative(const glm::vec3& newPos);
     void render(const Shader& shader);
 
-    const CollisionBox& getCollisionBox() const;
+    const CollisionObject* getCollisionObject() const;
+
+    void addCollisionObject(CollisionObjectType type);
 
 protected:
-    CollisionBox collisionBox_;
+    std::unique_ptr<CollisionObject> collisionObject_ = nullptr;
 
     // This holds the actual position the entity is in
     glm::vec3 currentPos_;
@@ -77,5 +116,6 @@ protected:
 
 private:
     Model model_;
+    glm::vec3 size_;
     glm::vec4 color_;
 };

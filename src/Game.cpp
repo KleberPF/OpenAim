@@ -63,9 +63,13 @@ Game::Game()
     this->resourceManager_.getMaterial("checkerboard")
         .addTexture(this->resourceManager_.getTexture("checkerboard"));
 
+    this->resourceManager_.addMaterial("checkerboard_red");
+    this->resourceManager_.getMaterial("checkerboard_red")
+        .addTexture(this->resourceManager_.getTexture("checkerboard_red"));
+
     this->resourceManager_.addModel(
         "cube", "../resources/objects/cube/cube.obj",
-        this->resourceManager_.getMaterial("checkerboard"));
+        this->resourceManager_.getMaterial("checkerboard_red"));
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
         this->resourceManager_.getShader("sprite"));

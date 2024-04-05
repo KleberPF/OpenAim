@@ -50,28 +50,47 @@ Game::Game()
                                      "../resources/shaders/sprite.frag");
     this->resourceManager_.addShader("entity",
                                      "../resources/shaders/model.vert",
-                                     "../resources/shaders/color.frag");
-    this->resourceManager_.addModel("cube",
-                                    "../resources/objects/cube/cube.obj");
-    this->resourceManager_.addModel("ball",
-                                    "../resources/objects/ball/ball.obj");
+                                     "../resources/shaders/model.frag");
+
+    this->resourceManager_.addTexture(
+        "checkerboard", "../resources/textures/checkerboard_red.png",
+        Texture::Type::Diffuse);
+    this->resourceManager_.addTexture(
+        "checkerboard_red", "../resources/textures/checkerboard_red.png",
+        Texture::Type::Diffuse);
+
+    this->resourceManager_.addMaterial("checkerboard");
+    this->resourceManager_.getMaterial("checkerboard")
+        .addTexture(this->resourceManager_.getTexture("checkerboard"));
+
+    this->resourceManager_.addModel(
+        "cube", "../resources/objects/cube/cube.obj",
+        this->resourceManager_.getMaterial("checkerboard"));
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
         this->resourceManager_.getShader("sprite"));
 
-    for (int i = -1; i <= 1; i++)
-    {
-        for (int j = -1; j <= 1; j++)
-        {
-            Entity entity(this->resourceManager_.getModel("ball"),
-                          glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
-                          glm::vec4(0.2, 0.0, 1.0, 1.0));
-            entity.addCollisionObject(CollisionObjectType::SPHERE);
-            entity.destroyable = true;
-            entity.health = 1;
-            this->entities_.push_back(std::move(entity));
-        }
-    }
+    // for (int i = -1; i <= 1; i++)
+    // {
+    //     for (int j = -1; j <= 1; j++)
+    //     {
+    //         Entity entity(this->resourceManager_.getModel("checkers_cube"),
+    //                       glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
+    //                       glm::vec4(0.2, 0.0, 1.0, 1.0));
+    //         entity.addCollisionObject(CollisionObjectType::SPHERE);
+    //         entity.destroyable = true;
+    //         entity.health = 1;
+    //         this->entities_.push_back(std::move(entity));
+    //     }
+    // }
+
+    Entity entity(this->resourceManager_.getModel("cube"),
+                  glm::vec3(0.0f, 0.0f, -15.0f), glm::vec3(0.5f),
+                  glm::vec4(0.2, 0.0, 1.0, 1.0));
+    entity.addCollisionObject(CollisionObjectType::AABB);
+    entity.destroyable = true;
+    entity.health = 1;
+    this->entities_.push_back(std::move(entity));
 
     // crosshair
     // this->sprites_.push_back(

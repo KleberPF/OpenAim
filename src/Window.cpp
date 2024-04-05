@@ -3,6 +3,7 @@
 #include "GLFW/glfw3.h"
 
 #include <glad/glad.h>
+#include <iostream>
 
 static void framebufferSizeCallback(GLFWwindow* /*unused*/, int width,
                                     int height)
@@ -30,6 +31,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
                                   this->title_.c_str(), monitor, nullptr);
     if (this->ptr_ == nullptr)
     {
+        std::cerr << "Error creating GLFW window\n";
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
@@ -38,7 +40,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
     glfwSwapInterval(0);  // turn off vsync
     glfwSetFramebufferSizeCallback(this->ptr_, framebufferSizeCallback);
 
-    glfwSetInputMode(this->ptr_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(this->ptr_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (glfwRawMouseMotionSupported())
     {

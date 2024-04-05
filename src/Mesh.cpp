@@ -1,12 +1,11 @@
 #include "Mesh.hpp"
 
+#include <string>
 #include <utility>
 
-Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices,
-           std::vector<Texture>& textures)
+Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
     : vertices(std::move(vertices))
     , indices(std::move(indices))
-    , textures(std::move(textures))
 {
     glGenVertexArrays(1, &this->vao);
     glGenBuffers(1, &this->vbo);
@@ -51,39 +50,8 @@ Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices,
     glBindVertexArray(0);
 }
 
-void Mesh::render(const Shader& shader)
+void Mesh::render() const
 {
-    // bind appropriate textures
-    unsigned int diffuseNr = 1;
-    unsigned int specularNr = 1;
-    unsigned int normalNr = 1;
-    unsigned int heightNr = 1;
-    for (unsigned int i = 0; i < this->textures.size(); i++)
-    {
-        glActiveTexture(GL_TEXTURE0 + i);
-        std::string number;
-        std::string name = this->textures[i].type;
-        if (name == "textureDiffuse")
-        {
-            number = std::to_string(diffuseNr++);
-        }
-        else if (name == "textureSpecular")
-        {
-            number = std::to_string(specularNr++);
-        }
-        else if (name == "textureNormal")
-        {
-            number = std::to_string(normalNr++);
-        }
-        else if (name == "textureHeight")
-        {
-            number = std::to_string(heightNr++);
-        }
-
-        shader.setInt(name + number, i);
-        glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
-    }
-
     glBindVertexArray(this->vao);
     glDrawElements(GL_TRIANGLES, static_cast<GLuint>(this->indices.size()),
                    GL_UNSIGNED_INT, nullptr);

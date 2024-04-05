@@ -22,24 +22,16 @@ struct Vertex {
     std::array<float, MAX_BONE_INFLUENCE> weights;
 };
 
-struct Texture {
-    GLuint id;
-    std::string type;
-    std::string path;
-};
-
 class Mesh
 {
 public:
     std::vector<Vertex> vertices;
     std::vector<GLuint> indices;
-    std::vector<Texture> textures;
     GLuint vao;
 
-    Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices,
-         std::vector<Texture>& textures);
+    Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices);
 
-    void render(const Shader& shader);
+    void render() const;
 
 private:
     GLuint vbo, ebo;

@@ -17,12 +17,12 @@ public:
 private:
     // clang-format off
     std::array<float, 18> vertices_ = {
-        0.0, 1.0,
-        1.0, 0.0,
         0.0, 0.0,
-        0.0, 1.0,
-        1.0, 1.0,
         1.0, 0.0,
+        0.0, 1.0,
+        1.0, 0.0,
+        1.0, 1.0,
+        0.0, 1.0,
     };
     // clang-format on
     Shader shader_;

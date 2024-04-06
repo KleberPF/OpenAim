@@ -31,6 +31,7 @@ Game::Game()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
@@ -48,53 +49,71 @@ Game::Game()
     this->resourceManager_.addShader("sprite",
                                      "../resources/shaders/sprite.vert",
                                      "../resources/shaders/sprite.frag");
-    this->resourceManager_.addShader("entity",
+    this->resourceManager_.addShader("textured",
                                      "../resources/shaders/model.vert",
                                      "../resources/shaders/model.frag");
+    this->resourceManager_.addShader("targets",
+                                     "../resources/shaders/model.vert",
+                                     "../resources/shaders/color.frag");
 
+    this->resourceManager_.addTexture("checkerboard",
+                                      "../resources/textures/checkerboard.png",
+                                      Texture::Type::Diffuse);
     this->resourceManager_.addTexture(
-        "checkerboard", "../resources/textures/checkerboard_red.png",
-        Texture::Type::Diffuse);
-    this->resourceManager_.addTexture(
-        "checkerboard_red", "../resources/textures/checkerboard_red.png",
-        Texture::Type::Diffuse);
+        "tiles", "../resources/textures/tiles.jpg", Texture::Type::Diffuse);
 
     this->resourceManager_.addMaterial("checkerboard");
     this->resourceManager_.getMaterial("checkerboard")
         .addTexture(this->resourceManager_.getTexture("checkerboard"));
 
-    this->resourceManager_.addMaterial("checkerboard_red");
-    this->resourceManager_.getMaterial("checkerboard_red")
-        .addTexture(this->resourceManager_.getTexture("checkerboard_red"));
+    this->resourceManager_.addMaterial("tiles");
+    this->resourceManager_.getMaterial("tiles").addTexture(
+        this->resourceManager_.getTexture("tiles"));
 
     this->resourceManager_.addModel(
         "cube", "../resources/objects/cube/cube.obj",
-        this->resourceManager_.getMaterial("checkerboard_red"));
+        this->resourceManager_.getMaterial("checkerboard"),
+        this->resourceManager_.getShader("targets"));
+    this->resourceManager_.addModel(
+        "ball", "../resources/objects/ball/ball.obj",
+        this->resourceManager_.getMaterial("checkerboard"),
+        this->resourceManager_.getShader("targets"));
+    this->resourceManager_.addModel(
+        "plane", "../resources/objects/plane/plane.obj",
+        this->resourceManager_.getMaterial("tiles"),
+        this->resourceManager_.getShader("textured"));
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
         this->resourceManager_.getShader("sprite"));
 
-    // for (int i = -1; i <= 1; i++)
-    // {
-    //     for (int j = -1; j <= 1; j++)
-    //     {
-    //         Entity entity(this->resourceManager_.getModel("checkers_cube"),
-    //                       glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
-    //                       glm::vec4(0.2, 0.0, 1.0, 1.0));
-    //         entity.addCollisionObject(CollisionObjectType::SPHERE);
-    //         entity.destroyable = true;
-    //         entity.health = 1;
-    //         this->entities_.push_back(std::move(entity));
-    //     }
-    // }
+    for (int i = -1; i <= 1; i++)
+    {
+        for (int j = -1; j <= 1; j++)
+        {
+            Entity entity(this->resourceManager_.getModel("ball"),
+                          glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
+                          glm::vec4(0.2, 0.0, 1.0, 1.0));
+            entity.addCollisionObject(CollisionObjectType::SPHERE);
+            entity.destroyable = true;
+            entity.health = 1;
+            this->entities_.push_back(std::move(entity));
+        }
+    }
 
-    Entity entity(this->resourceManager_.getModel("cube"),
-                  glm::vec3(0.0f, 0.0f, -15.0f), glm::vec3(0.5f),
-                  glm::vec4(0.2, 0.0, 1.0, 1.0));
-    entity.addCollisionObject(CollisionObjectType::AABB);
-    entity.destroyable = true;
-    entity.health = 1;
-    this->entities_.push_back(std::move(entity));
+    // Entity entity(this->resourceManager_.getModel("cube"),
+    //               glm::vec3(0.0f, 0.0f, -15.0f), glm::vec3(0.5f),
+    //               glm::vec4(0.2, 0.0, 1.0, 1.0));
+    // entity.addCollisionObject(CollisionObjectType::AABB);
+    // entity.destroyable = true;
+    // entity.health = 1;
+    // this->entities_.push_back(std::move(entity));
+
+    Entity plane(this->resourceManager_.getModel("plane"),
+                 glm::vec3(0.0f, 0.0f, -20.0f), glm::vec3(10.0f),
+                 glm::vec4(0.2, 0.0, 1.0, 1.0));
+    plane.addCollisionObject(CollisionObjectType::AABB);
+    plane.destroyable = false;
+    this->entities_.push_back(std::move(plane));
 
     // crosshair
     // this->sprites_.push_back(
@@ -257,28 +276,30 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    const Shader& entityShader = this->resourceManager_.getShader("entity");
-    entityShader.use();
-
     glm::mat4 view = this->camera_.getViewMatrix();
-    entityShader.setMat4("view", view);
 
     for (auto& entity : this->entities_)
     {
+        const Shader& shader = entity.getShader();
+        shader.use();
+        shader.setFloat("textureScale", 16);
+
+        shader.setMat4("view", view);
+
         auto model = glm::identity<glm::mat4>();
         model = glm::translate(model, entity.getCurrentPos());
         model = glm::scale(model, entity.getSize());
-        entityShader.setMat4("model", model);
+        shader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
             glm::radians(this->camera_.getZoom()),
             (float)this->window_.getWidth() / this->window_.getHeight(), 0.1F,
             100.0F);
-        entityShader.setMat4("projection", projection);
+        shader.setMat4("projection", projection);
 
-        entityShader.setVec4("color", entity.getColor());
+        shader.setVec4("color", entity.getColor());
 
-        entity.render(entityShader);
+        entity.render(shader);
     }
 
     const Shader& spriteShader = this->resourceManager_.getShader("sprite");

@@ -15,7 +15,8 @@
 class Model
 {
 public:
-    Model(const std::string& path, const Material& material);
+    Model(const std::string& path, const Material& material,
+          const Shader& shader);
 
     void render(const Shader& shader);
 
@@ -25,9 +26,13 @@ public:
 
     void setMaterial(const Material& material);
 
+    const Shader& getShader() const;
+    void setShader(const Shader& shader);
+
 private:
     void processNode(aiNode* node, const aiScene* scene);
     static Mesh processMesh(aiMesh* mesh);
 
     std::reference_wrapper<const Material> material_;
+    std::reference_wrapper<const Shader> shader_;
 };

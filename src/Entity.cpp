@@ -139,6 +139,11 @@ const glm::vec3& Entity::getSize() const
     return this->size_;
 }
 
+const Shader& Entity::getShader() const
+{
+    return this->model_.getShader();
+}
+
 void Entity::move(const glm::vec3& newPos)
 {
     this->currentPos_ = newPos;

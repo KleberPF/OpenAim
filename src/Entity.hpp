@@ -75,8 +75,8 @@ public:
            const glm::vec4& color);
     virtual ~Entity() = default;
 
-    Entity(const Entity& entity) = default;
-    Entity& operator=(const Entity& entity) = default;
+    Entity(const Entity& entity) = delete;
+    Entity& operator=(const Entity& entity) = delete;
 
     Entity(Entity&& entity) = default;
     Entity& operator=(Entity&& entity) = default;
@@ -88,6 +88,7 @@ public:
     const glm::vec3& getCurrentPos() const;
     const glm::vec4& getColor() const;
     const glm::vec3& getSize() const;
+    const Shader& getShader() const;
 
     virtual void onHit()
     {

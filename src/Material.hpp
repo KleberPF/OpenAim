@@ -31,9 +31,9 @@ private:
 class Material
 {
 public:
-    std::vector<std::reference_wrapper<const Texture>> textures;
-
     void addTexture(const Texture& texture);
-
     void bind(const Shader& shader) const;
+
+private:
+    std::vector<std::reference_wrapper<const Texture>> textures_;
 };

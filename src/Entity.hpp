@@ -18,6 +18,22 @@ enum class CollisionObjectType {
     SPHERE,
 };
 
+struct Rotation {
+    Rotation()
+        : axis(glm::vec3(0.0f, 1.0f, 0.0f))
+    {
+    }
+
+    Rotation(float _angle, const glm::vec3& _axis)
+        : angle(_angle)
+        , axis(_axis)
+    {
+    }
+
+    float angle = 0.0f;
+    glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f);
+};
+
 class CollisionObject
 {
 public:
@@ -30,8 +46,14 @@ public:
     * Returns the closest intersection between this collision object
     * and the line described by eyePos and eyeDir
     */
-    virtual IntersectionResult isIntersectedByLine(
-        const glm::vec3& eyePos, const glm::vec3& eyeDir) const = 0;
+    virtual IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
+                                                   glm::vec3 eyeDir) const = 0;
+
+    // As the name suggests, AABBs are axis aligned. Because the collision
+    // object is invisible anyways, we aren't actually going to rotate it.
+    // Instead, we rotate the eyePos and eyeDir when calculating the
+    // intersection.
+    Rotation rotation;
 
 protected:
     glm::vec3 pos_;
@@ -44,8 +66,8 @@ public:
 
     void move(const glm::vec3& newPos) override;
 
-    IntersectionResult isIntersectedByLine(
-        const glm::vec3& eyePos, const glm::vec3& eyeDir) const override;
+    IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
+                                           glm::vec3 eyeDir) const override;
 
 private:
     bool isPointInPlaneSection(const glm::vec3& point) const;
@@ -61,8 +83,8 @@ public:
 
     void move(const glm::vec3& newPos) override;
 
-    IntersectionResult isIntersectedByLine(
-        const glm::vec3& eyePos, const glm::vec3& eyeDir) const override;
+    IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
+                                           glm::vec3 eyeDir) const override;
 
 private:
     float radius_;
@@ -71,8 +93,7 @@ private:
 class Entity
 {
 public:
-    Entity(Model model, const glm::vec3& pos, const glm::vec3& size,
-           const glm::vec4& color);
+    Entity(Model model, const glm::vec3& pos);
     virtual ~Entity() = default;
 
     Entity(const Entity& entity) = delete;
@@ -83,17 +104,19 @@ public:
 
     bool destroyable = false;
     int health = INT_MAX;
+    glm::vec3 size = glm::vec3(1.0f);
+    glm::vec3 color = glm::vec3(0.0f);
 
+    const Rotation& getRotation() const;
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
-    const glm::vec4& getColor() const;
-    const glm::vec3& getSize() const;
     const Shader& getShader() const;
 
     virtual void onHit()
     {
     }
 
+    void rotate(float angle, const glm::vec3& axis);
     void move(const glm::vec3& newPos);
     void moveReferential(const glm::vec3& newPos);
     // Moves relative to the referential
@@ -105,8 +128,10 @@ public:
 
     void addCollisionObject(CollisionObjectType type);
 
-protected:
+private:
     std::unique_ptr<CollisionObject> collisionObject_ = nullptr;
+
+    Rotation rotation_;
 
     // This holds the actual position the entity is in
     glm::vec3 currentPos_;
@@ -115,8 +140,5 @@ protected:
     // oscilating around
     glm::vec3 referentialPos_;
 
-private:
     Model model_;
-    glm::vec3 size_;
-    glm::vec4 color_;
 };

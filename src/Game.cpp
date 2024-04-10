@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "glm/fwd.hpp"
 #include "InputManager.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
@@ -16,12 +17,13 @@
 
 #include <cstdlib>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <optional>
 
 Game::Game()
     : window_(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
-    , camera_({0.0, 1.5, 1.0}, {0.0, 1.0, 0.0}, -90.0, 0.0)
+    , camera_({0.0f, 0.0f, 0.0f}, {0.0, 1.0, 0.0}, -90.0, 0.0)
     , inputManager_(window_)
     , lastX_((float)this->window_.getWidth() / 2)
     , lastY_((float)this->window_.getHeight() / 2)
@@ -60,15 +62,15 @@ Game::Game()
                                       "../resources/textures/checkerboard.png",
                                       Texture::Type::Diffuse);
     this->resourceManager_.addTexture(
-        "tiles", "../resources/textures/tiles.jpg", Texture::Type::Diffuse);
+        "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
 
     this->resourceManager_.addMaterial("checkerboard");
     this->resourceManager_.getMaterial("checkerboard")
         .addTexture(this->resourceManager_.getTexture("checkerboard"));
 
-    this->resourceManager_.addMaterial("tiles");
-    this->resourceManager_.getMaterial("tiles").addTexture(
-        this->resourceManager_.getTexture("tiles"));
+    this->resourceManager_.addMaterial("bricks");
+    this->resourceManager_.getMaterial("bricks").addTexture(
+        this->resourceManager_.getTexture("bricks"));
 
     this->resourceManager_.addModel(
         "cube", "../resources/objects/cube/cube.obj",
@@ -80,7 +82,7 @@ Game::Game()
         this->resourceManager_.getShader("targets"));
     this->resourceManager_.addModel(
         "plane", "../resources/objects/plane/plane.obj",
-        this->resourceManager_.getMaterial("tiles"),
+        this->resourceManager_.getMaterial("bricks"),
         this->resourceManager_.getShader("textured"));
 
     this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
@@ -91,8 +93,10 @@ Game::Game()
         for (int j = -1; j <= 1; j++)
         {
             Entity entity(this->resourceManager_.getModel("ball"),
-                          glm::vec3(2 * i, 2 * j, -15.0), glm::vec3(0.5f),
-                          glm::vec4(0.2, 0.0, 1.0, 1.0));
+                          glm::vec3(2.0f * i, 2.0f * j, -18.0f));
+            entity.size = glm::vec3(0.5f);
+            entity.color = glm::vec3(0.125f, 0.55f, 0.9f);
+            entity.rotate(30.0f, glm::vec3(0.0f, 1.0f, 0.0f));
             entity.addCollisionObject(CollisionObjectType::SPHERE);
             entity.destroyable = true;
             entity.health = 1;
@@ -101,24 +105,40 @@ Game::Game()
     }
 
     // Entity entity(this->resourceManager_.getModel("cube"),
-    //               glm::vec3(0.0f, 0.0f, -15.0f), glm::vec3(0.5f),
-    //               glm::vec4(0.2, 0.0, 1.0, 1.0));
+    //               glm::vec3(2.0f, 0.0f, 2.0f));
+    // entity.size = glm::vec3(0.5f);
+    // entity.color = glm::vec3(0.125f, 0.55f, 0.9f);
+    // entity.rotate(45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
     // entity.addCollisionObject(CollisionObjectType::AABB);
     // entity.destroyable = true;
     // entity.health = 1;
     // this->entities_.push_back(std::move(entity));
 
     Entity plane(this->resourceManager_.getModel("plane"),
-                 glm::vec3(0.0f, 0.0f, -20.0f), glm::vec3(10.0f),
-                 glm::vec4(0.2, 0.0, 1.0, 1.0));
+                 glm::vec3(0.0f, 0.0f, -20.0f));
+    plane.size = glm::vec3(10.0f, 10.f, 1.0f);
+    plane.color = glm::vec3(1.0f, 0.0, 0.0f);
     plane.addCollisionObject(CollisionObjectType::AABB);
     plane.destroyable = false;
     this->entities_.push_back(std::move(plane));
 
-    // crosshair
-    // this->sprites_.push_back(
-    //     std::make_unique<Sprite>(SQUARE, std::nullopt, glm::vec3(0.0, 0.0, 1.0),
-    //                              glm::vec4(0.0, 1.0, 0.0, 1.0)));
+    Entity plane2(this->resourceManager_.getModel("plane"),
+                  glm::vec3(-10.0f, 0.0f, -10.0f));
+    plane2.size = glm::vec3(10.0f, 10.f, 1.0f);
+    plane2.color = glm::vec3(1.0f, 0.0, 0.0f);
+    plane2.rotate(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    plane2.addCollisionObject(CollisionObjectType::AABB);
+    plane2.destroyable = false;
+    this->entities_.push_back(std::move(plane2));
+
+    Entity plane3(this->resourceManager_.getModel("plane"),
+                  glm::vec3(10.0f, 0.0f, -10.0f));
+    plane3.size = glm::vec3(10.0f, 10.f, 1.0f);
+    plane3.color = glm::vec3(1.0f, 0.0, 0.0f);
+    plane3.rotate(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+    plane3.addCollisionObject(CollisionObjectType::AABB);
+    plane3.destroyable = false;
+    this->entities_.push_back(std::move(plane3));
 }
 
 void Game::mainLoop()
@@ -286,9 +306,16 @@ void Game::render()
 
         shader.setMat4("view", view);
 
+        // translation
         auto model = glm::identity<glm::mat4>();
         model = glm::translate(model, entity.getCurrentPos());
-        model = glm::scale(model, entity.getSize());
+
+        // rotation
+        model = glm::rotate(model, glm::radians(entity.getRotation().angle),
+                            entity.getRotation().axis);
+
+        // scaling
+        model = glm::scale(model, entity.size);
         shader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
@@ -297,7 +324,7 @@ void Game::render()
             100.0F);
         shader.setMat4("projection", projection);
 
-        shader.setVec4("color", entity.getColor());
+        shader.setVec3("color", entity.color);
 
         entity.render(shader);
     }

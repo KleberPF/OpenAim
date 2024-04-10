@@ -2,6 +2,8 @@
 
 #include "glm/ext/matrix_transform.hpp"
 
+#include <iostream>
+
 Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
                float pitch)
     : position_(position)

@@ -34,8 +34,8 @@ Texture::Texture(const std::string& path, Texture::Type type)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
-                    GL_LINEAR_MIPMAP_NEAREST);
+    // glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER,
+    //                 GL_LINEAR_MIPMAP_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
@@ -51,7 +51,7 @@ Texture::Type Texture::getType() const
 
 void Material::addTexture(const Texture& texture)
 {
-    this->textures.emplace_back(texture);
+    this->textures_.emplace_back(texture);
 }
 
 void Material::bind(const Shader& shader) const
@@ -72,9 +72,9 @@ void Material::bind(const Shader& shader) const
         }
     };
 
-    for (size_t i = 0; i < this->textures.size(); i++)
+    for (size_t i = 0; i < this->textures_.size(); i++)
     {
-        const Texture& texture = this->textures[i];
+        const Texture& texture = this->textures_[i];
         glActiveTexture(GL_TEXTURE0 + i);
 
         shader.setInt(textureTypeToStr(texture.getType()), i);

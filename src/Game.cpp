@@ -92,12 +92,12 @@ Game::Game()
     {
         for (int j = -1; j <= 1; j++)
         {
-            Entity entity(this->resourceManager_.getModel("ball"),
+            Entity entity(this->resourceManager_.getModel("cube"),
                           glm::vec3(2.0f * i, 2.0f * j, -18.0f));
             entity.size = glm::vec3(0.5f);
             entity.color = glm::vec3(0.125f, 0.55f, 0.9f);
             entity.rotate(30.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-            entity.addCollisionObject(CollisionObjectType::SPHERE);
+            entity.addCollisionObject(CollisionObjectType::AABB);
             entity.destroyable = true;
             entity.health = 1;
             this->entities_.push_back(std::move(entity));

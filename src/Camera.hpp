@@ -36,7 +36,7 @@ private:
     float pitch_;
 
     // options
-    float movementSpeed_ = 2.5;
+    float movementSpeed_ = 8.0f;
     float mouseSensitivity_ = 0.03;
     float zoom_ = 45.0;
 

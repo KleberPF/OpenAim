@@ -33,21 +33,19 @@ IntersectionResult CollisionBox::isIntersectedByLine(glm::vec3 eyePos,
 
     if (this->rotation.angle != 0.0f)
     {
-        auto transform = glm::identity<glm::mat4>();
-        transform = glm::translate(transform, this->pos_);
-        transform = glm::rotate(transform, glm::radians(-this->rotation.angle),
-                                this->rotation.axis);
-        transform = glm::translate(transform, -this->pos_);
-
-        glm::vec3 eyeDirEndpoint = eyePos + eyeDir;
+        glm::mat4 moveToOrigin =
+            glm::translate(glm::identity<glm::mat4>(), -this->pos_);
+        glm::mat4 rotateEye = glm::rotate(glm::identity<glm::mat4>(),
+                                          glm::radians(-this->rotation.angle),
+                                          this->rotation.axis);
+        glm::mat4 moveBack =
+            glm::translate(glm::identity<glm::mat4>(), this->pos_);
 
         auto tmp = glm::vec4(eyePos, 1.0f);
-        eyePos = glm::vec3(transform * tmp);
+        eyePos = glm::vec3(moveBack * rotateEye * moveToOrigin * tmp);
 
-        tmp = glm::vec4(eyeDirEndpoint, 1.0f);
-        eyeDirEndpoint = glm::vec3(transform * tmp);
-
-        eyeDir = eyeDirEndpoint - eyePos;
+        tmp = glm::vec4(eyeDir, 1.0f);
+        eyeDir = glm::vec3(rotateEye * tmp);
     }
 
     for (const auto& vertex : this->aabb_)

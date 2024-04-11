@@ -107,9 +107,8 @@ void CollisionSphere::move(const glm::vec3& newPos)
 IntersectionResult CollisionSphere::isIntersectedByLine(glm::vec3 eyePos,
                                                         glm::vec3 eyeDir) const
 {
-    glm::vec3 eyeDirNorm = glm::normalize(eyeDir);
     float delta =
-        pow(glm::dot(eyeDirNorm, eyePos - this->pos_), 2) -
+        pow(glm::dot(eyeDir, eyePos - this->pos_), 2) -
         (pow(glm::length(eyePos - this->pos_), 2) - pow(this->radius_, 2));
 
     if (delta < 0)
@@ -117,7 +116,7 @@ IntersectionResult CollisionSphere::isIntersectedByLine(glm::vec3 eyePos,
         return std::nullopt;
     }
 
-    float d = -(glm::dot(eyeDirNorm, eyePos - this->pos_)) - std::sqrt(delta);
+    float d = -(glm::dot(eyeDir, eyePos - this->pos_)) - std::sqrt(delta);
 
     if (d > 0)
     {

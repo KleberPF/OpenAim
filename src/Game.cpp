@@ -316,13 +316,14 @@ void Game::render()
 
         // scaling
         model = glm::scale(model, entity.size);
-        shader.setMat4("model", model);
 
         glm::mat4 projection = glm::perspective(
             glm::radians(this->camera_.getZoom()),
             (float)this->window_.getWidth() / this->window_.getHeight(), 0.1F,
             100.0F);
-        shader.setMat4("projection", projection);
+
+        glm::mat4 mvp = projection * view * model;
+        shader.setMat4("mvp", mvp);
 
         shader.setVec3("color", entity.color);
 

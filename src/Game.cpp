@@ -179,21 +179,10 @@ void Game::processInput()
     this->lastX_ = xpos;
     this->lastY_ = ypos;
 
-    if (!this->paused_)
-    {
-        this->updateEntities();
-    }
-
-    // camera mouse processing
-    if (!this->paused_)
-    {
-        this->camera_.processMouseMovement(xoffset, yoffset);
-    }
-
-    // generic processing
     if (this->inputManager_.isKeyToggled(GLFW_KEY_ESCAPE))
     {
         glfwSetWindowShouldClose(this->window_.getPtr(), true);
+        return;
     }
 
     if (this->inputManager_.isKeyToggled(GLFW_KEY_SPACE))
@@ -201,36 +190,40 @@ void Game::processInput()
         this->paused_ = !this->paused_;
     }
 
-    if (this->paused_)
+    if (!this->paused_)
     {
+        this->updateEntities();
+        this->camera_.processMouseMovement(xoffset, yoffset);
         glfwSetInputMode(this->window_.getPtr(), GLFW_CURSOR,
-                         GLFW_CURSOR_NORMAL);
+                         GLFW_CURSOR_DISABLED);
+
+        // camera keyboard processing
+        // uncomment this to allow flying around
+        if (this->inputManager_.isKeyPressed(GLFW_KEY_W))
+        {
+            this->camera_.processKeyboard(CameraMovement::FORWARD,
+                                          this->deltaTime_);
+        }
+        if (this->inputManager_.isKeyPressed(GLFW_KEY_S))
+        {
+            this->camera_.processKeyboard(CameraMovement::BACKWARD,
+                                          this->deltaTime_);
+        }
+        if (this->inputManager_.isKeyPressed(GLFW_KEY_A))
+        {
+            this->camera_.processKeyboard(CameraMovement::LEFT,
+                                          this->deltaTime_);
+        }
+        if (this->inputManager_.isKeyPressed(GLFW_KEY_D))
+        {
+            this->camera_.processKeyboard(CameraMovement::RIGHT,
+                                          this->deltaTime_);
+        }
     }
     else
     {
         glfwSetInputMode(this->window_.getPtr(), GLFW_CURSOR,
-                         GLFW_CURSOR_DISABLED);
-    }
-
-    // camera keyboard processing
-    // uncomment this to allow flying around
-    if (this->inputManager_.isKeyPressed(GLFW_KEY_W))
-    {
-        this->camera_.processKeyboard(CameraMovement::FORWARD,
-                                      this->deltaTime_);
-    }
-    if (this->inputManager_.isKeyPressed(GLFW_KEY_S))
-    {
-        this->camera_.processKeyboard(CameraMovement::BACKWARD,
-                                      this->deltaTime_);
-    }
-    if (this->inputManager_.isKeyPressed(GLFW_KEY_A))
-    {
-        this->camera_.processKeyboard(CameraMovement::LEFT, this->deltaTime_);
-    }
-    if (this->inputManager_.isKeyPressed(GLFW_KEY_D))
-    {
-        this->camera_.processKeyboard(CameraMovement::RIGHT, this->deltaTime_);
+                         GLFW_CURSOR_NORMAL);
     }
 
     this->inputManager_.consolidateKeyStates();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Model.hpp"
+#include "Renderer.hpp"
 #include "Shader.hpp"
 
 #include <glm/glm.hpp>
@@ -122,11 +123,12 @@ public:
     // Moves relative to the referential
     // Position after this should be referentialPos_ + newPos
     void moveRelative(const glm::vec3& newPos);
-    void render(const Shader& shader);
 
     const CollisionObject* getCollisionObject() const;
 
     void addCollisionObject(CollisionObjectType type);
+
+    friend class Renderer;
 
 private:
     std::unique_ptr<CollisionObject> collisionObject_ = nullptr;

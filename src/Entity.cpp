@@ -182,11 +182,6 @@ void Entity::moveRelative(const glm::vec3& newPos)
     this->move(this->referentialPos_ + newPos);
 }
 
-void Entity::render(const Shader& shader)
-{
-    this->model_.render(shader);
-}
-
 const CollisionObject* Entity::getCollisionObject() const
 {
     return this->collisionObject_.get();

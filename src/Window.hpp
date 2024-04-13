@@ -13,15 +13,13 @@ public:
     bool shouldClose();
     void swapBuffers();
 
-    int getWidth() const;
-    int getHeight() const;
-
     GLFWwindow* getPtr() const;
+
+    int width;
+    int height;
 
 private:
     GLFWwindow* ptr_;
     std::string title_;
-    int width_;
-    int height_;
     bool fullscreen_;
 };

@@ -18,12 +18,13 @@ public:
     Model(const std::string& path, const Material& material,
           const Shader& shader);
 
-    void render(const Shader& shader);
+    void render() const;
 
     std::vector<Mesh> meshes;
     std::string directory;
     bool gammaCorrection;
 
+    const Material& getMaterial() const;
     void setMaterial(const Material& material);
 
     const Shader& getShader() const;

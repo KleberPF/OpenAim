@@ -14,7 +14,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
     this->updateVectors();
 }
 
-glm::mat4 Camera::getViewMatrix()
+glm::mat4 Camera::getViewMatrix() const
 {
     return glm::lookAt(this->position_, this->position_ + this->front_,
                        this->up_);

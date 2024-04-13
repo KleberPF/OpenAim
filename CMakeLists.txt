@@ -17,7 +17,7 @@ set(SOURCES
     src/Mesh.cpp
     src/Model.cpp
     src/stb_image.c
-    src/SpriteRenderer.cpp
+    src/Renderer.cpp
     src/ResourceManager.cpp
     src/InputManager.cpp
     src/Material.cpp

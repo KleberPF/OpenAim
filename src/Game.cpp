@@ -25,8 +25,8 @@ Game::Game()
     : window_(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
     , camera_({0.0f, 0.0f, 0.0f}, {0.0, 1.0, 0.0}, -90.0, 0.0)
     , inputManager_(window_)
-    , lastX_((float)this->window_.getWidth() / 2)
-    , lastY_((float)this->window_.getHeight() / 2)
+    , lastX_((float)this->window_.width / 2)
+    , lastY_((float)this->window_.height / 2)
 {
     // opengl initialization
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -85,8 +85,9 @@ Game::Game()
         this->resourceManager_.getMaterial("bricks"),
         this->resourceManager_.getShader("textured"));
 
-    this->spriteRenderer_ = std::make_unique<SpriteRenderer>(
-        this->resourceManager_.getShader("sprite"));
+    this->Renderer_ =
+        std::make_unique<Renderer>(this->window_, this->camera_,
+                                   this->resourceManager_.getShader("sprite"));
 
     for (int i = -1; i <= 1; i++)
     {
@@ -296,50 +297,12 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glm::mat4 view = this->camera_.getViewMatrix();
-
     for (auto& entity : this->entities_)
     {
-        const Shader& shader = entity.getShader();
-        shader.use();
-        shader.setFloat("textureScale", 16);
-
-        shader.setMat4("view", view);
-
-        // translation
-        auto model = glm::identity<glm::mat4>();
-        model = glm::translate(model, entity.getCurrentPos());
-
-        // rotation
-        model = glm::rotate(model, glm::radians(entity.getRotation().angle),
-                            entity.getRotation().axis);
-
-        // scaling
-        model = glm::scale(model, entity.size);
-
-        glm::mat4 projection = glm::perspective(
-            glm::radians(this->camera_.getZoom()),
-            (float)this->window_.getWidth() / this->window_.getHeight(), 0.1F,
-            100.0F);
-
-        glm::mat4 mvp = projection * view * model;
-        shader.setMat4("mvp", mvp);
-
-        shader.setVec3("color", entity.color);
-
-        entity.render(shader);
+        this->Renderer_->renderEntity(entity);
     }
 
-    const Shader& spriteShader = this->resourceManager_.getShader("sprite");
-    spriteShader.use();
-
-    glm::mat4 projection = glm::ortho(
-        -this->window_.getWidth() / 2.0f, this->window_.getWidth() / 2.0f,
-        -this->window_.getHeight() / 2.0f, this->window_.getHeight() / 2.0f,
-        -1.0f, 1.0f);
-    spriteShader.setMat4("projection", projection);
-
-    this->spriteRenderer_->render(
+    this->Renderer_->renderSprite(
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, CROSSHAIR_SIZE_PX / 2), 0.0f,
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec3(0.0f, 1.0f, 0.0f));
@@ -356,28 +319,6 @@ void Game::render()
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
-
-    // for (auto& sprite : this->sprites_)
-    // {
-    //     sprite->getShader().use();
-
-    //     glm::mat4 model =
-    //         glm::scale(glm::identity<glm::mat4>(), {0.015, 0.015, 1.0});
-    //     sprite->getShader().setMat4("model", model);
-
-    //     float aspectRatio =
-    //         (float)this->window_.getWidth() / this->window_.getHeight();
-    //     glm::mat4 projection =
-    //         glm::ortho(-aspectRatio, aspectRatio, -1.0F, 1.0F);
-    //     sprite->getShader().setMat4("projection", projection);
-
-    //     auto view = glm::identity<glm::mat4>();
-    //     sprite->getShader().setMat4("view", view);
-
-    //     sprite->getShader().setVec4("color", sprite->getColor());
-
-    //     sprite->render();
-    // }
 }
 
 void Game::updateGlfw()

@@ -28,13 +28,17 @@ Model::Model(const std::string& path, const Material& material,
     this->processNode(scene->mRootNode, scene);
 }
 
-void Model::render(const Shader& shader)
+void Model::render() const
 {
-    this->material_.get().bind(shader);
-    for (auto& mesh : this->meshes)
+    for (const auto& mesh : this->meshes)
     {
         mesh.render();
     }
+}
+
+const Material& Model::getMaterial() const
+{
+    return this->material_;
 }
 
 void Model::setMaterial(const Material& material)

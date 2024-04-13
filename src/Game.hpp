@@ -3,8 +3,8 @@
 #include "Camera.hpp"
 #include "Entity.hpp"
 #include "InputManager.hpp"
+#include "Renderer.hpp"
 #include "ResourceManager.hpp"
-#include "SpriteRenderer.hpp"
 #include "Window.hpp"
 
 #include <memory>
@@ -34,7 +34,7 @@ private:
     Camera camera_;
     std::vector<Entity> entities_;
     // std::vector<std::unique_ptr<Sprite>> sprites_;
-    std::unique_ptr<SpriteRenderer> spriteRenderer_;
+    std::unique_ptr<Renderer> Renderer_;
     ResourceManager resourceManager_;
     InputManager inputManager_;
 

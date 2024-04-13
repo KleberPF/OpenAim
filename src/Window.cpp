@@ -3,18 +3,21 @@
 #include "GLFW/glfw3.h"
 
 #include <glad/glad.h>
+
 #include <iostream>
 
-static void framebufferSizeCallback(GLFWwindow* /*unused*/, int width,
-                                    int height)
+static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
+    auto* windowObj = static_cast<Window*>(glfwGetWindowUserPointer(window));
+    windowObj->width = width;
+    windowObj->height = height;
 }
 
 Window::Window(int width, int height, std::string title, bool fullscreen)
-    : title_(std::move(title))
-    , width_(width)
-    , height_(height)
+    : width(width)
+    , height(height)
+    , title_(std::move(title))
     , fullscreen_(fullscreen)
 {
     glfwInit();
@@ -27,7 +30,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 #endif
 
     GLFWmonitor* monitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    this->ptr_ = glfwCreateWindow(this->width_, this->height_,
+    this->ptr_ = glfwCreateWindow(this->width, this->height,
                                   this->title_.c_str(), monitor, nullptr);
     if (this->ptr_ == nullptr)
     {
@@ -38,6 +41,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 
     glfwMakeContextCurrent(this->ptr_);
     glfwSwapInterval(0);  // turn off vsync
+    glfwSetWindowUserPointer(this->ptr_, this);
     glfwSetFramebufferSizeCallback(this->ptr_, framebufferSizeCallback);
 
     // glfwSetInputMode(this->ptr_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -62,16 +66,6 @@ bool Window::shouldClose()
 void Window::swapBuffers()
 {
     glfwSwapBuffers(this->ptr_);
-}
-
-int Window::getWidth() const
-{
-    return this->width_;
-}
-
-int Window::getHeight() const
-{
-    return this->height_;
 }
 
 GLFWwindow* Window::getPtr() const

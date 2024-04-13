@@ -12,17 +12,12 @@
 #include <string>
 #include <vector>
 
-class Model
-{
+class Model {
 public:
     Model(const std::string& path, const Material& material,
-          const Shader& shader);
+        const Shader& shader);
 
     void render() const;
-
-    std::vector<Mesh> meshes;
-    std::string directory;
-    bool gammaCorrection;
 
     const Material& getMaterial() const;
     void setMaterial(const Material& material);
@@ -34,6 +29,10 @@ private:
     void processNode(aiNode* node, const aiScene* scene);
     static Mesh processMesh(aiMesh* mesh);
 
-    std::reference_wrapper<const Material> material_;
-    std::reference_wrapper<const Shader> shader_;
+    std::vector<Mesh> m_meshes;
+    std::string m_directory;
+    bool m_gammaCorrection;
+
+    std::reference_wrapper<const Material> m_material;
+    std::reference_wrapper<const Shader> m_shader;
 };

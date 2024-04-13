@@ -4,51 +4,48 @@
 
 #include <iostream>
 
-std::vector<InputManager*> InputManager::instances_;
+std::vector<InputManager*> InputManager::s_instances;
 
 InputManager::InputManager(Window& window)
-    : window_(window)
+    : m_window(window)
 {
-    InputManager::instances_.push_back(this);
+    InputManager::s_instances.push_back(this);
 }
 
 bool InputManager::isKeyPressed(const int key)
 {
-    return this->keys_.at(key).current;
+    return m_keys.at(key).current;
 }
 
 bool InputManager::isKeyToggled(int key)
 {
-    return this->keys_.at(key).current && !this->keys_.at(key).prev;
+    return m_keys.at(key).current && !m_keys.at(key).prev;
 }
 
 bool InputManager::isMouseButtonPressed(int button)
 {
-    return this->mouseBtns_.at(button).current;
+    return m_mouseBtns.at(button).current;
 }
 
 bool InputManager::isMouseButtonToggled(int button)
 {
-    return this->mouseBtns_.at(button).current &&
-           !this->mouseBtns_.at(button).prev;
+    return m_mouseBtns.at(button).current && !m_mouseBtns.at(button).prev;
 }
 
 std::pair<float, float> InputManager::getCursorPos()
 {
     double xpos = 0;
     double ypos = 0;
-    glfwGetCursorPos(this->window_.getPtr(), &xpos, &ypos);
-    return {xpos, ypos};
+    glfwGetCursorPos(m_window.getPtr(), &xpos, &ypos);
+    return { xpos, ypos };
 }
 
 void InputManager::consolidateKeyStates()
 {
-    for (auto& key : this->keys_)
-    {
+    for (auto& key : m_keys) {
         key.prev = key.current;
     }
-    for (auto& button : this->mouseBtns_)
-    {
+    for (auto& button : m_mouseBtns) {
         button.prev = button.current;
     }
 }
@@ -61,34 +58,32 @@ void InputManager::setupInputCallbacks(GLFWwindow* window)
 
 void InputManager::setKeyPressed(int key, bool pressed)
 {
-    this->keys_.at(key).current = pressed;
+    m_keys.at(key).current = pressed;
 }
 
 void InputManager::setMouseButtonPressed(int key, bool pressed)
 {
-    this->mouseBtns_.at(key).current = pressed;
+    m_mouseBtns.at(key).current = pressed;
 }
 
 void InputManager::setCursorPos(double xpos, double ypos)
 {
-    this->cursorPos_.first = xpos;
-    this->cursorPos_.second = ypos;
+    m_cursorPos.first = xpos;
+    m_cursorPos.second = ypos;
 }
 
 void InputManager::keyCallback(GLFWwindow* /*window*/, int key,
-                               int /*scancode*/, int action, int /*mods*/)
+    int /*scancode*/, int action, int /*mods*/)
 {
-    for (auto* instance : InputManager::instances_)
-    {
+    for (auto* instance : InputManager::s_instances) {
         instance->setKeyPressed(key, action != GLFW_RELEASE);
     }
 }
 
 void InputManager::mouseButtonCallback(GLFWwindow* /*window*/, int button,
-                                       int action, int /*mods*/)
+    int action, int /*mods*/)
 {
-    for (auto* instance : InputManager::instances_)
-    {
+    for (auto* instance : InputManager::s_instances) {
         instance->setMouseButtonPressed(button, action != GLFW_RELEASE);
     }
 }

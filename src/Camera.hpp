@@ -10,11 +10,10 @@ enum class CameraMovement {
 };
 
 // https://learnopengl.com/code_viewer_gh.php?code=includes/learnopengl/camera.h
-class Camera
-{
+class Camera {
 public:
     Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
-           float pitch);
+        float pitch);
 
     glm::mat4 getViewMatrix() const;
     void processKeyboard(CameraMovement direction, float deltaTime);
@@ -25,20 +24,20 @@ public:
     float getZoom() const;
 
 private:
-    glm::vec3 position_;
-    glm::vec3 front_;
-    glm::vec3 up_;
-    glm::vec3 right_;
-    glm::vec3 worldUp_;
+    glm::vec3 m_position;
+    glm::vec3 m_front;
+    glm::vec3 m_up;
+    glm::vec3 m_right;
+    glm::vec3 m_worldUp;
 
     // euler angles
-    float yaw_;
-    float pitch_;
+    float m_yaw;
+    float m_pitch;
 
     // options
-    float movementSpeed_ = 8.0f;
-    float mouseSensitivity_ = 0.03;
-    float zoom_ = 45.0;
+    float m_movementSpeed = 8.0f;
+    float m_mouseSensitivity = 0.03;
+    float m_zoom = 45.0;
 
     void updateVectors();
 };

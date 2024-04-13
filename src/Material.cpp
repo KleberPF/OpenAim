@@ -5,31 +5,27 @@
 #include <cassert>
 
 Texture::Texture(const std::string& path, Texture::Type type)
-    : type_(type)
+    : m_type(type)
 {
-    glGenTextures(1, &this->id_);
+    glGenTextures(1, &m_id);
 
     int width = 0;
     int height = 0;
     int nrComponents = 0;
-    unsigned char* data =
-        stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
+    unsigned char* data = stbi_load(path.c_str(), &width, &height, &nrComponents, 0);
     assert(data != nullptr);
 
     // default and when nrComponents == 1
     GLenum format = GL_RED;
-    if (nrComponents == 3)
-    {
+    if (nrComponents == 3) {
         format = GL_RGB;
-    }
-    else if (nrComponents == 4)
-    {
+    } else if (nrComponents == 4) {
         format = GL_RGBA;
     }
 
-    glBindTexture(GL_TEXTURE_2D, this->id_);
+    glBindTexture(GL_TEXTURE_2D, m_id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,
-                 GL_UNSIGNED_BYTE, data);
+        GL_UNSIGNED_BYTE, data);
     glGenerateMipmap(GL_TEXTURE_2D);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -41,40 +37,38 @@ Texture::Texture(const std::string& path, Texture::Type type)
 
 void Texture::bind() const
 {
-    glBindTexture(GL_TEXTURE_2D, this->id_);
+    glBindTexture(GL_TEXTURE_2D, m_id);
 }
 
 Texture::Type Texture::getType() const
 {
-    return this->type_;
+    return m_type;
 }
 
 void Material::addTexture(const Texture& texture)
 {
-    this->textures_.emplace_back(texture);
+    m_textures.emplace_back(texture);
 }
 
 void Material::bind(const Shader& shader) const
 {
     const auto textureTypeToStr = [](Texture::Type type) {
-        switch (type)
-        {
-            case Texture::Type::Diffuse:
-                return "diffuse";
-            case Texture::Type::Specular:
-                return "specular";
-            case Texture::Type::Normal:
-                return "normal";
-            case Texture::Type::Height:
-                return "height";
-            default:
-                return "";
+        switch (type) {
+        case Texture::Type::Diffuse:
+            return "diffuse";
+        case Texture::Type::Specular:
+            return "specular";
+        case Texture::Type::Normal:
+            return "normal";
+        case Texture::Type::Height:
+            return "height";
+        default:
+            return "";
         }
     };
 
-    for (size_t i = 0; i < this->textures_.size(); i++)
-    {
-        const Texture& texture = this->textures_[i];
+    for (size_t i = 0; i < m_textures.size(); i++) {
+        const Texture& texture = m_textures[i];
         glActiveTexture(GL_TEXTURE0 + i);
 
         shader.setInt(textureTypeToStr(texture.getType()), i);

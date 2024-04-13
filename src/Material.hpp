@@ -12,10 +12,13 @@
 #include <string>
 #include <vector>
 
-class Texture
-{
+class Texture {
 public:
-    enum class Type { Diffuse, Specular, Normal, Height, Last };
+    enum class Type { Diffuse,
+        Specular,
+        Normal,
+        Height,
+        Last };
 
     Texture(const std::string& path, Texture::Type type);
 
@@ -24,16 +27,15 @@ public:
     Texture::Type getType() const;
 
 private:
-    GLuint id_;
-    Texture::Type type_;
+    GLuint m_id;
+    Texture::Type m_type;
 };
 
-class Material
-{
+class Material {
 public:
     void addTexture(const Texture& texture);
     void bind(const Shader& shader) const;
 
 private:
-    std::vector<std::reference_wrapper<const Texture>> textures_;
+    std::vector<std::reference_wrapper<const Texture>> m_textures;
 };

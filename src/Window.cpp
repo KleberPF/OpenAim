@@ -10,15 +10,15 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     auto* windowObj = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    windowObj->width = width;
-    windowObj->height = height;
+    windowObj->setWidth(width);
+    windowObj->setHeight(height);
 }
 
 Window::Window(int width, int height, std::string title, bool fullscreen)
-    : width(width)
-    , height(height)
-    , title_(std::move(title))
-    , fullscreen_(fullscreen)
+    : m_title(std::move(title))
+    , m_fullscreen(fullscreen)
+    , m_width(width)
+    , m_height(height)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -30,45 +30,62 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 #endif
 
     GLFWmonitor* monitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    this->ptr_ = glfwCreateWindow(this->width, this->height,
-                                  this->title_.c_str(), monitor, nullptr);
-    if (this->ptr_ == nullptr)
-    {
+    m_ptr = glfwCreateWindow(m_width, m_height,
+        m_title.c_str(), monitor, nullptr);
+    if (m_ptr == nullptr) {
         std::cerr << "Error creating GLFW window\n";
         glfwTerminate();
         exit(EXIT_FAILURE);
     }
 
-    glfwMakeContextCurrent(this->ptr_);
-    glfwSwapInterval(0);  // turn off vsync
-    glfwSetWindowUserPointer(this->ptr_, this);
-    glfwSetFramebufferSizeCallback(this->ptr_, framebufferSizeCallback);
+    glfwMakeContextCurrent(m_ptr);
+    glfwSwapInterval(0); // turn off vsync
+    glfwSetWindowUserPointer(m_ptr, this);
+    glfwSetFramebufferSizeCallback(m_ptr, framebufferSizeCallback);
 
-    // glfwSetInputMode(this->ptr_, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    if (glfwRawMouseMotionSupported())
-    {
-        glfwSetInputMode(this->ptr_, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    if (glfwRawMouseMotionSupported()) {
+        glfwSetInputMode(m_ptr, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     }
 
     // has to run after glfwCreateWindow
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
+    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         exit(EXIT_FAILURE);
     }
 }
 
 bool Window::shouldClose()
 {
-    return glfwWindowShouldClose(this->ptr_);
+    return glfwWindowShouldClose(m_ptr);
 }
 
 void Window::swapBuffers()
 {
-    glfwSwapBuffers(this->ptr_);
+    glfwSwapBuffers(m_ptr);
 }
 
 GLFWwindow* Window::getPtr() const
 {
-    return this->ptr_;
+    return m_ptr;
+}
+
+int Window::getWidth() const
+{
+    return m_width;
+}
+
+void Window::setWidth(int width)
+{
+    m_width = width;
+}
+
+int Window::getHeight() const
+{
+    return m_height;
+}
+
+void Window::setHeight(int height)
+{
+    m_height = height;
 }

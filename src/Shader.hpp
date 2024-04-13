@@ -5,8 +5,7 @@
 
 #include <string>
 
-class Shader
-{
+class Shader {
 public:
     Shader(const std::string& vertexPath, const std::string& fragmentPath);
     // glDeleteProgram will be done in ResourceManager if needed
@@ -19,5 +18,5 @@ public:
     void setMat4(const std::string& name, const glm::mat4& value) const;
 
 private:
-    GLuint id_;
+    GLuint m_id;
 };

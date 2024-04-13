@@ -20,8 +20,7 @@ struct InputState {
     bool current = false;
 };
 
-class InputManager
-{
+class InputManager {
 public:
     InputManager(Window& window);
 
@@ -47,18 +46,18 @@ public:
     static void setupInputCallbacks(GLFWwindow* window);
 
 private:
-    Window& window_;
-    std::array<InputState, GLFW_KEY_LAST + 1> keys_;
-    std::array<InputState, GLFW_MOUSE_BUTTON_LAST + 1> mouseBtns_;
-    std::pair<double, double> cursorPos_ = {-1, -1};
-    static std::vector<InputManager*> instances_;
+    Window& m_window;
+    std::array<InputState, GLFW_KEY_LAST + 1> m_keys;
+    std::array<InputState, GLFW_MOUSE_BUTTON_LAST + 1> m_mouseBtns;
+    std::pair<double, double> m_cursorPos = { -1, -1 };
+    static std::vector<InputManager*> s_instances;
 
     void setKeyPressed(int key, bool pressed);
     void setMouseButtonPressed(int key, bool pressed);
     void setCursorPos(double xpos, double ypos);
 
     static void keyCallback(GLFWwindow* window, int key, int scancode,
-                            int action, int mods);
+        int action, int mods);
     static void mouseButtonCallback(GLFWwindow* window, int button, int action,
-                                    int mods);
+        int mods);
 };

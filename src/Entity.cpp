@@ -1,9 +1,9 @@
 #include "Entity.hpp"
 
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/geometric.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
+#include "glm/ext/matrix_transform.hpp"
+#include "glm/geometric.hpp"
 
 #include <cassert>
 #include <cmath>
@@ -13,33 +13,40 @@
 #include <utility>
 
 CollisionObject::CollisionObject(const glm::vec3& pos)
-    : pos_(pos)
+    : m_pos(pos)
 {
+}
+
+void CollisionObject::setRotation(const Rotation& rotation)
+{
+    m_rotation = rotation;
+}
+
+const Rotation& CollisionObject::getRotation() const
+{
+    return m_rotation;
 }
 
 CollisionBox::CollisionBox(const glm::vec3& pos, const glm::vec3& size)
     : CollisionObject(pos)
-    , size_(size)
+    , m_size(size)
 {
-    this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5) * this->size_;
-    this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5) * this->size_;
+    m_aabb[0] = m_pos - glm::vec3(0.5, 0.5, 0.5) * m_size;
+    m_aabb[1] = m_pos + glm::vec3(0.5, 0.5, 0.5) * m_size;
 }
 
 IntersectionResult CollisionBox::isIntersectedByLine(glm::vec3 eyePos,
-                                                     glm::vec3 eyeDir) const
+    glm::vec3 eyeDir) const
 {
     IntersectionResult result = std::nullopt;
     float closestDist = FLT_MAX;
 
-    if (this->rotation.angle != 0.0f)
-    {
-        glm::mat4 moveToOrigin =
-            glm::translate(glm::identity<glm::mat4>(), -this->pos_);
+    if (m_rotation.angle != 0.0f) {
+        glm::mat4 moveToOrigin = glm::translate(glm::identity<glm::mat4>(), -m_pos);
         glm::mat4 rotateEye = glm::rotate(glm::identity<glm::mat4>(),
-                                          glm::radians(-this->rotation.angle),
-                                          this->rotation.axis);
-        glm::mat4 moveBack =
-            glm::translate(glm::identity<glm::mat4>(), this->pos_);
+            glm::radians(-m_rotation.angle),
+            m_rotation.axis);
+        glm::mat4 moveBack = glm::translate(glm::identity<glm::mat4>(), m_pos);
 
         auto tmp = glm::vec4(eyePos, 1.0f);
         eyePos = glm::vec3(moveBack * rotateEye * moveToOrigin * tmp);
@@ -48,27 +55,22 @@ IntersectionResult CollisionBox::isIntersectedByLine(glm::vec3 eyePos,
         eyeDir = glm::vec3(rotateEye * tmp);
     }
 
-    for (const auto& vertex : this->aabb_)
-    {
-        for (size_t j = 0; j < 3; j++)
-        {
+    for (const auto& vertex : m_aabb) {
+        for (size_t j = 0; j < 3; j++) {
             float t = (vertex[j] - eyePos[j]) / eyeDir[j];
-            if (t < 0)
-            {
+            if (t < 0) {
                 continue;
             }
 
             glm::vec3 intersection = eyePos + eyeDir * t;
-            bool intersectsNow = this->isPointInPlaneSection(intersection);
+            bool intersectsNow = isPointInPlaneSection(intersection);
 
-            if (!intersectsNow)
-            {
+            if (!intersectsNow) {
                 continue;
             }
 
             float dist = glm::distance(intersection, eyePos);
-            if (dist < closestDist)
-            {
+            if (dist < closestDist) {
                 closestDist = dist;
                 result = intersection;
             }
@@ -80,46 +82,40 @@ IntersectionResult CollisionBox::isIntersectedByLine(glm::vec3 eyePos,
 
 void CollisionBox::move(const glm::vec3& newPos)
 {
-    this->pos_ = newPos;
-    this->aabb_[0] = this->pos_ - glm::vec3(0.5, 0.5, 0.5) * this->size_;
-    this->aabb_[1] = this->pos_ + glm::vec3(0.5, 0.5, 0.5) * this->size_;
+    m_pos = newPos;
+    m_aabb[0] = m_pos - glm::vec3(0.5, 0.5, 0.5) * m_size;
+    m_aabb[1] = m_pos + glm::vec3(0.5, 0.5, 0.5) * m_size;
 }
 
 bool CollisionBox::isPointInPlaneSection(const glm::vec3& point) const
 {
-    return (point.x <= this->aabb_[1].x && point.x >= this->aabb_[0].x &&
-            point.y <= this->aabb_[1].y && point.y >= this->aabb_[0].y &&
-            point.z <= this->aabb_[1].z && point.z >= this->aabb_[0].z);
+    return (point.x <= m_aabb[1].x && point.x >= m_aabb[0].x && point.y <= m_aabb[1].y && point.y >= m_aabb[0].y && point.z <= m_aabb[1].z && point.z >= m_aabb[0].z);
 }
 
 CollisionSphere::CollisionSphere(const glm::vec3& pos, float radius)
     : CollisionObject(pos)
-    , radius_(radius)
+    , m_radius(radius)
 {
 }
 
 void CollisionSphere::move(const glm::vec3& newPos)
 {
-    this->pos_ = newPos;
+    m_pos = newPos;
 }
 
 // https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
 IntersectionResult CollisionSphere::isIntersectedByLine(glm::vec3 eyePos,
-                                                        glm::vec3 eyeDir) const
+    glm::vec3 eyeDir) const
 {
-    float delta =
-        pow(glm::dot(eyeDir, eyePos - this->pos_), 2) -
-        (pow(glm::length(eyePos - this->pos_), 2) - pow(this->radius_, 2));
+    float delta = pow(glm::dot(eyeDir, eyePos - m_pos), 2) - (pow(glm::length(eyePos - m_pos), 2) - pow(m_radius, 2));
 
-    if (delta < 0)
-    {
+    if (delta < 0) {
         return std::nullopt;
     }
 
-    float d = -(glm::dot(eyeDir, eyePos - this->pos_)) - std::sqrt(delta);
+    float d = -(glm::dot(eyeDir, eyePos - m_pos)) - std::sqrt(delta);
 
-    if (d > 0)
-    {
+    if (d > 0) {
         return eyePos + eyeDir * d;
     }
 
@@ -127,79 +123,110 @@ IntersectionResult CollisionSphere::isIntersectedByLine(glm::vec3 eyePos,
 }
 
 Entity::Entity(Model model, const glm::vec3& pos)
-    : currentPos_(pos)
-    , referentialPos_(pos)
-    , model_(std::move(model))
+    : m_currentPos(pos)
+    , m_referentialPos(pos)
+    , m_model(std::move(model))
 {
 }
 
 const Rotation& Entity::getRotation() const
 {
-    return this->rotation_;
+    return m_rotation;
 }
 
 const glm::vec3& Entity::getReferentialPos() const
 {
-    return this->referentialPos_;
+    return m_referentialPos;
 }
 
 const glm::vec3& Entity::getCurrentPos() const
 {
-    return this->currentPos_;
+    return m_currentPos;
 }
 
 const Shader& Entity::getShader() const
 {
-    return this->model_.getShader();
+    return m_model.getShader();
 }
 
 void Entity::rotate(float angle, const glm::vec3& axis)
 {
-    this->rotation_ = {angle, axis};
-    if (this->collisionObject_ != nullptr)
-    {
-        this->collisionObject_->rotation = {angle, axis};
+    m_rotation = { angle, axis };
+    if (m_collisionObject != nullptr) {
+        m_collisionObject->setRotation({ angle, axis });
     }
 }
 
 void Entity::move(const glm::vec3& newPos)
 {
-    this->currentPos_ = newPos;
-    if (this->collisionObject_ != nullptr)
-    {
-        this->collisionObject_->move(newPos);
+    m_currentPos = newPos;
+    if (m_collisionObject != nullptr) {
+        m_collisionObject->move(newPos);
     }
 }
 
 void Entity::moveReferential(const glm::vec3& newPos)
 {
-    this->referentialPos_ = newPos;
-    this->move(newPos);
+    m_referentialPos = newPos;
+    move(newPos);
 }
 
 void Entity::moveRelative(const glm::vec3& newPos)
 {
-    this->move(this->referentialPos_ + newPos);
+    move(m_referentialPos + newPos);
 }
 
 const CollisionObject* Entity::getCollisionObject() const
 {
-    return this->collisionObject_.get();
+    return m_collisionObject.get();
 }
 
 void Entity::addCollisionObject(CollisionObjectType type)
 {
-    switch (type)
-    {
-        case CollisionObjectType::SPHERE:
-            this->collisionObject_ = std::make_unique<CollisionSphere>(
-                this->currentPos_, this->size.x);
-            break;
-        default:
-            this->collisionObject_ =
-                std::make_unique<CollisionBox>(this->currentPos_, this->size);
-            break;
+    switch (type) {
+    case CollisionObjectType::SPHERE:
+        m_collisionObject = std::make_unique<CollisionSphere>(
+            m_currentPos, m_size.x);
+        break;
+    default:
+        m_collisionObject = std::make_unique<CollisionBox>(m_currentPos, m_size);
+        break;
     }
 
-    this->collisionObject_->rotation = this->rotation_;
+    m_collisionObject->setRotation(m_rotation);
+}
+
+bool Entity::isDestroyable() const
+{
+    return m_destroyable;
+}
+
+void Entity::setDestroyable(bool destroyable)
+{
+    m_destroyable = destroyable;
+}
+
+int Entity::getHealth() const
+{
+    return m_health;
+}
+
+void Entity::setHealth(int health)
+{
+    m_health = health;
+}
+
+void Entity::setSize(const glm::vec3& size)
+{
+    m_size = size;
+}
+
+void Entity::setColor(const glm::vec3& color)
+{
+    m_color = color;
+}
+
+void Entity::setRotation(const Rotation& rotation)
+{
+    m_rotation = rotation;
 }

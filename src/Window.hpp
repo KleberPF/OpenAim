@@ -5,8 +5,7 @@
 
 #include <string>
 
-class Window
-{
+class Window {
 public:
     Window(int width, int height, std::string title, bool fullscreen);
 
@@ -15,11 +14,17 @@ public:
 
     GLFWwindow* getPtr() const;
 
-    int width;
-    int height;
+    int getWidth() const;
+    void setWidth(int width);
+
+    int getHeight() const;
+    void setHeight(int height);
 
 private:
-    GLFWwindow* ptr_;
-    std::string title_;
-    bool fullscreen_;
+    GLFWwindow* m_ptr;
+    std::string m_title;
+    bool m_fullscreen;
+
+    int m_width;
+    int m_height;
 };

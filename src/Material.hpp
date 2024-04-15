@@ -14,21 +14,27 @@
 
 class Texture {
 public:
-    enum class Type { Diffuse,
-        Specular,
-        Normal,
-        Height,
-        Last };
+    enum class Type { Diffuse, Specular, Normal, Height, Last };
 
     Texture(const std::string& path, Texture::Type type);
+    virtual ~Texture() = default;
 
-    void bind() const;
+    virtual void bind() const;
 
     Texture::Type getType() const;
 
-private:
+protected:
+    Texture() = default;
+
     GLuint m_id;
     Texture::Type m_type;
+};
+
+class Cubemap : public Texture {
+public:
+    Cubemap(const std::array<std::string, 6>& paths);
+
+    void bind() const override;
 };
 
 class Material {

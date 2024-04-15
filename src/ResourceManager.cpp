@@ -5,8 +5,7 @@
 #include "Shader.hpp"
 
 void ResourceManager::addShader(const std::string& name,
-    const std::string& vertexPath,
-    const std::string& fragmentPath)
+    const std::string& vertexPath, const std::string& fragmentPath)
 {
     m_shaders.insert({ name, Shader(vertexPath, fragmentPath) });
 }
@@ -16,8 +15,19 @@ const Shader& ResourceManager::getShader(const std::string& name)
     return m_shaders.at(name);
 }
 
-void ResourceManager::addTexture(const std::string& name,
-    const std::string& path, Texture::Type type)
+void ResourceManager::addCubemap(
+    const std::string& name, const std::array<std::string, 6>& paths)
+{
+    m_cubemaps.insert({ name, Cubemap(paths) });
+}
+
+const Cubemap& ResourceManager::getCubemap(const std::string& name)
+{
+    return m_cubemaps.at(name);
+}
+
+void ResourceManager::addTexture(
+    const std::string& name, const std::string& path, Texture::Type type)
 {
     m_textures.insert({ name, Texture(path, type) });
 }

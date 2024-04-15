@@ -7,6 +7,7 @@
 #include "Model.hpp"
 #include "Shader.hpp"
 
+#include <array>
 #include <map>
 #include <memory>
 #include <string>
@@ -18,8 +19,12 @@ public:
         const std::string& fragmentPath);
     const Shader& getShader(const std::string& name);
 
-    void addTexture(const std::string& name, const std::string& path,
-        Texture::Type type);
+    void addCubemap(
+        const std::string& name, const std::array<std::string, 6>& paths);
+    const Cubemap& getCubemap(const std::string& name);
+
+    void addTexture(
+        const std::string& name, const std::string& path, Texture::Type type);
     const Texture& getTexture(const std::string& name);
 
     void addModel(const std::string& name, const std::string& path,
@@ -32,6 +37,9 @@ public:
 private:
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
+    // This is weird because Cubemap is a Texture, but it's
+    // the best way I found to do this for now
+    std::map<std::string, Cubemap> m_cubemaps;
     std::map<std::string, Model> m_models;
     std::map<std::string, Material> m_materials;
 };

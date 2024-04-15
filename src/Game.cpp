@@ -4,6 +4,7 @@
 #include "Entity.hpp"
 #include "GLFW/glfw3.h"
 #include "InputManager.hpp"
+#include "Material.hpp"
 #include "Shader.hpp"
 #include "Window.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
@@ -33,7 +34,7 @@ Game::Game()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    // glEnable(GL_CULL_FACE);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
@@ -48,19 +49,25 @@ Game::Game()
     stbi_set_flip_vertically_on_load(true);
 
     // load shaders and models
-    m_resourceManager.addShader("sprite",
-        "../resources/shaders/sprite.vert",
+    m_resourceManager.addShader("sprite", "../resources/shaders/sprite.vert",
         "../resources/shaders/sprite.frag");
-    m_resourceManager.addShader("textured",
-        "../resources/shaders/model.vert",
+    m_resourceManager.addShader("textured", "../resources/shaders/model.vert",
         "../resources/shaders/model.frag");
-    m_resourceManager.addShader("targets",
-        "../resources/shaders/model.vert",
+    m_resourceManager.addShader("targets", "../resources/shaders/model.vert",
         "../resources/shaders/color.frag");
+    m_resourceManager.addShader("skybox", "../resources/shaders/skybox.vert",
+        "../resources/shaders/skybox.frag");
+
+    m_resourceManager.addCubemap("skybox",
+        { "../resources/textures/skybox/right.bmp",
+            "../resources/textures/skybox/left.bmp",
+            "../resources/textures/skybox/top.bmp",
+            "../resources/textures/skybox/bottom.bmp",
+            "../resources/textures/skybox/front.bmp",
+            "../resources/textures/skybox/back.bmp" });
 
     m_resourceManager.addTexture("checkerboard",
-        "../resources/textures/checkerboard.png",
-        Texture::Type::Diffuse);
+        "../resources/textures/checkerboard.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture(
         "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
 
@@ -72,21 +79,17 @@ Game::Game()
     m_resourceManager.getMaterial("bricks").addTexture(
         m_resourceManager.getTexture("bricks"));
 
-    m_resourceManager.addModel(
-        "cube", "../resources/objects/cube/cube.obj",
+    m_resourceManager.addModel("cube", "../resources/objects/cube/cube.obj",
         m_resourceManager.getMaterial("checkerboard"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel(
-        "ball", "../resources/objects/ball/ball.obj",
+    m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("checkerboard"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel(
-        "plane", "../resources/objects/plane/plane.obj",
+    m_resourceManager.addModel("plane", "../resources/objects/plane/plane.obj",
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
-    m_renderer = std::make_unique<Renderer>(m_window, m_camera,
-        m_resourceManager.getShader("sprite"));
+    m_renderer = std::make_unique<Renderer>(m_window, m_camera);
 
     for (int i = -1; i <= 1; i++) {
         for (int j = -1; j <= 1; j++) {
@@ -111,16 +114,16 @@ Game::Game()
     // entity.health = 1;
     // m_entities.push_back(std::move(entity));
 
-    Entity plane(m_resourceManager.getModel("plane"),
-        glm::vec3(0.0f, 0.0f, -20.0f));
+    Entity plane(
+        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 0.0f, -20.0f));
     plane.addCollisionObject(CollisionObjectType::AABB);
     plane.setSize(glm::vec3(10.0f, 10.f, 1.0f));
     plane.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane.setDestroyable(false);
     m_entities.push_back(std::move(plane));
 
-    Entity plane2(m_resourceManager.getModel("plane"),
-        glm::vec3(-10.0f, 0.0f, -10.0f));
+    Entity plane2(
+        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f, -10.0f));
     plane2.addCollisionObject(CollisionObjectType::AABB);
     plane2.setSize(glm::vec3(10.0f, 10.f, 1.0f));
     plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
@@ -128,8 +131,8 @@ Game::Game()
     plane2.setDestroyable(false);
     m_entities.push_back(std::move(plane2));
 
-    Entity plane3(m_resourceManager.getModel("plane"),
-        glm::vec3(10.0f, 0.0f, -10.0f));
+    Entity plane3(
+        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
     plane3.addCollisionObject(CollisionObjectType::AABB);
     plane3.setSize(glm::vec3(10.0f, 10.f, 1.0f));
     plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
@@ -167,7 +170,8 @@ void Game::processInput()
     }
 
     float xoffset = xpos - m_lastX;
-    float yoffset = m_lastY - ypos; // reversed since y-coordinates go from bottom to top
+    float yoffset
+        = m_lastY - ypos; // reversed since y-coordinates go from bottom to top
 
     m_lastX = xpos;
     m_lastY = ypos;
@@ -177,37 +181,31 @@ void Game::processInput()
         return;
     }
 
-    if (m_inputManager.isKeyToggled(GLFW_KEY_SPACE)) {
+    if (m_inputManager.isKeyToggled(GLFW_KEY_TAB)) {
         m_paused = !m_paused;
     }
 
     if (!m_paused) {
         updateEntities();
         m_camera.processMouseMovement(xoffset, yoffset);
-        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR,
-            GLFW_CURSOR_DISABLED);
+        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
         // camera keyboard processing
         // uncomment this to allow flying around
         if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-            m_camera.processKeyboard(CameraMovement::FORWARD,
-                m_deltaTime);
+            m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
         }
         if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-            m_camera.processKeyboard(CameraMovement::BACKWARD,
-                m_deltaTime);
+            m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
         }
         if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-            m_camera.processKeyboard(CameraMovement::LEFT,
-                m_deltaTime);
+            m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
         }
         if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-            m_camera.processKeyboard(CameraMovement::RIGHT,
-                m_deltaTime);
+            m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
         }
     } else {
-        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR,
-            GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
     }
 
     m_inputManager.consolidateKeyStates();
@@ -250,7 +248,8 @@ void Game::updateShotEntities()
         }
     }
 
-    if (closestEntityIt != m_entities.end() && closestEntityIt->isDestroyable()) {
+    if (closestEntityIt != m_entities.end()
+        && closestEntityIt->isDestroyable()) {
         closestEntityIt->setHealth(closestEntityIt->getHealth() - 1);
         if (closestEntityIt->getHealth() <= 0) {
             m_entities.erase(closestEntityIt);
@@ -270,10 +269,13 @@ void Game::render()
         m_renderer->renderEntity(entity);
     }
 
-    m_renderer->renderSprite(
+    m_renderer->renderSprite(m_resourceManager.getShader("sprite"),
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, CROSSHAIR_SIZE_PX / 2), 0.0f,
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec3(0.0f, 1.0f, 0.0f));
+
+    m_renderer->renderSkybox(m_resourceManager.getShader("skybox"),
+        m_resourceManager.getCubemap("skybox"));
 
     // render ImGui stuff
     if (m_paused) {
@@ -298,7 +300,8 @@ void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,
     GLenum severity, GLsizei /*unused*/, const GLchar* message,
     const void* /*unused*/)
 {
-    if (severity == GL_DEBUG_SEVERITY_MEDIUM || severity == GL_DEBUG_SEVERITY_HIGH) {
+    if (severity == GL_DEBUG_SEVERITY_MEDIUM
+        || severity == GL_DEBUG_SEVERITY_HIGH) {
         std::cerr << "GL CALLBACK: "
                   << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
                   << " type = 0x" << std::hex << type << ", severity = 0x"

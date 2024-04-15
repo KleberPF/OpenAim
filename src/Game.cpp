@@ -85,7 +85,7 @@ Game::Game()
     m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("checkerboard"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("plane", "../resources/objects/plane/plane.obj",
+    m_resourceManager.addModel("plane", "../resources/objects/plane2/plane.obj",
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
@@ -98,47 +98,20 @@ Game::Game()
             entity.addCollisionObject(CollisionObjectType::AABB);
             entity.setSize(glm::vec3(0.5f));
             entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
-            entity.rotate(30.0f, glm::vec3(0.0f, 1.0f, 0.0f));
+            entity.setRotation(0, 30.0f, 0);
             entity.setDestroyable(true);
             m_entities.push_back(std::move(entity));
         }
     }
 
-    // Entity entity(m_resourceManager.getModel("cube"),
-    //               glm::vec3(2.0f, 0.0f, 2.0f));
-    // entity.size = glm::vec3(0.5f);
-    // entity.color = glm::vec3(0.125f, 0.55f, 0.9f);
-    // entity.rotate(45.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    // entity.addCollisionObject(CollisionObjectType::AABB);
-    // entity.destroyable = true;
-    // entity.health = 1;
-    // m_entities.push_back(std::move(entity));
-
     Entity plane(
         m_resourceManager.getModel("plane"), glm::vec3(0.0f, 0.0f, -20.0f));
     plane.addCollisionObject(CollisionObjectType::AABB);
-    plane.setSize(glm::vec3(10.0f, 10.f, 1.0f));
+    plane.setRotation(90, 0, 0);
+    plane.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
     plane.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane.setDestroyable(false);
     m_entities.push_back(std::move(plane));
-
-    Entity plane2(
-        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f, -10.0f));
-    plane2.addCollisionObject(CollisionObjectType::AABB);
-    plane2.setSize(glm::vec3(10.0f, 10.f, 1.0f));
-    plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    plane2.rotate(90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    plane2.setDestroyable(false);
-    m_entities.push_back(std::move(plane2));
-
-    Entity plane3(
-        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
-    plane3.addCollisionObject(CollisionObjectType::AABB);
-    plane3.setSize(glm::vec3(10.0f, 10.f, 1.0f));
-    plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    plane3.rotate(-90.0f, glm::vec3(0.0f, 1.0f, 0.0f));
-    plane3.setDestroyable(false);
-    m_entities.push_back(std::move(plane3));
 }
 
 void Game::mainLoop()

@@ -5,6 +5,7 @@
 #include "Shader.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
+#include "utils.hpp"
 
 Renderer::Renderer(const Window& window, const Camera& camera)
     : m_window(window)
@@ -69,8 +70,9 @@ void Renderer::renderEntity(const Entity& entity)
     model = glm::translate(model, entity.m_currentPos);
 
     // rotation
-    model = glm::rotate(
-        model, glm::radians(entity.m_rotation.angle), entity.m_rotation.axis);
+    if (entity.m_rotation.has_value()) {
+        model *= anglesToRotationMatrix(entity.m_rotation.value());
+    }
 
     // scaling
     model = glm::scale(model, entity.m_size);

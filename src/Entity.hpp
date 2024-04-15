@@ -19,21 +19,9 @@ enum class CollisionObjectType {
     SPHERE,
 };
 
-struct Rotation {
-    Rotation()
-        : axis(glm::vec3(0.0f, 1.0f, 0.0f))
-    {
-    }
-
-    Rotation(float _angle, const glm::vec3& _axis)
-        : angle(_angle)
-        , axis(_axis)
-    {
-    }
-
-    float angle = 0.0f;
-    glm::vec3 axis = glm::vec3(0.0f, 1.0f, 0.0f);
-};
+// Each coordinate represents the rotation along
+// the main axis
+using Rotation = glm::vec3;
 
 class CollisionObject {
 public:
@@ -46,12 +34,14 @@ public:
      * Returns the closest intersection between this collision object
      * and the line described by eyePos and eyeDir
      */
-    virtual IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
-        glm::vec3 eyeDir) const
+    virtual IntersectionResult isIntersectedByLine(
+        glm::vec3 eyePos, glm::vec3 eyeDir) const
         = 0;
 
     void setRotation(const Rotation& rotation);
-    const Rotation& getRotation() const;
+    std::optional<Rotation> getRotation() const;
+
+    virtual void setSize(const glm::vec3& size) = 0;
 
 protected:
     glm::vec3 m_pos;
@@ -60,7 +50,7 @@ protected:
     // object is invisible anyways, we aren't actually going to rotate it.
     // Instead, we rotate the eyePos and eyeDir when calculating the
     // intersection.
-    Rotation m_rotation;
+    std::optional<Rotation> m_rotation;
 };
 
 class CollisionBox : public CollisionObject {
@@ -69,12 +59,16 @@ public:
 
     void move(const glm::vec3& newPos) override;
 
-    IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
-        glm::vec3 eyeDir) const override;
+    IntersectionResult isIntersectedByLine(
+        glm::vec3 eyePos, glm::vec3 eyeDir) const override;
+
+    void setSize(const glm::vec3& size) override;
 
 private:
     bool isPointInPlaneSection(const glm::vec3& point) const;
 
+    // TODO: we probably don't need aabb and size
+    // remove one of them in the future
     std::array<glm::vec3, 2> m_aabb;
     glm::vec3 m_size;
 };
@@ -85,8 +79,10 @@ public:
 
     void move(const glm::vec3& newPos) override;
 
-    IntersectionResult isIntersectedByLine(glm::vec3 eyePos,
-        glm::vec3 eyeDir) const override;
+    IntersectionResult isIntersectedByLine(
+        glm::vec3 eyePos, glm::vec3 eyeDir) const override;
+
+    void setSize(const glm::vec3& size) override;
 
 private:
     float m_radius;
@@ -103,7 +99,7 @@ public:
     Entity(Entity&& entity) = default;
     Entity& operator=(Entity&& entity) = default;
 
-    const Rotation& getRotation() const;
+    std::optional<Rotation> getRotation() const;
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
     const Shader& getShader() const;
@@ -112,7 +108,7 @@ public:
     {
     }
 
-    void rotate(float angle, const glm::vec3& axis);
+    void setRotation(float x, float y, float z);
     void move(const glm::vec3& newPos);
     void moveReferential(const glm::vec3& newPos);
     // Moves relative to the referential
@@ -131,7 +127,6 @@ public:
 
     void setSize(const glm::vec3& size);
     void setColor(const glm::vec3& color);
-    void setRotation(const Rotation& rotation);
 
     friend class Renderer;
 
@@ -142,7 +137,7 @@ private:
     int m_health = 1;
     glm::vec3 m_size = glm::vec3(1.0f);
     glm::vec3 m_color = glm::vec3(0.0f);
-    Rotation m_rotation;
+    std::optional<Rotation> m_rotation;
 
     // This holds the actual position the entity is in
     glm::vec3 m_currentPos;

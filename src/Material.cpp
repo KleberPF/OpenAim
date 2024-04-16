@@ -55,7 +55,6 @@ Cubemap::Cubemap(const std::array<std::string, 6>& paths)
     int height = 0;
     int nrComponents = 0;
 
-    stbi_set_flip_vertically_on_load(false);
     for (size_t i = 0; i < paths.size(); i++) {
         unsigned char* data
             = stbi_load(paths.at(i).c_str(), &width, &height, &nrComponents, 0);
@@ -65,7 +64,6 @@ Cubemap::Cubemap(const std::array<std::string, 6>& paths)
             height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         stbi_image_free(data);
     }
-    stbi_set_flip_vertically_on_load(true);
 
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

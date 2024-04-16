@@ -34,7 +34,7 @@ Game::Game()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_DEPTH_TEST);
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
@@ -44,9 +44,6 @@ Game::Game()
     ImGui::CreateContext();
     ImGui_ImplGlfw_InitForOpenGL(m_window.getPtr(), true);
     ImGui_ImplOpenGL3_Init("#version 130");
-
-    // stb_image initialization
-    stbi_set_flip_vertically_on_load(true);
 
     // load shaders and models
     m_resourceManager.addShader("sprite", "../resources/shaders/sprite.vert",
@@ -98,7 +95,7 @@ Game::Game()
             entity.addCollisionObject(CollisionObjectType::AABB);
             entity.setSize(glm::vec3(0.5f));
             entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
-            entity.setRotation(0, 30.0f, 0);
+            entity.setRotation(30.0f, 30.0f, 0);
             entity.setDestroyable(true);
             m_entities.push_back(std::move(entity));
         }
@@ -112,6 +109,24 @@ Game::Game()
     plane.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane.setDestroyable(false);
     m_entities.push_back(std::move(plane));
+
+    Entity plane2(
+        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f, -10.0f));
+    plane2.addCollisionObject(CollisionObjectType::AABB);
+    plane2.setRotation(90, 90, 0);
+    plane2.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
+    plane2.setDestroyable(false);
+    m_entities.push_back(std::move(plane2));
+
+    Entity plane3(
+        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
+    plane3.addCollisionObject(CollisionObjectType::AABB);
+    plane3.setRotation(90, -90, 0);
+    plane3.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
+    plane3.setDestroyable(false);
+    m_entities.push_back(std::move(plane3));
 }
 
 void Game::mainLoop()

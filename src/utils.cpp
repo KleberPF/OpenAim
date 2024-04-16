@@ -12,7 +12,7 @@ glm::mat4 anglesToRotationMatrix(const glm::vec3& rotation)
         glm::vec3(0, 1, 0),
         glm::vec3(0, 0, 1),
     };
-    for (int i = 0; i < 3; i++) {
+    for (int i = 2; i >= 0; i--) {
         if (rotation[i] != 0) {
             model = glm::rotate(
                 model, glm::radians(rotation[i]), rotationAxis[i]);

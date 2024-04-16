@@ -2,6 +2,10 @@
 
 #include "glm/glm.hpp"
 
-// Generates the rotation matrix from the angles of rotation
-// in each axis
+// Returns RzRyRx, where Ra is the rotation matrix around the
+// t axis
 glm::mat4 anglesToRotationMatrix(const glm::vec3& rotation);
+
+// Returns the inverse of RzRyRx, where Ra is the rotation
+// matrix around the axis a
+// glm::mat4 anglesToRotationMatrix(const glm::vec3& rotation);

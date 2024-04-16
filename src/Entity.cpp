@@ -4,6 +4,7 @@
 #include "Shader.hpp"
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/geometric.hpp"
+#include "glm/matrix.hpp"
 #include "utils.hpp"
 
 #include <cassert>
@@ -43,7 +44,8 @@ IntersectionResult CollisionBox::isIntersectedByLine(
     if (m_rotation.has_value()) {
         glm::mat4 moveToOrigin
             = glm::translate(glm::identity<glm::mat4>(), -m_pos);
-        glm::mat4 rotateEye = anglesToRotationMatrix(-m_rotation.value());
+        glm::mat4 rotateEye
+            = glm::inverse(anglesToRotationMatrix(m_rotation.value()));
         glm::mat4 moveBack = glm::translate(glm::identity<glm::mat4>(), m_pos);
 
         auto tmp = glm::vec4(eyePos, 1.0f);

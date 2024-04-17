@@ -104,10 +104,6 @@ public:
     const glm::vec3& getCurrentPos() const;
     const Shader& getShader() const;
 
-    virtual void onHit()
-    {
-    }
-
     void setRotation(float x, float y, float z);
     void move(const glm::vec3& newPos);
     void moveReferential(const glm::vec3& newPos);

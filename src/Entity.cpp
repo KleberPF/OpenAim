@@ -72,7 +72,7 @@ IntersectionResult CollisionBox::isIntersectedByLine(
             float dist = glm::distance(intersection, eyePos);
             if (dist < closestDist) {
                 closestDist = dist;
-                result = intersection;
+                result = { intersection, closestDist };
             }
         }
     }
@@ -126,7 +126,7 @@ IntersectionResult CollisionSphere::isIntersectedByLine(
     float d = -(glm::dot(eyeDir, eyePos - m_pos)) - std::sqrt(delta);
 
     if (d > 0) {
-        return eyePos + eyeDir * d;
+        return { { eyePos + eyeDir * d, d } };
     }
 
     return std::nullopt;
@@ -245,4 +245,14 @@ void Entity::setSize(const glm::vec3& size)
 void Entity::setColor(const glm::vec3& color)
 {
     m_color = color;
+}
+
+const std::string& Entity::getName() const
+{
+    return m_name;
+}
+
+void Entity::setName(const std::string& name)
+{
+    m_name = name;
 }

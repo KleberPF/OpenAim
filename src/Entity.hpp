@@ -12,7 +12,18 @@
 #include <optional>
 #include <vector>
 
-using IntersectionResult = std::optional<glm::vec3>;
+struct Intersection {
+    Intersection(const glm::vec3& coord, float dist)
+        : coord(coord)
+        , dist(dist)
+    {
+    }
+
+    glm::vec3 coord;
+    float dist;
+};
+
+using IntersectionResult = std::optional<Intersection>;
 
 enum class CollisionObjectType {
     AABB,
@@ -124,11 +135,15 @@ public:
     void setSize(const glm::vec3& size);
     void setColor(const glm::vec3& color);
 
+    const std::string& getName() const;
+    void setName(const std::string& name);
+
     friend class Renderer;
 
 private:
     std::unique_ptr<CollisionObject> m_collisionObject = nullptr;
 
+    std::string m_name;
     bool m_destroyable = false;
     int m_health = 1;
     glm::vec3 m_size = glm::vec3(1.0f);

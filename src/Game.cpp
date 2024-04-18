@@ -97,6 +97,8 @@ Game::Game()
             entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
             entity.setRotation(30.0f, 30.0f, 0);
             entity.setDestroyable(true);
+            entity.setName(
+                "Cube i=" + std::to_string(i) + " j=" + std::to_string(j));
             m_entities.push_back(std::move(entity));
         }
     }
@@ -105,27 +107,30 @@ Game::Game()
         m_resourceManager.getModel("plane"), glm::vec3(0.0f, 0.0f, -20.0f));
     plane.addCollisionObject(CollisionObjectType::AABB);
     plane.setRotation(90, 0, 0);
-    plane.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
     plane.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane.setDestroyable(false);
+    plane.setName("Plane1");
     m_entities.push_back(std::move(plane));
 
     Entity plane2(
         m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f, -10.0f));
     plane2.addCollisionObject(CollisionObjectType::AABB);
     plane2.setRotation(90, 90, 0);
-    plane2.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane2.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
     plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane2.setDestroyable(false);
+    plane2.setName("Plane2");
     m_entities.push_back(std::move(plane2));
 
     Entity plane3(
         m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
     plane3.addCollisionObject(CollisionObjectType::AABB);
     plane3.setRotation(90, -90, 0);
-    plane3.setSize(glm::vec3(10.0f, 1.0f, 10.0f));
+    plane3.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
     plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
     plane3.setDestroyable(false);
+    plane3.setName("Plane3");
     m_entities.push_back(std::move(plane3));
 }
 
@@ -228,9 +233,8 @@ void Game::updateShotEntities()
             m_camera.getPosition(), m_camera.getFront());
 
         if (intersection.has_value()) {
-            float dist = glm::distance(m_camera.getPosition(), *intersection);
-            if (dist < closestDist) {
-                closestDist = dist;
+            if (intersection->dist < closestDist) {
+                closestDist = intersection->dist;
                 closestEntityIt = it;
             }
         }

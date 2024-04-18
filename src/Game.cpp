@@ -174,6 +174,10 @@ void Game::processInput()
         return;
     }
 
+    if (m_inputManager.isKeyToggled(GLFW_KEY_Y)) {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    }
+
     if (m_inputManager.isKeyToggled(GLFW_KEY_TAB)) {
         m_paused = !m_paused;
     }

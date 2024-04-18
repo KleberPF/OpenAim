@@ -169,7 +169,7 @@ void Game::processInput()
     m_lastX = xpos;
     m_lastY = ypos;
 
-    if (m_inputManager.isKeyToggled(GLFW_KEY_ESCAPE)) {
+    if (m_inputManager.isKeyToggled(GLFW_KEY_F1)) {
         glfwSetWindowShouldClose(m_window.getPtr(), true);
         return;
     }
@@ -178,7 +178,7 @@ void Game::processInput()
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    if (m_inputManager.isKeyToggled(GLFW_KEY_TAB)) {
+    if (m_inputManager.isKeyToggled(GLFW_KEY_ESCAPE)) {
         m_paused = !m_paused;
     }
 
@@ -266,7 +266,7 @@ void Game::render()
     }
 
     m_renderer->renderSprite(m_resourceManager.getShader("sprite"),
-        glm::vec2(-CROSSHAIR_SIZE_PX / 2, CROSSHAIR_SIZE_PX / 2), 0.0f,
+        glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f,
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec3(0.0f, 1.0f, 0.0f));
 
@@ -279,7 +279,9 @@ void Game::render()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        ImGui::ShowDemoWindow();
+        // Kinda out of place, just a proof of concept
+        ImGui::SliderFloat("Sensitivity", &m_mouseSensitivity, 0.03, 0.5);
+        m_camera.setMouseSensitivity(m_mouseSensitivity);
 
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());

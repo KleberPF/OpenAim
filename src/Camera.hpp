@@ -23,6 +23,8 @@ public:
     glm::vec3 getFront() const;
     float getZoom() const;
 
+    void setMouseSensitivity(float sensitivity);
+
 private:
     glm::vec3 m_position;
     glm::vec3 m_front;

@@ -41,6 +41,7 @@ private:
     bool m_firstMouse = true;
     float m_lastX;
     float m_lastY;
+    float m_mouseSensitivity = 0.03;
 
     // timing
     float m_deltaTime = 0.0;
@@ -55,5 +56,5 @@ private:
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,
-    GLenum severity, GLsizei length,
-    const GLchar* message, const void* userParam);
+    GLenum severity, GLsizei length, const GLchar* message,
+    const void* userParam);

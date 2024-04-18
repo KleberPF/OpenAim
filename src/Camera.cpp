@@ -4,8 +4,8 @@
 
 #include <iostream>
 
-Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
-    float pitch)
+Camera::Camera(
+    const glm::vec3& position, const glm::vec3& up, float yaw, float pitch)
     : m_position(position)
     , m_worldUp(up)
     , m_yaw(yaw)
@@ -16,8 +16,7 @@ Camera::Camera(const glm::vec3& position, const glm::vec3& up, float yaw,
 
 glm::mat4 Camera::getViewMatrix() const
 {
-    return glm::lookAt(m_position, m_position + m_front,
-        m_up);
+    return glm::lookAt(m_position, m_position + m_front, m_up);
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)
@@ -73,6 +72,11 @@ float Camera::getZoom() const
     return m_zoom;
 }
 
+void Camera::setMouseSensitivity(float sensitivity)
+{
+    m_mouseSensitivity = sensitivity;
+}
+
 void Camera::updateVectors()
 {
     // calculate the new front vector
@@ -82,8 +86,9 @@ void Camera::updateVectors()
     front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
     m_front = glm::normalize(front);
     // also re-calculate the right and up vector
-    m_right = glm::normalize(glm::cross(
-        m_front,
-        m_worldUp)); // normalize the vectors, because their length gets closer to 0 the more you look up or down which results in slower movement.
+    m_right = glm::normalize(glm::cross(m_front,
+        m_worldUp)); // normalize the vectors, because their length gets closer
+                     // to 0 the more you look up or down which results in
+                     // slower movement.
     m_up = glm::normalize(glm::cross(m_right, m_front));
 }

@@ -39,9 +39,14 @@ public:
 
 class Material {
 public:
-    void addTexture(const Texture& texture);
+    Material& setColor(const glm::vec3& color);
+    Material& setTextureScale(float textureScale);
+
+    Material& addTexture(const Texture& texture);
     void bind(const Shader& shader) const;
 
 private:
+    glm::vec3 m_color = glm::vec3(1.0f);
+    float m_textureScale = 1.0f;
     std::vector<std::reference_wrapper<const Texture>> m_textures;
 };

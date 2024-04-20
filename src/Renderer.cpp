@@ -59,9 +59,6 @@ void Renderer::renderEntity(const Entity& entity)
     const Shader& shader = entity.m_model.getShader();
     shader.use();
 
-    shader.setFloat("textureScale", 16);
-    shader.setVec3("color", entity.m_color);
-
     glm::mat4 view = m_camera.get().getViewMatrix();
     shader.setMat4("view", view);
 

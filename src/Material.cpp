@@ -77,13 +77,29 @@ void Cubemap::bind() const
     glBindTexture(GL_TEXTURE_CUBE_MAP, m_id);
 }
 
-void Material::addTexture(const Texture& texture)
+Material& Material::setColor(const glm::vec3& color)
+{
+    m_color = color;
+    return *this;
+}
+
+Material& Material::setTextureScale(float textureScale)
+{
+    m_textureScale = textureScale;
+    return *this;
+}
+
+Material& Material::addTexture(const Texture& texture)
 {
     m_textures.emplace_back(texture);
+    return *this;
 }
 
 void Material::bind(const Shader& shader) const
 {
+    shader.setVec3("color", m_color);
+    shader.setFloat("textureScale", m_textureScale);
+
     const auto textureTypeToStr = [](Texture::Type type) {
         switch (type) {
         case Texture::Type::Diffuse:

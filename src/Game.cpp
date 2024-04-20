@@ -64,24 +64,20 @@ Game::Game()
             "../resources/textures/skybox/front.bmp",
             "../resources/textures/skybox/back.bmp" });
 
-    m_resourceManager.addTexture("checkerboard",
-        "../resources/textures/checkerboard.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture(
         "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
 
-    m_resourceManager.addMaterial("checkerboard");
-    m_resourceManager.getMaterial("checkerboard")
-        .addTexture(m_resourceManager.getTexture("checkerboard"));
+    m_resourceManager.addMaterial("targets");
+    m_resourceManager.getMaterial("targets").setColor(
+        glm::vec3(0.125f, 0.55f, 0.9f));
 
     m_resourceManager.addMaterial("bricks");
-    m_resourceManager.getMaterial("bricks").addTexture(
-        m_resourceManager.getTexture("bricks"));
+    m_resourceManager.getMaterial("bricks")
+        .addTexture(m_resourceManager.getTexture("bricks"))
+        .setTextureScale(16);
 
-    m_resourceManager.addModel("cube", "../resources/objects/cube/cube.obj",
-        m_resourceManager.getMaterial("checkerboard"),
-        m_resourceManager.getShader("targets"));
     m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
-        m_resourceManager.getMaterial("checkerboard"),
+        m_resourceManager.getMaterial("targets"),
         m_resourceManager.getShader("targets"));
     m_resourceManager.addModel("plane", "../resources/objects/plane/plane.obj",
         m_resourceManager.getMaterial("bricks"),
@@ -101,7 +97,6 @@ Game::Game()
         Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
         entity.addCollisionObject(CollisionObjectType::SPHERE);
         entity.setSize(glm::vec3(0.3f));
-        entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
         entity.setDestroyable(true);
         entity.setName("Ball " + std::to_string(i));
         m_entities.push_back(std::move(entity));
@@ -136,27 +131,6 @@ Game::Game()
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
     m_entities.push_back(std::move(rightWall));
-
-    // Entity plane2(
-    //     m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f,
-    //     -10.0f));
-    // plane2.addCollisionObject(CollisionObjectType::AABB);
-    // plane2.setRotation(90, 90, 0);
-    // plane2.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
-    // plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    // plane2.setDestroyable(false);
-    // plane2.setName("Plane2");
-    // m_entities.push_back(std::move(plane2));
-
-    // Entity plane3(
-    //     m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
-    // plane3.addCollisionObject(CollisionObjectType::AABB);
-    // plane3.setRotation(90, -90, 0);
-    // plane3.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
-    // plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    // plane3.setDestroyable(false);
-    // plane3.setName("Plane3");
-    // m_entities.push_back(std::move(plane3));
 }
 
 void Game::mainLoop()

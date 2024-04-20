@@ -11,6 +11,7 @@
 #include "glm/ext/matrix_transform.hpp"
 #include "glm/fwd.hpp"
 
+#include <array>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
@@ -24,7 +25,7 @@
 
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
-    , m_camera({ 0.0f, 0.0f, 0.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
+    , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
     , m_lastX((float)m_window.getWidth() / 2)
     , m_lastY((float)m_window.getHeight() / 2)
@@ -82,56 +83,80 @@ Game::Game()
     m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("checkerboard"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("plane", "../resources/objects/plane2/plane.obj",
+    m_resourceManager.addModel("plane", "../resources/objects/plane/plane.obj",
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
     m_renderer = std::make_unique<Renderer>(m_window, m_camera);
 
-    for (int i = -1; i <= 1; i++) {
-        for (int j = -1; j <= 1; j++) {
-            Entity entity(m_resourceManager.getModel("cube"),
-                glm::vec3(2.0f * i, 2.0f * j, -18.0f));
-            entity.addCollisionObject(CollisionObjectType::AABB);
-            entity.setSize(glm::vec3(0.5f));
-            entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
-            entity.setRotation(30.0f, 30.0f, 0);
-            entity.setDestroyable(true);
-            entity.setName(
-                "Cube i=" + std::to_string(i) + " j=" + std::to_string(j));
-            m_entities.push_back(std::move(entity));
-        }
+    std::array<glm::vec3, 5> targetPositions = {
+        glm::vec3(-8.13, 9.2, -8.0),
+        glm::vec3(7.23, 6.6, -8.0),
+        glm::vec3(-4.27, 5.62, -8.0),
+        glm::vec3(5.04, 3.97, -8.0),
+        glm::vec3(-1.79, 1.26, -8.0),
+    };
+
+    for (size_t i = 0; i < targetPositions.size(); i++) {
+        Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
+        entity.addCollisionObject(CollisionObjectType::SPHERE);
+        entity.setSize(glm::vec3(0.3f));
+        entity.setColor(glm::vec3(0.125f, 0.55f, 0.9f));
+        entity.setDestroyable(true);
+        entity.setName("Ball " + std::to_string(i));
+        m_entities.push_back(std::move(entity));
     }
 
-    Entity plane(
-        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 0.0f, -20.0f));
-    plane.addCollisionObject(CollisionObjectType::AABB);
-    plane.setRotation(90, 0, 0);
-    plane.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
-    plane.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    plane.setDestroyable(false);
-    plane.setName("Plane1");
-    m_entities.push_back(std::move(plane));
+    Entity floor(m_resourceManager.getModel("plane"), glm::vec3(0));
+    floor.addCollisionObject(CollisionObjectType::AABB);
+    floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    floor.setName("Floor");
+    m_entities.push_back(std::move(floor));
 
-    Entity plane2(
-        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f, -10.0f));
-    plane2.addCollisionObject(CollisionObjectType::AABB);
-    plane2.setRotation(90, 90, 0);
-    plane2.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
-    plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    plane2.setDestroyable(false);
-    plane2.setName("Plane2");
-    m_entities.push_back(std::move(plane2));
+    Entity frontWall(
+        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
+    frontWall.addCollisionObject(CollisionObjectType::AABB);
+    frontWall.setRotation(90, 0, 0);
+    frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    frontWall.setName("Front Wall");
+    m_entities.push_back(std::move(frontWall));
 
-    Entity plane3(
-        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
-    plane3.addCollisionObject(CollisionObjectType::AABB);
-    plane3.setRotation(90, -90, 0);
-    plane3.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
-    plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
-    plane3.setDestroyable(false);
-    plane3.setName("Plane3");
-    m_entities.push_back(std::move(plane3));
+    Entity leftWall(
+        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
+    leftWall.addCollisionObject(CollisionObjectType::AABB);
+    leftWall.setRotation(90, 90, 0);
+    leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    leftWall.setName("Left Wall");
+    m_entities.push_back(std::move(leftWall));
+
+    Entity rightWall(
+        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
+    rightWall.addCollisionObject(CollisionObjectType::AABB);
+    rightWall.setRotation(90, -90, 0);
+    rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    rightWall.setName("Right Wall");
+    m_entities.push_back(std::move(rightWall));
+
+    // Entity plane2(
+    //     m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 0.0f,
+    //     -10.0f));
+    // plane2.addCollisionObject(CollisionObjectType::AABB);
+    // plane2.setRotation(90, 90, 0);
+    // plane2.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
+    // plane2.setColor(glm::vec3(1.0f, 0.0, 0.0f));
+    // plane2.setDestroyable(false);
+    // plane2.setName("Plane2");
+    // m_entities.push_back(std::move(plane2));
+
+    // Entity plane3(
+    //     m_resourceManager.getModel("plane"), glm::vec3(10.0f, 0.0f, -10.0f));
+    // plane3.addCollisionObject(CollisionObjectType::AABB);
+    // plane3.setRotation(90, -90, 0);
+    // plane3.setSize(glm::vec3(10.0f, 0.0f, 10.0f));
+    // plane3.setColor(glm::vec3(1.0f, 0.0, 0.0f));
+    // plane3.setDestroyable(false);
+    // plane3.setName("Plane3");
+    // m_entities.push_back(std::move(plane3));
 }
 
 void Game::mainLoop()
@@ -248,7 +273,11 @@ void Game::updateShotEntities()
         && closestEntityIt->isDestroyable()) {
         closestEntityIt->setHealth(closestEntityIt->getHealth() - 1);
         if (closestEntityIt->getHealth() <= 0) {
-            m_entities.erase(closestEntityIt);
+            // move entity to a random location
+            float newX = (float)rand() / RAND_MAX * 17 - 8; // [-8, 8]
+            float newY = (float)rand() / RAND_MAX * 7 + 2; // [2, 8]
+            float newZ = -8;
+            closestEntityIt->move(glm::vec3(newX, newY, newZ));
         }
         m_shotsHit++;
     }
@@ -280,7 +309,7 @@ void Game::render()
         ImGui::NewFrame();
 
         // Kinda out of place, just a proof of concept
-        ImGui::SliderFloat("Sensitivity", &m_mouseSensitivity, 0.03, 0.5);
+        ImGui::SliderFloat("Sensitivity", &m_mouseSensitivity, 0, 0.5);
         m_camera.setMouseSensitivity(m_mouseSensitivity);
 
         ImGui::Render();

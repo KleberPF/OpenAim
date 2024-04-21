@@ -7,6 +7,7 @@
 
 #include <array>
 #include <functional>
+#include <optional>
 
 class Entity;
 
@@ -16,63 +17,65 @@ public:
     ~Renderer();
 
     void renderEntity(const Entity& entity);
-    void renderSprite(const Shader& shader, const glm::vec2& pos, float rotation,
-        const glm::vec2& dimensions, const glm::vec3& color);
+    void renderSprite(const Shader& shader, std::optional<Texture> texture,
+        const glm::vec2& pos, float rotation, const glm::vec2& dimensions,
+        const glm::vec3& color);
     void renderSkybox(const Shader& shader, const Cubemap& cubemap);
 
 private:
     // clang-format off
-    std::array<float, 18> m_spriteVertices = {
-        0, 0,
-        1, 0,
-        0, 1,
-        1, 0,
-        1, 1,
-        0, 1,
+    std::array<float, 24> m_spriteVertices = {
+        // pos      tex
+        0.0f, 0.0f, 0.0f, 0.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f,
+        1.0f, 1.0f, 1.0f, 1.0f,
+        0.0f, 1.0f, 0.0f, 1.0f,
     };
 
     std::array<float, 108> m_skyboxVertices = {      
-        -1,  1, -1,
-        -1, -1, -1,
-         1, -1, -1,
-         1, -1, -1,
-         1,  1, -1,
-        -1,  1, -1,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-        -1, -1,  1,
-        -1, -1, -1,
-        -1,  1, -1,
-        -1,  1, -1,
-        -1,  1,  1,
-        -1, -1,  1,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-         1, -1, -1,
-         1, -1,  1,
-         1,  1,  1,
-         1,  1,  1,
-         1,  1, -1,
-         1, -1, -1,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
 
-        -1, -1,  1,
-        -1,  1,  1,
-         1,  1,  1,
-         1,  1,  1,
-         1, -1,  1,
-        -1, -1,  1,
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
 
-        -1,  1, -1,
-         1,  1, -1,
-         1,  1,  1,
-         1,  1,  1,
-        -1,  1,  1,
-        -1,  1, -1,
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
 
-        -1, -1, -1,
-        -1, -1,  1,
-         1, -1, -1,
-         1, -1, -1,
-        -1, -1,  1,
-         1, -1,  1
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
     };
     // clang-format on
 

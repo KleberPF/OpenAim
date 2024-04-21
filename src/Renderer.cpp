@@ -14,17 +14,16 @@ Renderer::Renderer(const Window& window, const Camera& camera)
     // sprite
     glGenVertexArrays(1, &m_spriteVao);
     glGenBuffers(1, &m_spriteVbo);
-    glBindVertexArray(m_spriteVao);
 
     glBindBuffer(GL_ARRAY_BUFFER, m_spriteVbo);
     glBufferData(GL_ARRAY_BUFFER,
         sizeof(m_spriteVertices[0]) * m_spriteVertices.size(),
         m_spriteVertices.data(), GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-        sizeof(m_spriteVertices[0]) * 2, (void*)nullptr);
+    glBindVertexArray(m_spriteVao);
     glEnableVertexAttribArray(0);
-
+    glVertexAttribPointer(
+        0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)nullptr);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
@@ -86,10 +85,16 @@ void Renderer::renderEntity(const Entity& entity)
     entity.m_model.render();
 }
 
-void Renderer::renderSprite(const Shader& shader, const glm::vec2& pos,
-    float rotation, const glm::vec2& dimensions, const glm::vec3& color)
+void Renderer::renderSprite(const Shader& shader,
+    std::optional<Texture> texture, const glm::vec2& pos, float rotation,
+    const glm::vec2& dimensions, const glm::vec3& color)
 {
     shader.use();
+    if (texture.has_value()) {
+        glActiveTexture(GL_TEXTURE0); // maybe hide this somehow
+        shader.setInt("image", 0);
+        texture->bind();
+    }
     shader.setVec3("color", color);
 
     auto model = glm::identity<glm::mat4>();
@@ -110,7 +115,7 @@ void Renderer::renderSprite(const Shader& shader, const glm::vec2& pos,
     shader.setMat4("mvp", mvp);
 
     glBindVertexArray(m_spriteVao);
-    glDrawArrays(GL_TRIANGLES, 0, m_spriteVertices.size() / 3);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::renderSkybox(const Shader& shader, const Cubemap& cubemap)

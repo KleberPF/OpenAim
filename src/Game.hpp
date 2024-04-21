@@ -13,7 +13,7 @@
 constexpr auto SCR_WIDTH = 1920;
 constexpr auto SCR_HEIGHT = 1080;
 constexpr auto FULLSCREEN = true;
-constexpr auto CROSSHAIR_SIZE_PX = 4.0f;
+constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
 
 class Game {
 public:

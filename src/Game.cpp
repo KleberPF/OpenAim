@@ -66,6 +66,8 @@ Game::Game()
 
     m_resourceManager.addTexture(
         "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
+    m_resourceManager.addTexture("crosshair",
+        "../resources/textures/crosshair.png", Texture::Type::Diffuse);
 
     m_resourceManager.addMaterial("targets");
     m_resourceManager.getMaterial("targets").setColor(
@@ -268,13 +270,14 @@ void Game::render()
         m_renderer->renderEntity(entity);
     }
 
+    m_renderer->renderSkybox(m_resourceManager.getShader("skybox"),
+        m_resourceManager.getCubemap("skybox"));
+
     m_renderer->renderSprite(m_resourceManager.getShader("sprite"),
+        m_resourceManager.getTexture("crosshair"),
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f,
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec3(0.0f, 1.0f, 0.0f));
-
-    m_renderer->renderSkybox(m_resourceManager.getShader("skybox"),
-        m_resourceManager.getCubemap("skybox"));
 
     // render ImGui stuff
     if (m_paused) {

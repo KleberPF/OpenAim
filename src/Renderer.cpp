@@ -61,17 +61,7 @@ void Renderer::renderEntity(const Entity& entity)
     glm::mat4 view = m_camera.get().getViewMatrix();
     shader.setMat4("view", view);
 
-    // translation
-    auto model = glm::identity<glm::mat4>();
-    model = glm::translate(model, entity.m_currentPos);
-
-    // rotation
-    if (entity.m_rotation.has_value()) {
-        model *= anglesToRotationMatrix(entity.m_rotation.value());
-    }
-
-    // scaling
-    model = glm::scale(model, entity.m_size);
+    auto model = entity.getModelMatrix();
 
     glm::mat4 projection
         = glm::perspective(glm::radians(m_camera.get().getZoom()),

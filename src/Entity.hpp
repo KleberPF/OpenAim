@@ -110,6 +110,9 @@ public:
     Entity(Entity&& entity) = default;
     Entity& operator=(Entity&& entity) = default;
 
+    glm::mat4 getModelMatrix() const;
+    glm::mat3 getNormalMatrix() const;
+
     std::optional<Rotation> getRotation() const;
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
@@ -141,6 +144,12 @@ public:
     friend class Renderer;
 
 private:
+    // both are meant to be called after a move, resize or rotation
+    void updateMatrices();
+
+    glm::mat4 m_modelMatrix;
+    glm::mat3 m_normalMatrix;
+
     std::unique_ptr<CollisionObject> m_collisionObject = nullptr;
 
     std::string m_name;

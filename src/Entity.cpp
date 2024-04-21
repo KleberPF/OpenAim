@@ -144,6 +144,16 @@ Entity::Entity(Model model, const glm::vec3& pos)
 {
 }
 
+glm::mat4 Entity::getModelMatrix() const
+{
+    return m_modelMatrix;
+}
+
+glm::mat3 Entity::getNormalMatrix() const
+{
+    return m_normalMatrix;
+}
+
 std::optional<Rotation> Entity::getRotation() const
 {
     return m_rotation;
@@ -170,6 +180,8 @@ void Entity::setRotation(float x, float y, float z)
     if (m_collisionObject != nullptr) {
         m_collisionObject->setRotation(m_rotation.value());
     }
+
+    updateMatrices();
 }
 
 void Entity::move(const glm::vec3& newPos)
@@ -178,6 +190,8 @@ void Entity::move(const glm::vec3& newPos)
     if (m_collisionObject != nullptr) {
         m_collisionObject->move(newPos);
     }
+
+    updateMatrices();
 }
 
 void Entity::moveReferential(const glm::vec3& newPos)
@@ -240,6 +254,8 @@ void Entity::setSize(const glm::vec3& size)
     if (m_collisionObject != nullptr) {
         m_collisionObject->setSize(size);
     }
+
+    updateMatrices();
 }
 
 void Entity::setColor(const glm::vec3& color)
@@ -255,4 +271,22 @@ const std::string& Entity::getName() const
 void Entity::setName(const std::string& name)
 {
     m_name = name;
+}
+
+void Entity::updateMatrices()
+{
+    // translation
+    m_modelMatrix = glm::identity<glm::mat4>();
+    m_modelMatrix = glm::translate(m_modelMatrix, m_currentPos);
+
+    // rotation
+    if (m_rotation.has_value()) {
+        m_modelMatrix *= anglesToRotationMatrix(m_rotation.value());
+    }
+
+    // scaling
+    m_modelMatrix = glm::scale(m_modelMatrix, m_size);
+
+    // update normal
+    m_normalMatrix = glm::mat3(glm::transpose(glm::inverse(m_modelMatrix)));
 }

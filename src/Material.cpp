@@ -97,19 +97,20 @@ Material& Material::addTexture(const Texture& texture)
 
 void Material::bind(const Shader& shader) const
 {
-    shader.setVec3("color", m_color);
-    shader.setFloat("textureScale", m_textureScale);
+    shader.setVec3("material.color", m_color);
+    shader.setFloat("material.shininess", m_shininess);
+    shader.setFloat("material.textureScale", m_textureScale);
 
     const auto textureTypeToStr = [](Texture::Type type) {
         switch (type) {
         case Texture::Type::Diffuse:
-            return "diffuse";
+            return "material.diffuse";
         case Texture::Type::Specular:
-            return "specular";
+            return "material.specular";
         case Texture::Type::Normal:
-            return "normal";
+            return "material.normal";
         case Texture::Type::Height:
-            return "height";
+            return "material.height";
         default:
             return "";
         }

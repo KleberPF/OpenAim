@@ -58,10 +58,20 @@ void Renderer::renderEntity(const Entity& entity)
     const Shader& shader = entity.m_model.getShader();
     shader.use();
 
+    // lighting stuff
+    shader.setVec3("viewPos", m_camera.get().getPosition());
+    shader.setVec3("light.direction",
+        glm::vec3(-0.2f, -1.0f, -0.3f)); // this is here temporarily
+    shader.setVec3("light.ambient", glm::vec3(0.4f, 0.4f, 0.4f));
+    shader.setVec3("light.diffuse", glm::vec3(0.7f, 0.7f, 0.7f));
+    shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
     glm::mat4 view = m_camera.get().getViewMatrix();
     shader.setMat4("view", view);
 
     auto model = entity.getModelMatrix();
+    shader.setMat4("model", model);
+    shader.setMat3("normal", entity.getNormalMatrix());
 
     glm::mat4 projection
         = glm::perspective(glm::radians(m_camera.get().getZoom()),

@@ -47,6 +47,7 @@ public:
 
 private:
     glm::vec3 m_color = glm::vec3(1.0f);
+    float m_shininess = 32.0f;
     float m_textureScale = 1.0f;
     std::vector<std::reference_wrapper<const Texture>> m_textures;
 };

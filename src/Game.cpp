@@ -50,9 +50,9 @@ Game::Game()
     m_resourceManager.addShader("sprite", "../resources/shaders/sprite.vert",
         "../resources/shaders/sprite.frag");
     m_resourceManager.addShader("textured", "../resources/shaders/model.vert",
-        "../resources/shaders/model.frag");
+        "../resources/shaders/model_lighting.frag");
     m_resourceManager.addShader("targets", "../resources/shaders/model.vert",
-        "../resources/shaders/color.frag");
+        "../resources/shaders/model_lighting.frag");
     m_resourceManager.addShader("skybox", "../resources/shaders/skybox.vert",
         "../resources/shaders/skybox.frag");
 
@@ -68,10 +68,13 @@ Game::Game()
         "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
     m_resourceManager.addTexture("crosshair",
         "../resources/textures/crosshair.png", Texture::Type::Diffuse);
+    m_resourceManager.addTexture("white_pixel",
+        "../resources/textures/white_pixel.png", Texture::Type::Diffuse);
 
     m_resourceManager.addMaterial("targets");
-    m_resourceManager.getMaterial("targets").setColor(
-        glm::vec3(0.125f, 0.55f, 0.9f));
+    m_resourceManager.getMaterial("targets")
+        .addTexture(m_resourceManager.getTexture("white_pixel"))
+        .setColor(glm::vec3(0.125f, 0.55f, 0.9f));
 
     m_resourceManager.addMaterial("bricks");
     m_resourceManager.getMaterial("bricks")

@@ -1,27 +1,29 @@
 #pragma once
 
-#include "Camera.hpp"
 #include "Material.hpp"
+#include "Scene.hpp"
 #include "Shader.hpp"
 #include "Sprite.hpp"
-#include "Window.hpp"
 
 #include <array>
 #include <functional>
 #include <optional>
 
-class Entity;
-
 class Renderer {
 public:
-    Renderer(const Window& window, const Camera& camera);
+    Renderer();
     ~Renderer();
 
-    void renderEntity(const Entity& entity);
-    void renderSprite(const Sprite& sprite);
-    void renderSkybox(const Shader& shader, const Cubemap& cubemap);
+    void renderScene(const Scene& scene);
 
 private:
+    // Should probably change this later, having to always pass the scene
+    // is kinda ugly
+    static void renderEntity(const Scene& scene, const Entity& entity);
+    void renderSprite(const Scene& scene, const Sprite& sprite) const;
+    void renderSkybox(
+        const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
+
     // clang-format off
     std::array<float, 24> m_spriteVertices = {
         // pos      tex
@@ -77,11 +79,6 @@ private:
          1.0f, -1.0f,  1.0f,
     };
     // clang-format on
-
-    // Don't really like having a window here, but it will
-    // do for now
-    std::reference_wrapper<const Window> m_window;
-    std::reference_wrapper<const Camera> m_camera;
 
     GLuint m_spriteVao;
     GLuint m_spriteVbo;

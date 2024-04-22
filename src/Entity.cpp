@@ -174,6 +174,11 @@ const Shader& Entity::getShader() const
     return m_model.getShader();
 }
 
+const Material& Entity::getMaterial() const
+{
+    return m_model.getMaterial();
+}
+
 void Entity::setRotation(float x, float y, float z)
 {
     m_rotation = glm::vec3(x, y, z);
@@ -271,6 +276,11 @@ const std::string& Entity::getName() const
 void Entity::setName(const std::string& name)
 {
     m_name = name;
+}
+
+void Entity::render() const
+{
+    m_model.render();
 }
 
 void Entity::updateMatrices()

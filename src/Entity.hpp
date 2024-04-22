@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Model.hpp"
-#include "Renderer.hpp"
 #include "Shader.hpp"
 
 #include <glm/glm.hpp>
@@ -117,6 +116,7 @@ public:
     const glm::vec3& getReferentialPos() const;
     const glm::vec3& getCurrentPos() const;
     const Shader& getShader() const;
+    const Material& getMaterial() const;
 
     void setRotation(float x, float y, float z);
     void move(const glm::vec3& newPos);
@@ -141,7 +141,7 @@ public:
     const std::string& getName() const;
     void setName(const std::string& name);
 
-    friend class Renderer;
+    void render() const;
 
 private:
     // both are meant to be called after a move, resize or rotation

@@ -5,11 +5,8 @@
 #include "Shader.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
-#include "utils.hpp"
 
-Renderer::Renderer(const Window& window, const Camera& camera)
-    : m_window(window)
-    , m_camera(camera)
+Renderer::Renderer()
 {
     // sprite
     glGenVertexArrays(1, &m_spriteVao);
@@ -53,20 +50,22 @@ Renderer::~Renderer()
     glDeleteBuffers(1, &m_skyboxVbo);
 }
 
-void Renderer::renderEntity(const Entity& entity)
+void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 {
-    const Shader& shader = entity.m_model.getShader();
+    const Shader& shader = entity.getShader();
     shader.use();
 
     // lighting stuff
-    shader.setVec3("viewPos", m_camera.get().getPosition());
-    shader.setVec3("light.direction",
-        glm::vec3(-0.2f, -1.0f, -0.3f)); // this is here temporarily
-    shader.setVec3("light.ambient", glm::vec3(0.4f, 0.4f, 0.4f));
-    shader.setVec3("light.diffuse", glm::vec3(0.7f, 0.7f, 0.7f));
-    shader.setVec3("light.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+    if (scene.globalLightSource) {
+        shader.setVec3("viewPos", scene.camera.getPosition());
+        shader.setVec3("light.direction",
+            scene.globalLightSource->direction); // this is here temporarily
+        shader.setVec3("light.ambient", scene.globalLightSource->ambient);
+        shader.setVec3("light.diffuse", scene.globalLightSource->diffuse);
+        shader.setVec3("light.specular", scene.globalLightSource->specular);
+    }
 
-    glm::mat4 view = m_camera.get().getViewMatrix();
+    glm::mat4 view = scene.camera.getViewMatrix();
     shader.setMat4("view", view);
 
     auto model = entity.getModelMatrix();
@@ -74,18 +73,17 @@ void Renderer::renderEntity(const Entity& entity)
     shader.setMat3("normal", entity.getNormalMatrix());
 
     glm::mat4 projection
-        = glm::perspective(glm::radians(m_camera.get().getZoom()),
-            (float)m_window.get().getWidth() / m_window.get().getHeight(), 0.1F,
-            100.0F);
+        = glm::perspective(glm::radians(scene.camera.getZoom()),
+            (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
 
     glm::mat4 mvp = projection * view * model;
     shader.setMat4("mvp", mvp);
 
-    entity.m_model.getMaterial().bind(shader);
-    entity.m_model.render();
+    entity.getMaterial().bind(shader);
+    entity.render();
 }
 
-void Renderer::renderSprite(const Sprite& sprite)
+void Renderer::renderSprite(const Scene& scene, const Sprite& sprite) const
 {
     sprite.shader.get().use();
     sprite.material.get().bind(sprite.shader);
@@ -105,9 +103,9 @@ void Renderer::renderSprite(const Sprite& sprite)
 
     model = glm::scale(model, glm::vec3(sprite.dimensions, 1.0));
 
-    glm::mat4 projection = glm::ortho(-m_window.get().getWidth() / 2.0f,
-        m_window.get().getWidth() / 2.0f, -m_window.get().getHeight() / 2.0f,
-        m_window.get().getHeight() / 2.0f, -1.0f, 1.0f);
+    glm::mat4 projection = glm::ortho(-scene.viewportWidth / 2.0f,
+        scene.viewportWidth / 2.0f, -scene.viewportHeight / 2.0f,
+        scene.viewportHeight / 2.0f, -1.0f, 1.0f);
 
     glm::mat4 mvp = projection * model;
     sprite.shader.get().setMat4("mvp", mvp);
@@ -116,18 +114,18 @@ void Renderer::renderSprite(const Sprite& sprite)
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Renderer::renderSkybox(const Shader& shader, const Cubemap& cubemap)
+void Renderer::renderSkybox(
+    const Scene& scene, const Shader& shader, const Cubemap& cubemap) const
 {
     glDepthFunc(GL_LEQUAL);
     shader.use();
     // ... set view and projection matrix
-    glm::mat4 view = glm::mat4(glm::mat3(m_camera.get().getViewMatrix()));
+    glm::mat4 view = glm::mat4(glm::mat3(scene.camera.getViewMatrix()));
     shader.setMat4("view", view);
 
     glm::mat4 projection
-        = glm::perspective(glm::radians(m_camera.get().getZoom()),
-            (float)m_window.get().getWidth() / m_window.get().getHeight(), 0.1F,
-            100.0F);
+        = glm::perspective(glm::radians(scene.camera.getZoom()),
+            (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
     shader.setMat4("projection", projection);
 
     glBindVertexArray(m_skyboxVao);
@@ -135,4 +133,26 @@ void Renderer::renderSkybox(const Shader& shader, const Cubemap& cubemap)
     cubemap.bind();
     glDrawArrays(GL_TRIANGLES, 0, m_skyboxVertices.size() / 3);
     glDepthFunc(GL_LESS);
+}
+
+void Renderer::renderScene(const Scene& scene)
+{
+    glClearColor(0.3, 0.3, 0.3, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (scene.entities) {
+        for (auto& entity : *scene.entities) {
+            renderEntity(scene, entity);
+        }
+    }
+
+    if (scene.skybox) {
+        renderSkybox(scene, scene.skybox->shader, scene.skybox->cubemap);
+    }
+
+    if (scene.sprites) {
+        for (auto& sprite : *scene.sprites) {
+            renderSprite(scene, sprite);
+        }
+    }
 }

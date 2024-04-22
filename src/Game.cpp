@@ -5,6 +5,7 @@
 #include "GLFW/glfw3.h"
 #include "InputManager.hpp"
 #include "Material.hpp"
+#include "Scene.hpp"
 #include "Shader.hpp"
 #include "Sprite.hpp"
 #include "Window.hpp"
@@ -94,7 +95,7 @@ Game::Game()
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
-    m_renderer = std::make_unique<Renderer>(m_window, m_camera);
+    m_renderer = std::make_unique<Renderer>();
 
     std::array<glm::vec3, 5> targetPositions = {
         glm::vec3(-8.13, 9.2, -8.0),
@@ -281,16 +282,27 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    for (auto& entity : m_entities) {
-        m_renderer->renderEntity(entity);
-    }
+    // TODO: move this somewhere it's done only once
+    // --------
+    LightSource globalLightSource;
+    globalLightSource.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    globalLightSource.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
+    globalLightSource.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+    globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    m_renderer->renderSkybox(m_resourceManager.getShader("skybox"),
-        m_resourceManager.getCubemap("skybox"));
+    Skybox skybox(m_resourceManager.getCubemap("skybox"),
+        m_resourceManager.getShader("skybox"));
+    // --------
 
-    for (auto& sprite : m_sprites) {
-        m_renderer->renderSprite(sprite);
-    }
+    Scene scene(m_camera);
+    scene.viewportWidth = m_window.getWidth();
+    scene.viewportHeight = m_window.getHeight();
+    scene.globalLightSource = &globalLightSource;
+    scene.skybox = &skybox;
+    scene.entities = &m_entities;
+    scene.sprites = &m_sprites;
+
+    m_renderer->renderScene(scene);
 
     // render ImGui stuff
     if (m_paused) {

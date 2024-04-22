@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
+#include "Sprite.hpp"
 #include "Window.hpp"
 
 #include <array>
@@ -17,9 +18,7 @@ public:
     ~Renderer();
 
     void renderEntity(const Entity& entity);
-    void renderSprite(const Shader& shader, std::optional<Texture> texture,
-        const glm::vec2& pos, float rotation, const glm::vec2& dimensions,
-        const glm::vec3& color);
+    void renderSprite(const Sprite& sprite);
     void renderSkybox(const Shader& shader, const Cubemap& cubemap);
 
 private:

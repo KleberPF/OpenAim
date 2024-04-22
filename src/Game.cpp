@@ -6,6 +6,7 @@
 #include "InputManager.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
+#include "Sprite.hpp"
 #include "Window.hpp"
 #include "glm/ext/matrix_clip_space.hpp"
 #include "glm/ext/matrix_transform.hpp"
@@ -81,6 +82,11 @@ Game::Game()
         .addTexture(m_resourceManager.getTexture("bricks"))
         .setTextureScale(16);
 
+    m_resourceManager.addMaterial("crosshair");
+    m_resourceManager.getMaterial("crosshair")
+        .addTexture(m_resourceManager.getTexture("crosshair"))
+        .setColor(glm::vec3(0.0f, 1.0f, 0.0f));
+
     m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("targets"),
         m_resourceManager.getShader("targets"));
@@ -136,6 +142,12 @@ Game::Game()
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
     m_entities.push_back(std::move(rightWall));
+
+    Sprite crosshair(m_resourceManager.getShader("sprite"),
+        m_resourceManager.getMaterial("crosshair"),
+        glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
+        glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f);
+    m_sprites.push_back(crosshair);
 }
 
 void Game::mainLoop()
@@ -276,11 +288,9 @@ void Game::render()
     m_renderer->renderSkybox(m_resourceManager.getShader("skybox"),
         m_resourceManager.getCubemap("skybox"));
 
-    m_renderer->renderSprite(m_resourceManager.getShader("sprite"),
-        m_resourceManager.getTexture("crosshair"),
-        glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f,
-        glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
-        glm::vec3(0.0f, 1.0f, 0.0f));
+    for (auto& sprite : m_sprites) {
+        m_renderer->renderSprite(sprite);
+    }
 
     // render ImGui stuff
     if (m_paused) {

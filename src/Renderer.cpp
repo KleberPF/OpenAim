@@ -85,34 +85,32 @@ void Renderer::renderEntity(const Entity& entity)
     entity.m_model.render();
 }
 
-void Renderer::renderSprite(const Shader& shader,
-    std::optional<Texture> texture, const glm::vec2& pos, float rotation,
-    const glm::vec2& dimensions, const glm::vec3& color)
+void Renderer::renderSprite(const Sprite& sprite)
 {
-    shader.use();
-    if (texture.has_value()) {
-        glActiveTexture(GL_TEXTURE0); // maybe hide this somehow
-        shader.setInt("image", 0);
-        texture->bind();
-    }
-    shader.setVec3("color", color);
+    sprite.shader.get().use();
+    sprite.material.get().bind(sprite.shader);
 
     auto model = glm::identity<glm::mat4>();
-    model = glm::translate(model, glm::vec3(pos, 1.0f));
+    model = glm::translate(model, glm::vec3(sprite.position, 1.0f));
 
-    model = glm::translate(
-        model, glm::vec3(0.5 * dimensions.x, 0.5 * dimensions.y, 0));
-    model = glm::rotate(model, glm::radians(rotation), glm::vec3(0, 0, 1));
-    model = glm::translate(
-        model, glm::vec3(-0.5 * dimensions.x, -0.5 * dimensions.y, 0));
-    model = glm::scale(model, glm::vec3(dimensions, 1.0));
+    if (sprite.rotationAngle != 0.0f) {
+        model = glm::translate(model,
+            glm::vec3(0.5 * sprite.dimensions.x, 0.5 * sprite.dimensions.y, 0));
+        model = glm::rotate(
+            model, glm::radians(sprite.rotationAngle), glm::vec3(0, 0, 1));
+        model = glm::translate(model,
+            glm::vec3(
+                -0.5 * sprite.dimensions.x, -0.5 * sprite.dimensions.y, 0));
+    }
+
+    model = glm::scale(model, glm::vec3(sprite.dimensions, 1.0));
 
     glm::mat4 projection = glm::ortho(-m_window.get().getWidth() / 2.0f,
         m_window.get().getWidth() / 2.0f, -m_window.get().getHeight() / 2.0f,
         m_window.get().getHeight() / 2.0f, -1.0f, 1.0f);
 
     glm::mat4 mvp = projection * model;
-    shader.setMat4("mvp", mvp);
+    sprite.shader.get().setMat4("mvp", mvp);
 
     glBindVertexArray(m_spriteVao);
     glDrawArrays(GL_TRIANGLES, 0, 6);

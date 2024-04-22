@@ -5,6 +5,7 @@
 #include "InputManager.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
+#include "Sprite.hpp"
 #include "Window.hpp"
 
 #include <memory>
@@ -32,7 +33,7 @@ private:
     Window m_window;
     Camera m_camera;
     std::vector<Entity> m_entities;
-    // std::vector<std::unique_ptr<Sprite>> sprites;
+    std::vector<Sprite> m_sprites;
     std::unique_ptr<Renderer> m_renderer;
     ResourceManager m_resourceManager;
     InputManager m_inputManager;

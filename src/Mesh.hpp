@@ -5,8 +5,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include <array>
-#include <string>
 #include <vector>
 
 struct Vertex {

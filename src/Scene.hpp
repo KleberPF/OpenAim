@@ -4,8 +4,9 @@
 #include "Entity.hpp"
 #include "Material.hpp"
 #include "Sprite.hpp"
-#include "glm/glm.hpp"
-#include <functional>
+
+#include <glm/glm.hpp>
+
 #include <optional>
 #include <vector>
 

@@ -5,11 +5,8 @@
 
 #include <glm/glm.hpp>
 
-#include <array>
-#include <climits>
 #include <memory>
 #include <optional>
-#include <vector>
 
 struct Intersection {
     Intersection(const glm::vec3& coord, float dist)

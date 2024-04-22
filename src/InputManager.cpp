@@ -1,8 +1,6 @@
 #include "InputManager.hpp"
 
-#include "GLFW/glfw3.h"
-
-#include <iostream>
+#include <GLFW/glfw3.h>
 
 std::vector<InputManager*> InputManager::s_instances;
 
@@ -72,16 +70,16 @@ void InputManager::setCursorPos(double xpos, double ypos)
     m_cursorPos.second = ypos;
 }
 
-void InputManager::keyCallback(GLFWwindow* /*window*/, int key,
-    int /*scancode*/, int action, int /*mods*/)
+void InputManager::keyCallback(
+    GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
 {
     for (auto* instance : InputManager::s_instances) {
         instance->setKeyPressed(key, action != GLFW_RELEASE);
     }
 }
 
-void InputManager::mouseButtonCallback(GLFWwindow* /*window*/, int button,
-    int action, int /*mods*/)
+void InputManager::mouseButtonCallback(
+    GLFWwindow* /*window*/, int button, int action, int /*mods*/)
 {
     for (auto* instance : InputManager::s_instances) {
         instance->setMouseButtonPressed(button, action != GLFW_RELEASE);

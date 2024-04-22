@@ -1,7 +1,6 @@
 #include "Window.hpp"
 
-#include "GLFW/glfw3.h"
-
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 #include <iostream>
@@ -30,8 +29,8 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 #endif
 
     GLFWmonitor* monitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    m_ptr = glfwCreateWindow(m_width, m_height,
-        m_title.c_str(), monitor, nullptr);
+    m_ptr = glfwCreateWindow(
+        m_width, m_height, m_title.c_str(), monitor, nullptr);
     if (m_ptr == nullptr) {
         std::cerr << "Error creating GLFW window\n";
         glfwTerminate();

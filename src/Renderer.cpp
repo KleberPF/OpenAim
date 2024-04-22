@@ -3,8 +3,8 @@
 #include "Entity.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 Renderer::Renderer()
 {

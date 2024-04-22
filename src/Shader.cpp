@@ -2,8 +2,6 @@
 
 #include "filereader.hpp"
 
-#include <iostream>
-
 Shader::Shader(const std::string& vertexPath, const std::string& fragmentPath)
     : m_id(glCreateProgram())
 {

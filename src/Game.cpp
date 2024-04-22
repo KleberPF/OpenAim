@@ -2,28 +2,20 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
-#include "GLFW/glfw3.h"
 #include "InputManager.hpp"
 #include "Material.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Sprite.hpp"
 #include "Window.hpp"
-#include "glm/ext/matrix_clip_space.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/fwd.hpp"
 
-#include <array>
+#include <GLFW/glfw3.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
 #include <stb_image.h>
 
-#include <cstdlib>
 #include <iostream>
-#include <iterator>
-#include <memory>
-#include <optional>
 
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)

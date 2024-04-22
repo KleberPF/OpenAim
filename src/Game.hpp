@@ -8,8 +8,6 @@
 #include "Sprite.hpp"
 #include "Window.hpp"
 
-#include <memory>
-
 // settings
 constexpr auto SCR_WIDTH = 1920;
 constexpr auto SCR_HEIGHT = 1080;

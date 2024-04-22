@@ -2,8 +2,6 @@
 
 #include <stb_image.h>
 
-#include <cassert>
-
 Texture::Texture(const std::string& path, Texture::Type type)
     : m_type(type)
 {

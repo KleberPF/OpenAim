@@ -1,22 +1,23 @@
 #include "Model.hpp"
 
-#include "assimp/Importer.hpp"
-#include "assimp/scene.h"
-
+#include <assimp/Importer.hpp>
+#include <assimp/postprocess.h>
 #include <stb_image.h>
 
 #include <iostream>
 
-Model::Model(const std::string& path, const Material& material,
-    const Shader& shader)
+Model::Model(
+    const std::string& path, const Material& material, const Shader& shader)
     : m_material(material)
     , m_shader(shader)
 {
     Assimp::Importer importer;
-    const aiScene* scene = importer.ReadFile(
-        path, aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs | aiProcess_CalcTangentSpace);
+    const aiScene* scene = importer.ReadFile(path,
+        aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_FlipUVs
+            | aiProcess_CalcTangentSpace);
 
-    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+    if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE
+        || !scene->mRootNode) {
         throw std::string("ERROR::ASSIMP:: ") + importer.GetErrorString();
         return;
     }
@@ -56,12 +57,14 @@ void Model::processNode(aiNode* node, const aiScene* scene)
 {
     // process each mesh located at the current node
     for (unsigned int i = 0; i < node->mNumMeshes; i++) {
-        // the node object only contains indices to index the actual objects in the scene.
-        // the scene contains all the data, node is just to keep stuff organized (like relations between nodes).
+        // the node object only contains indices to index the actual objects in
+        // the scene. the scene contains all the data, node is just to keep
+        // stuff organized (like relations between nodes).
         aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
         m_meshes.push_back(Model::processMesh(mesh));
     }
-    // after we've processed all of the meshes (if any) we then recursively process each of the children nodes
+    // after we've processed all of the meshes (if any) we then recursively
+    // process each of the children nodes
     for (unsigned int i = 0; i < node->mNumChildren; i++) {
         processNode(node->mChildren[i], scene);
     }
@@ -87,8 +90,10 @@ Mesh Model::processMesh(aiMesh* mesh)
 
         // does the mesh contain texture coordinates?
         if (mesh->mTextureCoords[0]) {
-            // a vertex can contain up to 8 different texture coordinates. We thus make the assumption that we won't
-            // use models where a vertex can have multiple texture coordinates so we always take the first set (0).
+            // a vertex can contain up to 8 different texture coordinates. We
+            // thus make the assumption that we won't use models where a vertex
+            // can have multiple texture coordinates so we always take the first
+            // set (0).
             vertex.texCoords.x = mesh->mTextureCoords[0][i].x;
             vertex.texCoords.y = mesh->mTextureCoords[0][i].y;
 

@@ -2,9 +2,8 @@
 
 #include "Material.hpp"
 #include "Shader.hpp"
-#include "glm/glm.hpp"
-#include <functional>
-#include <optional>
+
+#include <glm/glm.hpp>
 
 struct Sprite {
     Sprite(const Shader& shader, const Material& material,

@@ -2,17 +2,9 @@
 
 #include "Model.hpp"
 #include "Shader.hpp"
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/geometric.hpp"
-#include "glm/matrix.hpp"
 #include "utils.hpp"
 
-#include <cassert>
-#include <cmath>
-#include <iostream>
-#include <memory>
-#include <optional>
-#include <utility>
+#include <glm/gtc/matrix_transform.hpp>
 
 CollisionObject::CollisionObject(const glm::vec3& pos)
     : m_pos(pos)

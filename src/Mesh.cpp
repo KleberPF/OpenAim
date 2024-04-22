@@ -1,8 +1,5 @@
 #include "Mesh.hpp"
 
-#include <string>
-#include <utility>
-
 Mesh::Mesh(std::vector<Vertex>& vertices, std::vector<GLuint>& indices)
     : m_vertices(std::move(vertices))
     , m_indices(std::move(indices))

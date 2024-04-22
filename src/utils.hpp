@@ -1,6 +1,6 @@
 #pragma once
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 // Returns RzRyRx, where Ra is the rotation matrix around the
 // t axis

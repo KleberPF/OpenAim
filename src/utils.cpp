@@ -1,7 +1,7 @@
 #include "utils.hpp"
 
-#include "glm/ext/matrix_transform.hpp"
-#include "glm/glm.hpp"
+#include <glm/gtc/matrix_transform.hpp>
+
 #include <array>
 
 glm::mat4 anglesToRotationMatrix(const glm::vec3& rotation)

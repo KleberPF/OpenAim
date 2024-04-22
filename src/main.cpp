@@ -1,8 +1,9 @@
 #include "Game.hpp"
 
+#include <glad/glad.h>
+
 #include <cstdlib>
 #include <ctime>
-#include <glad/glad.h>
 
 int main()
 {

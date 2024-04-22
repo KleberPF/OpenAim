@@ -6,8 +6,6 @@
 #include "Sprite.hpp"
 
 #include <array>
-#include <functional>
-#include <optional>
 
 class Renderer {
 public:

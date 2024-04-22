@@ -6,8 +6,6 @@
 #include <GLFW/glfw3.h>
 
 #include <array>
-#include <map>
-#include <utility>
 #include <vector>
 
 // This struct holds information about a keyboard key

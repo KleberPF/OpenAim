@@ -9,6 +9,8 @@
 #include "Weapon.hpp"
 #include "Window.hpp"
 
+#include <irrKlang/ik_ISoundEngine.h>
+
 // settings
 constexpr auto SCR_WIDTH = 1920;
 constexpr auto SCR_HEIGHT = 1080;
@@ -18,6 +20,7 @@ constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
 class Game {
 public:
     Game();
+    ~Game();
 
     void mainLoop();
 
@@ -37,6 +40,7 @@ private:
     ResourceManager m_resourceManager;
     InputManager m_inputManager;
 
+    irrklang::ISoundEngine* m_soundEngine;
     Weapon m_weapon;
 
     // mouse input

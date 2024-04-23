@@ -60,10 +60,10 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # Set library directories
-# target_link_directories(${PROJECT_NAME}
-#     PRIVATE
-#         ${CMAKE_CURRENT_SOURCE_DIR}/lib
-# )
+target_link_directories(${PROJECT_NAME}
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/lib
+)
 
 # Add any additional libraries your executable may depend on
 target_link_libraries(${PROJECT_NAME}
@@ -71,6 +71,7 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         glm
         assimp
+        IrrKlang
         # Add more libraries here as needed
 )
 

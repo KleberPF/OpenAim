@@ -6,6 +6,7 @@
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
 #include "Sprite.hpp"
+#include "Weapon.hpp"
 #include "Window.hpp"
 
 // settings
@@ -35,6 +36,8 @@ private:
     std::unique_ptr<Renderer> m_renderer;
     ResourceManager m_resourceManager;
     InputManager m_inputManager;
+
+    Weapon m_weapon;
 
     // mouse input
     bool m_firstMouse = true;

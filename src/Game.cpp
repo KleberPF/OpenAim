@@ -232,7 +232,11 @@ void Game::updateEntities()
 
 void Game::updateShotEntities()
 {
-    if (!m_inputManager.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT)) {
+    if (!m_inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+        return;
+    }
+
+    if (!m_weapon.tryShoot(glfwGetTime() * 1000)) {
         return;
     }
 

@@ -289,10 +289,10 @@ void Game::render()
     Scene scene(m_camera);
     scene.viewportWidth = m_window.getWidth();
     scene.viewportHeight = m_window.getHeight();
-    scene.globalLightSource = &globalLightSource;
-    scene.skybox = &skybox;
-    scene.entities = &m_entities;
-    scene.sprites = &m_sprites;
+    scene.globalLightSource = globalLightSource;
+    scene.skybox = skybox;
+    scene.entities = m_entities;
+    scene.sprites = m_sprites;
 
     m_renderer->renderScene(scene);
 

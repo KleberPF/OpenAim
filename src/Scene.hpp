@@ -7,6 +7,7 @@
 
 #include <glm/glm.hpp>
 
+#include <functional>
 #include <optional>
 #include <vector>
 
@@ -41,8 +42,8 @@ struct Scene {
     int viewportWidth;
     int viewportHeight;
     const Camera& camera;
-    LightSource* globalLightSource = nullptr;
-    Skybox* skybox = nullptr;
-    std::vector<Entity>* entities = nullptr;
-    std::vector<Sprite>* sprites = nullptr;
+    std::optional<std::reference_wrapper<LightSource>> globalLightSource;
+    std::optional<std::reference_wrapper<Skybox>> skybox;
+    std::optional<std::reference_wrapper<std::vector<Entity>>> entities;
+    std::optional<std::reference_wrapper<std::vector<Sprite>>> sprites;
 };

@@ -56,13 +56,14 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
     shader.use();
 
     // lighting stuff
-    if (scene.globalLightSource) {
+    if (scene.globalLightSource.has_value()) {
         shader.setVec3("viewPos", scene.camera.getPosition());
-        shader.setVec3("light.direction",
-            scene.globalLightSource->direction); // this is here temporarily
-        shader.setVec3("light.ambient", scene.globalLightSource->ambient);
-        shader.setVec3("light.diffuse", scene.globalLightSource->diffuse);
-        shader.setVec3("light.specular", scene.globalLightSource->specular);
+        shader.setVec3(
+            "light.direction", scene.globalLightSource->get().direction);
+        shader.setVec3("light.ambient", scene.globalLightSource->get().ambient);
+        shader.setVec3("light.diffuse", scene.globalLightSource->get().diffuse);
+        shader.setVec3(
+            "light.specular", scene.globalLightSource->get().specular);
     }
 
     glm::mat4 view = scene.camera.getViewMatrix();
@@ -140,18 +141,19 @@ void Renderer::renderScene(const Scene& scene)
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (scene.entities) {
-        for (auto& entity : *scene.entities) {
+    if (scene.entities.has_value()) {
+        for (auto& entity : scene.entities->get()) {
             renderEntity(scene, entity);
         }
     }
 
-    if (scene.skybox) {
-        renderSkybox(scene, scene.skybox->shader, scene.skybox->cubemap);
+    if (scene.skybox.has_value()) {
+        renderSkybox(
+            scene, scene.skybox->get().shader, scene.skybox->get().cubemap);
     }
 
-    if (scene.sprites) {
-        for (auto& sprite : *scene.sprites) {
+    if (scene.sprites.has_value()) {
+        for (auto& sprite : scene.sprites->get()) {
             renderSprite(scene, sprite);
         }
     }

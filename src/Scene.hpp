@@ -34,14 +34,16 @@ struct Skybox {
 };
 
 struct Scene {
-    Scene(const Camera& camera)
+    Scene(const Camera& camera, int viewportWidth, int viewportHeight)
         : camera(camera)
+        , viewportWidth(viewportWidth)
+        , viewportHeight(viewportHeight)
     {
     }
 
+    const Camera& camera;
     int viewportWidth;
     int viewportHeight;
-    const Camera& camera;
     std::optional<std::reference_wrapper<LightSource>> globalLightSource;
     std::optional<std::reference_wrapper<Skybox>> skybox;
     std::optional<std::reference_wrapper<std::vector<Entity>>> entities;

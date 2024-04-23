@@ -286,9 +286,7 @@ void Game::render()
         m_resourceManager.getShader("skybox"));
     // --------
 
-    Scene scene(m_camera);
-    scene.viewportWidth = m_window.getWidth();
-    scene.viewportHeight = m_window.getHeight();
+    Scene scene(m_camera, m_window.getWidth(), m_window.getHeight());
     scene.globalLightSource = globalLightSource;
     scene.skybox = skybox;
     scene.entities = m_entities;

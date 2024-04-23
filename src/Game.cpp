@@ -250,32 +250,29 @@ void Game::updateShotEntities()
         return;
     }
 
-    auto closestEntityIt = m_entities.end();
+    Entity* closestEntity = nullptr;
     float closestDist = FLT_MAX;
 
-    for (auto it = m_entities.begin(); it != m_entities.end(); it++) {
-        const auto& entity = *it;
-
+    for (auto& entity : m_entities) {
         auto intersection = entity.getCollisionObject()->isIntersectedByLine(
             m_camera.getPosition(), m_camera.getFront());
 
         if (intersection.has_value()) {
             if (intersection->dist < closestDist) {
                 closestDist = intersection->dist;
-                closestEntityIt = it;
+                closestEntity = &entity;
             }
         }
     }
 
-    if (closestEntityIt != m_entities.end()
-        && closestEntityIt->isDestroyable()) {
-        closestEntityIt->setHealth(closestEntityIt->getHealth() - 1);
-        if (closestEntityIt->getHealth() <= 0) {
+    if (closestEntity != nullptr && closestEntity->isDestroyable()) {
+        closestEntity->setHealth(closestEntity->getHealth() - 1);
+        if (closestEntity->getHealth() <= 0) {
             // move entity to a random location
             float newX = (float)rand() / RAND_MAX * 17 - 8; // [-8, 8]
             float newY = (float)rand() / RAND_MAX * 7 + 2; // [2, 8]
             float newZ = -8;
-            closestEntityIt->move(glm::vec3(newX, newY, newZ));
+            closestEntity->move(glm::vec3(newX, newY, newZ));
         }
         m_shotsHit++;
     }

@@ -244,7 +244,9 @@ void Game::updateShotEntities()
         return;
     }
 
-    if (!m_weapon.tryShoot(glfwGetTime() * 1000)) {
+    bool isHoldingMouseButton
+        = !m_inputManager.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT);
+    if (!m_weapon.tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
         return;
     }
 

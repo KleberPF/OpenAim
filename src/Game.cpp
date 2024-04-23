@@ -269,8 +269,8 @@ void Game::updateShotEntities()
         closestEntity->setHealth(closestEntity->getHealth() - 1);
         if (closestEntity->getHealth() <= 0) {
             // move entity to a random location
-            float newX = (float)rand() / RAND_MAX * 17 - 8; // [-8, 8]
-            float newY = (float)rand() / RAND_MAX * 7 + 2; // [2, 8]
+            float newX = m_rng.getFloatInRange(-8, 8);
+            float newY = m_rng.getFloatInRange(2, 8);
             float newZ = -8;
             closestEntity->move(glm::vec3(newX, newY, newZ));
         }

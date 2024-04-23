@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "Entity.hpp"
 #include "InputManager.hpp"
+#include "RNG.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
 #include "Sprite.hpp"
@@ -39,6 +40,7 @@ private:
     std::unique_ptr<Renderer> m_renderer;
     ResourceManager m_resourceManager;
     InputManager m_inputManager;
+    RNG m_rng;
 
     irrklang::ISoundEngine* m_soundEngine;
     Weapon m_weapon;

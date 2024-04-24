@@ -1,5 +1,7 @@
 #include "Camera.hpp"
 
+#include "glm/geometric.hpp"
+
 #include <glm/gtc/matrix_transform.hpp>
 
 Camera::Camera(
@@ -21,19 +23,25 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime)
 {
     float velocity = m_movementSpeed * deltaTime;
 
-    switch (direction) {
-    case CameraMovement::FORWARD:
-        m_position += m_front * velocity;
-        break;
-    case CameraMovement::BACKWARD:
-        m_position -= m_front * velocity;
-        break;
-    case CameraMovement::LEFT:
+    if (direction == CameraMovement::FORWARD
+        || direction == CameraMovement::BACKWARD) {
+
+        // unit vector normal to the xz plane
+        glm::vec3 normal = glm::normalize(glm::cross(
+            glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f)));
+        // front vector projected onto the xz plane and normalized
+        glm::vec3 projected
+            = glm::normalize(m_front - (glm::dot(m_front, normal)) * normal);
+
+        if (direction == CameraMovement::BACKWARD) {
+            projected *= -1;
+        }
+
+        m_position += projected * velocity;
+    } else if (direction == CameraMovement::LEFT) {
         m_position -= m_right * velocity;
-        break;
-    case CameraMovement::RIGHT:
+    } else if (direction == CameraMovement::RIGHT) {
         m_position += m_right * velocity;
-        break;
     }
 }
 

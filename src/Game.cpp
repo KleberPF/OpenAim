@@ -62,7 +62,7 @@ Game::Game()
             "../resources/textures/skybox/back.bmp" });
 
     m_resourceManager.addTexture(
-        "bricks", "../resources/textures/bricks.jpg", Texture::Type::Diffuse);
+        "bricks", "../resources/textures/bricks.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture("crosshair",
         "../resources/textures/crosshair.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture("white_pixel",

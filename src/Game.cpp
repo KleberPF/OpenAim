@@ -231,10 +231,9 @@ void Game::updateEntities()
 
     // move targets so they oscilate around their original position
     // on the x axis
-    // for (auto& entity : m_entities)
-    // {
-    //     float offset = 5 * sin(glfwGetTime());  // [-5, 5]
-    //     entity->moveRelative(glm::vec3(offset, 0.0, 0.0));
+    // for (auto& entity : m_entities) {
+    //     float offset = 5 * sin(glfwGetTime()); // [-5, 5]
+    //     entity.moveRelative(glm::vec3(offset, 0.0, 0.0));
     // }
 }
 

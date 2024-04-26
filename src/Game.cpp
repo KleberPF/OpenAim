@@ -154,14 +154,15 @@ Game::~Game()
 void Game::mainLoop()
 {
     while (!m_window.shouldClose()) {
-        processTiming();
+        mainLoopBegin();
         processInput();
+        updateEntities();
         render();
-        updateGlfw();
+        mainLoopEnd();
     }
 }
 
-void Game::processTiming()
+void Game::mainLoopBegin()
 {
     auto currentFrame = (float)glfwGetTime();
     m_deltaTime = currentFrame - m_lastFrame;
@@ -170,22 +171,7 @@ void Game::processTiming()
 
 void Game::processInput()
 {
-    // mouse input
-    auto [xpos, ypos] = m_inputManager.getCursorPos();
-
-    if (m_firstMouse) {
-        m_lastX = xpos;
-        m_lastY = ypos;
-        m_firstMouse = false;
-    }
-
-    float xoffset = xpos - m_lastX;
-    float yoffset
-        = m_lastY - ypos; // reversed since y-coordinates go from bottom to top
-
-    m_lastX = xpos;
-    m_lastY = ypos;
-
+    // high priority keys
     if (m_inputManager.isKeyToggled(GLFW_KEY_F1)) {
         glfwSetWindowShouldClose(m_window.getPtr(), true);
         return;
@@ -196,37 +182,58 @@ void Game::processInput()
     }
 
     if (m_inputManager.isKeyToggled(GLFW_KEY_ESCAPE)) {
-        m_paused = !m_paused;
+        togglePaused();
     }
 
-    if (!m_paused) {
-        updateEntities();
-        m_camera.processMouseMovement(xoffset, yoffset);
-        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-
-        // camera keyboard processing
-        // uncomment this to allow flying around
-        if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-            m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
-        }
-        if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-            m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
-        }
-        if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-            m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
-        }
-        if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-            m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
-        }
-    } else {
+    if (m_paused) {
         glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        return;
     }
 
-    m_inputManager.consolidateKeyStates();
+    // mouse input
+    if (m_inputManager.didCursorMove()) {
+        auto [xpos, ypos] = m_inputManager.getCursorPos();
+
+        if (m_ignoreCursorMovement) {
+            m_lastX = xpos;
+            m_lastY = ypos;
+            m_ignoreCursorMovement = false;
+        }
+
+        float xoffset = xpos - m_lastX;
+        float yoffset = m_lastY
+            - ypos; // reversed since y-coordinates go from bottom to top
+
+        m_lastX = xpos;
+        m_lastY = ypos;
+
+        m_camera.processMouseMovement(xoffset, yoffset);
+    }
+
+    glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    // camera keyboard processing
+    // uncomment this to allow flying around
+    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+        m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+        m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+        m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+        m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
+    }
 }
 
 void Game::updateEntities()
 {
+    if (m_paused) {
+        return;
+    }
+
     updateShotEntities();
 
     // move targets so they oscilate around their original position
@@ -319,10 +326,17 @@ void Game::render()
     }
 }
 
-void Game::updateGlfw()
+void Game::mainLoopEnd()
 {
+    m_inputManager.consolidateKeyStates();
     glfwSwapBuffers(m_window.getPtr());
     glfwPollEvents();
+}
+
+void Game::togglePaused()
+{
+    m_paused = !m_paused;
+    m_ignoreCursorMovement = true;
 }
 
 void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,

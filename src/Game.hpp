@@ -26,12 +26,14 @@ public:
     void mainLoop();
 
 private:
-    void processTiming();
+    void mainLoopBegin();
     void processInput();
     void updateEntities();
     void updateShotEntities();
     void render();
-    void updateGlfw();
+    void mainLoopEnd();
+
+    void togglePaused();
 
     Window m_window;
     Camera m_camera;
@@ -46,7 +48,10 @@ private:
     Weapon m_weapon;
 
     // mouse input
-    bool m_firstMouse = true;
+    // This is meant to be set every time we go from a free moving cursor to
+    // one locked in the middle of the screen.
+    // Right now, this happens when launching the game and after unpausing
+    bool m_ignoreCursorMovement = true;
     float m_lastX;
     float m_lastY;
     float m_mouseSensitivity = 0.03;

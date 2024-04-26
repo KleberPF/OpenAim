@@ -17,6 +17,7 @@
 #include <stb_image.h>
 
 #include <iostream>
+#include <memory>
 
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
@@ -144,6 +145,14 @@ Game::Game()
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f);
     m_sprites.push_back(crosshair);
+
+    m_globalLightSource.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
+    m_globalLightSource.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
+    m_globalLightSource.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+    m_globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
+
+    m_skybox = std::make_unique<Skybox>(m_resourceManager.getCubemap("skybox"),
+        m_resourceManager.getShader("skybox"));
 }
 
 Game::~Game()
@@ -291,21 +300,9 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    // TODO: move this somewhere it's done only once
-    // --------
-    LightSource globalLightSource;
-    globalLightSource.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-    globalLightSource.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
-    globalLightSource.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
-    globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
-
-    Skybox skybox(m_resourceManager.getCubemap("skybox"),
-        m_resourceManager.getShader("skybox"));
-    // --------
-
     Scene scene(m_camera, m_window.getWidth(), m_window.getHeight());
-    scene.globalLightSource = globalLightSource;
-    scene.skybox = skybox;
+    scene.globalLightSource = m_globalLightSource;
+    scene.skybox = *m_skybox;
     scene.entities = m_entities;
     scene.sprites = m_sprites;
 

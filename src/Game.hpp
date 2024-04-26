@@ -43,6 +43,8 @@ private:
     ResourceManager m_resourceManager;
     InputManager m_inputManager;
     RNG m_rng;
+    LightSource m_globalLightSource;
+    std::unique_ptr<Skybox> m_skybox;
 
     irrklang::ISoundEngine* m_soundEngine;
     Weapon m_weapon;

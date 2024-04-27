@@ -1,10 +1,5 @@
 #include "Weapon.hpp"
 
-Weapon::Weapon(irrklang::ISoundEngine* soundEngine)
-    : m_soundEngine(soundEngine)
-{
-}
-
 bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 {
     if (type == Type::SemiAuto && holdingMouseLeft) {
@@ -13,9 +8,6 @@ bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 
     if (currentTimeMs - m_lastTimeFiredMs >= m_shootDelaysMs[(int)type]) {
         m_lastTimeFiredMs = currentTimeMs;
-        if (type == Type::SemiAuto) { // temp just so my ears won't die
-            m_soundEngine->play2D("../resources/sounds/pistol.wav");
-        }
         return true;
     }
 

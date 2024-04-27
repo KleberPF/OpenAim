@@ -72,7 +72,6 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         glm
         assimp
-        IrrKlang
         # Add more libraries here as needed
 )
 

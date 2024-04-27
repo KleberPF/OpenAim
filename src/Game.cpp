@@ -14,7 +14,6 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
 #include <imgui.h>
-#include <irrKlang/irrKlang.h>
 #include <stb_image.h>
 
 #include <iostream>
@@ -24,8 +23,6 @@ Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
-    , m_soundEngine(irrklang::createIrrKlangDevice())
-    , m_weapon(m_soundEngine)
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -114,11 +111,6 @@ Game::Game()
     buildPlayArea();
     createClickingScenario();
     // createTrackingScenario();
-}
-
-Game::~Game()
-{
-    m_soundEngine->drop();
 }
 
 void Game::mainLoop()

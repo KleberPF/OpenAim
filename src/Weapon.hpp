@@ -1,11 +1,10 @@
 #pragma once
 
-#include <irrKlang/irrKlang.h>
-
 #include <array>
+
 class Weapon {
 public:
-    Weapon(irrklang::ISoundEngine* soundEngine);
+    Weapon() = default;
 
     enum class Type {
         SemiAuto,
@@ -22,5 +21,4 @@ private:
         = { 100.0f, 25.0f };
 
     float m_lastTimeFiredMs = 0.0f;
-    irrklang::ISoundEngine* m_soundEngine;
 };

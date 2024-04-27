@@ -5,6 +5,7 @@
 
 #include <glm/glm.hpp>
 
+#include <functional>
 #include <memory>
 #include <optional>
 
@@ -138,7 +139,15 @@ public:
     const std::string& getName() const;
     void setName(const std::string& name);
 
+    void setMovementPattern(std::function<glm::vec3(float)> callback);
+    void update(float timePassedSeconds);
+
     void render() const;
+
+    // This holds a reference position used for entity movement.
+    // For example, the point where the entity is circling or
+    // oscilating around
+    glm::vec3 referentialPos;
 
 private:
     // both are meant to be called after a move, resize or rotation
@@ -149,6 +158,11 @@ private:
 
     std::unique_ptr<CollisionObject> m_collisionObject = nullptr;
 
+    // This function is used to determine the new position of this entity
+    // given the current time of the application
+    // If null, we are going to assume this entity isn't moving
+    std::function<glm::vec3(float)> m_calculateNewPos = nullptr;
+
     std::string m_name;
     bool m_destroyable = false;
     int m_health = 1;
@@ -158,10 +172,6 @@ private:
 
     // This holds the actual position the entity is in
     glm::vec3 m_currentPos;
-    // This holds a reference position used for entity movement.
-    // For example, the point where the entity is circling or
-    // oscilating around
-    glm::vec3 m_referentialPos;
 
     Model m_model;
 };

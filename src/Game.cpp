@@ -107,6 +107,9 @@ Game::Game()
         entity.setSize(glm::vec3(0.3f));
         entity.setDestroyable(true);
         entity.setName("Ball " + std::to_string(i));
+        entity.setMovementPattern([](float timePassedSeconds) {
+            return glm::vec3(cos(4 * timePassedSeconds), 0.0f, 0.0f);
+        });
         m_entities.push_back(std::move(entity));
     }
 
@@ -245,12 +248,9 @@ void Game::updateEntities()
 
     updateShotEntities();
 
-    // move targets so they oscilate around their original position
-    // on the x axis
-    // for (auto& entity : m_entities) {
-    //     float offset = 5 * sin(glfwGetTime()); // [-5, 5]
-    //     entity.moveRelative(glm::vec3(offset, 0.0, 0.0));
-    // }
+    for (auto& entity : m_entities) {
+        entity.update(glfwGetTime());
+    }
 }
 
 void Game::updateShotEntities()
@@ -283,11 +283,10 @@ void Game::updateShotEntities()
     if (closestEntity != nullptr && closestEntity->isDestroyable()) {
         closestEntity->setHealth(closestEntity->getHealth() - 1);
         if (closestEntity->getHealth() <= 0) {
-            // move entity to a random location
             float newX = m_rng.getFloatInRange(-8, 8);
             float newY = m_rng.getFloatInRange(2, 8);
-            float newZ = -8;
-            closestEntity->move(glm::vec3(newX, newY, newZ));
+            float newZ = -8.0f;
+            closestEntity->referentialPos = glm::vec3(newX, newY, newZ);
         }
         m_shotsHit++;
     }

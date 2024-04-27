@@ -6,6 +6,8 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <utility>
+
 CollisionObject::CollisionObject(const glm::vec3& pos)
     : m_pos(pos)
 {
@@ -130,8 +132,8 @@ void CollisionSphere::setSize(const glm::vec3& size)
 }
 
 Entity::Entity(Model model, const glm::vec3& pos)
-    : m_currentPos(pos)
-    , m_referentialPos(pos)
+    : referentialPos(pos)
+    , m_currentPos(pos)
     , m_model(std::move(model))
 {
 }
@@ -153,7 +155,7 @@ std::optional<Rotation> Entity::getRotation() const
 
 const glm::vec3& Entity::getReferentialPos() const
 {
-    return m_referentialPos;
+    return referentialPos;
 }
 
 const glm::vec3& Entity::getCurrentPos() const
@@ -193,13 +195,13 @@ void Entity::move(const glm::vec3& newPos)
 
 void Entity::moveReferential(const glm::vec3& newPos)
 {
-    m_referentialPos = newPos;
+    referentialPos = newPos;
     move(newPos);
 }
 
 void Entity::moveRelative(const glm::vec3& newPos)
 {
-    move(m_referentialPos + newPos);
+    move(referentialPos + newPos);
 }
 
 const CollisionObject* Entity::getCollisionObject() const
@@ -268,6 +270,21 @@ const std::string& Entity::getName() const
 void Entity::setName(const std::string& name)
 {
     m_name = name;
+}
+
+void Entity::setMovementPattern(std::function<glm::vec3(float)> callback)
+{
+    m_calculateNewPos = std::move(callback);
+}
+
+void Entity::update(float timePassedSeconds)
+{
+    if (!m_calculateNewPos) {
+        return;
+    }
+
+    glm::vec3 newPos = m_calculateNewPos(timePassedSeconds);
+    moveRelative(newPos);
 }
 
 void Entity::render() const

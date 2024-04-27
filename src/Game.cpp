@@ -7,6 +7,7 @@
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Sprite.hpp"
+#include "Weapon.hpp"
 #include "Window.hpp"
 
 #include <GLFW/glfw3.h>
@@ -84,6 +85,9 @@ Game::Game()
         .addTexture(m_resourceManager.getTexture("crosshair"))
         .setColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
+    m_resourceManager.addModel("cube", "../resources/objects/cube/cube.obj",
+        m_resourceManager.getMaterial("targets"),
+        m_resourceManager.getShader("targets"));
     m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("targets"),
         m_resourceManager.getShader("targets"));
@@ -92,56 +96,6 @@ Game::Game()
         m_resourceManager.getShader("textured"));
 
     m_renderer = std::make_unique<Renderer>();
-
-    std::array<glm::vec3, 5> targetPositions = {
-        glm::vec3(-8.13, 9.2, -8.0),
-        glm::vec3(7.23, 6.6, -8.0),
-        glm::vec3(-4.27, 5.62, -8.0),
-        glm::vec3(5.04, 3.97, -8.0),
-        glm::vec3(-1.79, 1.26, -8.0),
-    };
-
-    for (size_t i = 0; i < targetPositions.size(); i++) {
-        Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
-        entity.addCollisionObject(CollisionObjectType::SPHERE);
-        entity.setSize(glm::vec3(0.3f));
-        entity.destroyable = true;
-        entity.setName("Ball " + std::to_string(i));
-        entity.setMovementPattern([](float timePassedSeconds) {
-            return glm::vec3(cos(4 * timePassedSeconds), 0.0f, 0.0f);
-        });
-        m_entities.push_back(std::move(entity));
-    }
-
-    Entity floor(m_resourceManager.getModel("plane"), glm::vec3(0));
-    floor.addCollisionObject(CollisionObjectType::AABB);
-    floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    floor.setName("Floor");
-    m_entities.push_back(std::move(floor));
-
-    Entity frontWall(
-        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
-    frontWall.addCollisionObject(CollisionObjectType::AABB);
-    frontWall.setRotation(90, 0, 0);
-    frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    frontWall.setName("Front Wall");
-    m_entities.push_back(std::move(frontWall));
-
-    Entity leftWall(
-        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
-    leftWall.addCollisionObject(CollisionObjectType::AABB);
-    leftWall.setRotation(90, 90, 0);
-    leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    leftWall.setName("Left Wall");
-    m_entities.push_back(std::move(leftWall));
-
-    Entity rightWall(
-        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
-    rightWall.addCollisionObject(CollisionObjectType::AABB);
-    rightWall.setRotation(90, -90, 0);
-    rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    rightWall.setName("Right Wall");
-    m_entities.push_back(std::move(rightWall));
 
     Sprite crosshair(m_resourceManager.getShader("sprite"),
         m_resourceManager.getMaterial("crosshair"),
@@ -156,6 +110,10 @@ Game::Game()
 
     m_skybox = std::make_unique<Skybox>(m_resourceManager.getCubemap("skybox"),
         m_resourceManager.getShader("skybox"));
+
+    buildPlayArea();
+    createClickingScenario();
+    // createTrackingScenario();
 }
 
 Game::~Game()
@@ -265,28 +223,30 @@ void Game::updateShotEntities()
         return;
     }
 
-    Entity* closestEntity = nullptr;
+    auto closestEntityIt = m_entities.end();
     float closestDist = FLT_MAX;
 
-    for (auto& entity : m_entities) {
+    for (auto it = m_entities.begin(); it != m_entities.end(); it++) {
+        const auto& entity = *it;
         auto intersection = entity.collisionObject()->isIntersectedByLine(
             m_camera.position(), m_camera.front());
 
         if (intersection.has_value()) {
             if (intersection->dist < closestDist) {
                 closestDist = intersection->dist;
-                closestEntity = &entity;
+                closestEntityIt = it;
             }
         }
     }
 
-    if (closestEntity != nullptr && closestEntity->destroyable) {
-        closestEntity->health--;
-        if (closestEntity->health <= 0) {
+    if (closestEntityIt != m_entities.end() && closestEntityIt->destroyable) {
+        closestEntityIt->health--;
+        if (closestEntityIt->health <= 0) {
             float newX = m_rng.getFloatInRange(-8, 8);
             float newY = m_rng.getFloatInRange(2, 8);
             float newZ = -8.0f;
-            closestEntity->referentialPos = glm::vec3(newX, newY, newZ);
+            closestEntityIt->referentialPos = glm::vec3(newX, newY, newZ);
+            // m_entities.erase(closestEntityIt);
         }
         m_shotsHit++;
     }
@@ -333,6 +293,81 @@ void Game::togglePaused()
 {
     m_paused = !m_paused;
     m_ignoreCursorMovement = true;
+}
+
+void Game::buildPlayArea()
+{
+    Entity floor(m_resourceManager.getModel("plane"), glm::vec3(0));
+    floor.addCollisionObject(CollisionObjectType::AABB);
+    floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    floor.setName("Floor");
+    m_entities.push_back(std::move(floor));
+
+    Entity frontWall(
+        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
+    frontWall.addCollisionObject(CollisionObjectType::AABB);
+    frontWall.setRotation(90, 0, 0);
+    frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    frontWall.setName("Front Wall");
+    m_entities.push_back(std::move(frontWall));
+
+    Entity leftWall(
+        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
+    leftWall.addCollisionObject(CollisionObjectType::AABB);
+    leftWall.setRotation(90, 90, 0);
+    leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    leftWall.setName("Left Wall");
+    m_entities.push_back(std::move(leftWall));
+
+    Entity rightWall(
+        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
+    rightWall.addCollisionObject(CollisionObjectType::AABB);
+    rightWall.setRotation(90, -90, 0);
+    rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    rightWall.setName("Right Wall");
+    m_entities.push_back(std::move(rightWall));
+}
+
+void Game::createClickingScenario()
+{
+    m_weapon.type = Weapon::Type::SemiAuto;
+
+    std::array<glm::vec3, 5> targetPositions = {
+        glm::vec3(-8.13, 9.2, -8.0),
+        glm::vec3(7.23, 6.6, -8.0),
+        glm::vec3(-4.27, 5.62, -8.0),
+        glm::vec3(5.04, 3.97, -8.0),
+        glm::vec3(-1.79, 1.26, -8.0),
+    };
+
+    for (size_t i = 0; i < targetPositions.size(); i++) {
+        Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
+        entity.addCollisionObject(CollisionObjectType::SPHERE);
+        entity.setSize(glm::vec3(0.3f));
+        entity.destroyable = true;
+        entity.setName("Ball " + std::to_string(i));
+        entity.setMovementPattern([](float timePassedSeconds) {
+            return glm::vec3(cos(4 * timePassedSeconds), 0.0f, 0.0f);
+        });
+        m_entities.push_back(std::move(entity));
+    }
+}
+
+void Game::createTrackingScenario()
+{
+    m_weapon.type = Weapon::Type::Auto;
+
+    Entity entity(
+        m_resourceManager.getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));
+    entity.addCollisionObject(CollisionObjectType::AABB);
+    entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
+    entity.destroyable = true;
+    entity.health = 200;
+    entity.setName("Moving target");
+    entity.setMovementPattern([](float timePassedSeconds) {
+        return glm::vec3(5 * cos(2 * timePassedSeconds), 0.0f, 0.0f);
+    });
+    m_entities.push_back(std::move(entity));
 }
 
 void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,

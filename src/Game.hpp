@@ -35,6 +35,10 @@ private:
 
     void togglePaused();
 
+    void buildPlayArea();
+    void createClickingScenario();
+    void createTrackingScenario();
+
     Window m_window;
     Camera m_camera;
     std::vector<Entity> m_entities;

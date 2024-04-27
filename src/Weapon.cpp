@@ -13,7 +13,9 @@ bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 
     if (currentTimeMs - m_lastTimeFiredMs >= m_shootDelaysMs[(int)type]) {
         m_lastTimeFiredMs = currentTimeMs;
-        m_soundEngine->play2D("../resources/sounds/pistol.wav");
+        if (type == Type::SemiAuto) { // temp just so my ears won't die
+            m_soundEngine->play2D("../resources/sounds/pistol.wav");
+        }
         return true;
     }
 

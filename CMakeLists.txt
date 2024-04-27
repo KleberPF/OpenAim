@@ -48,6 +48,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
 # Add assimp submodule
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
 
+# Add openal-soft submodule
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openal-soft)
+
 # Add an executable target
 add_executable(${PROJECT_NAME} ${SOURCES})
 

@@ -16,11 +16,8 @@ public:
 
     void render() const;
 
-    const Material& getMaterial() const;
-    void setMaterial(const Material& material);
-
-    const Shader& getShader() const;
-    void setShader(const Shader& shader);
+    std::reference_wrapper<const Material> material;
+    std::reference_wrapper<const Shader> shader;
 
 private:
     void processNode(aiNode* node, const aiScene* scene);
@@ -29,7 +26,4 @@ private:
     std::vector<Mesh> m_meshes;
     std::string m_directory;
     bool m_gammaCorrection;
-
-    std::reference_wrapper<const Material> m_material;
-    std::reference_wrapper<const Shader> m_shader;
 };

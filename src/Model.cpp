@@ -8,8 +8,8 @@
 
 Model::Model(
     const std::string& path, const Material& material, const Shader& shader)
-    : m_material(material)
-    , m_shader(shader)
+    : material(material)
+    , shader(shader)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,
@@ -31,26 +31,6 @@ void Model::render() const
     for (const auto& mesh : m_meshes) {
         mesh.render();
     }
-}
-
-const Material& Model::getMaterial() const
-{
-    return m_material;
-}
-
-void Model::setMaterial(const Material& material)
-{
-    m_material = material;
-}
-
-const Shader& Model::getShader() const
-{
-    return m_shader.get();
-}
-
-void Model::setShader(const Shader& shader)
-{
-    m_shader = shader;
 }
 
 void Model::processNode(aiNode* node, const aiScene* scene)

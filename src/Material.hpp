@@ -14,9 +14,9 @@ public:
     Texture(const std::string& path, Texture::Type type);
     virtual ~Texture() = default;
 
-    virtual void bind() const;
+    Texture::Type type() const;
 
-    Texture::Type getType() const;
+    virtual void bind() const;
 
 protected:
     Texture() = default;

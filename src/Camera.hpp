@@ -15,13 +15,13 @@ public:
     Camera(
         const glm::vec3& position, const glm::vec3& up, float yaw, float pitch);
 
-    glm::mat4 getViewMatrix() const;
+    glm::mat4 buildViewMatrix() const;
     void processKeyboard(CameraMovement direction, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset);
 
-    glm::vec3 getPosition() const;
-    glm::vec3 getFront() const;
-    float getZoom() const;
+    glm::vec3 position() const;
+    glm::vec3 front() const;
+    float zoom() const;
 
     void setMouseSensitivity(float sensitivity);
 

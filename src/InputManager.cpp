@@ -39,7 +39,7 @@ std::pair<float, float> InputManager::getCursorPos()
 {
     // double xpos = 0;
     // double ypos = 0;
-    // glfwGetCursorPos(m_window.getPtr(), &xpos, &ypos);
+    // glfwGetCursorPos(m_window.ptr(), &xpos, &ypos);
     // return { xpos, ypos };
     return m_cursorPos;
 }

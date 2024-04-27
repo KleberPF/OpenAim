@@ -52,12 +52,12 @@ Renderer::~Renderer()
 
 void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 {
-    const Shader& shader = entity.getShader();
+    const Shader& shader = entity.shader();
     shader.use();
 
     // lighting stuff
     if (scene.globalLightSource.has_value()) {
-        shader.setVec3("viewPos", scene.camera.getPosition());
+        shader.setVec3("viewPos", scene.camera.position());
         shader.setVec3(
             "light.direction", scene.globalLightSource->get().direction);
         shader.setVec3("light.ambient", scene.globalLightSource->get().ambient);
@@ -66,21 +66,20 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
             "light.specular", scene.globalLightSource->get().specular);
     }
 
-    glm::mat4 view = scene.camera.getViewMatrix();
+    glm::mat4 view = scene.camera.buildViewMatrix();
     shader.setMat4("view", view);
 
-    auto model = entity.getModelMatrix();
+    auto model = entity.modelMatrix();
     shader.setMat4("model", model);
-    shader.setMat3("normal", entity.getNormalMatrix());
+    shader.setMat3("normal", entity.normalMatrix());
 
-    glm::mat4 projection
-        = glm::perspective(glm::radians(scene.camera.getZoom()),
-            (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
+    glm::mat4 projection = glm::perspective(glm::radians(scene.camera.zoom()),
+        (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
 
     glm::mat4 mvp = projection * view * model;
     shader.setMat4("mvp", mvp);
 
-    entity.getMaterial().bind(shader);
+    entity.material().bind(shader);
     entity.render();
 }
 
@@ -121,12 +120,11 @@ void Renderer::renderSkybox(
     glDepthFunc(GL_LEQUAL);
     shader.use();
     // ... set view and projection matrix
-    glm::mat4 view = glm::mat4(glm::mat3(scene.camera.getViewMatrix()));
+    glm::mat4 view = glm::mat4(glm::mat3(scene.camera.buildViewMatrix()));
     shader.setMat4("view", view);
 
-    glm::mat4 projection
-        = glm::perspective(glm::radians(scene.camera.getZoom()),
-            (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
+    glm::mat4 projection = glm::perspective(glm::radians(scene.camera.zoom()),
+        (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
     shader.setMat4("projection", projection);
 
     glBindVertexArray(m_skyboxVao);

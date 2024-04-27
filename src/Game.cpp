@@ -25,8 +25,8 @@ Game::Game()
     , m_inputManager(m_window)
     , m_soundEngine(irrklang::createIrrKlangDevice())
     , m_weapon(m_soundEngine)
-    , m_lastX((float)m_window.getWidth() / 2)
-    , m_lastY((float)m_window.getHeight() / 2)
+    , m_lastX((float)m_window.width / 2)
+    , m_lastY((float)m_window.height / 2)
 {
     // opengl initialization
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -37,11 +37,11 @@ Game::Game()
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
-    InputManager::setupInputCallbacks(m_window.getPtr());
+    InputManager::setupInputCallbacks(m_window.ptr());
 
     // ImGui initialization
     ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(m_window.getPtr(), true);
+    ImGui_ImplGlfw_InitForOpenGL(m_window.ptr(), true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
     // load shaders and models
@@ -105,7 +105,7 @@ Game::Game()
         Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
         entity.addCollisionObject(CollisionObjectType::SPHERE);
         entity.setSize(glm::vec3(0.3f));
-        entity.setDestroyable(true);
+        entity.destroyable = true;
         entity.setName("Ball " + std::to_string(i));
         entity.setMovementPattern([](float timePassedSeconds) {
             return glm::vec3(cos(4 * timePassedSeconds), 0.0f, 0.0f);
@@ -185,7 +185,7 @@ void Game::processInput()
 {
     // high priority keys
     if (m_inputManager.isKeyToggled(GLFW_KEY_F1)) {
-        glfwSetWindowShouldClose(m_window.getPtr(), true);
+        glfwSetWindowShouldClose(m_window.ptr(), true);
         return;
     }
 
@@ -198,7 +198,7 @@ void Game::processInput()
     }
 
     if (m_paused) {
-        glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+        glfwSetInputMode(m_window.ptr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return;
     }
 
@@ -222,7 +222,7 @@ void Game::processInput()
         m_camera.processMouseMovement(xoffset, yoffset);
     }
 
-    glfwSetInputMode(m_window.getPtr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(m_window.ptr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // camera keyboard processing
     // uncomment this to allow flying around
@@ -269,8 +269,8 @@ void Game::updateShotEntities()
     float closestDist = FLT_MAX;
 
     for (auto& entity : m_entities) {
-        auto intersection = entity.getCollisionObject()->isIntersectedByLine(
-            m_camera.getPosition(), m_camera.getFront());
+        auto intersection = entity.collisionObject()->isIntersectedByLine(
+            m_camera.position(), m_camera.front());
 
         if (intersection.has_value()) {
             if (intersection->dist < closestDist) {
@@ -280,9 +280,9 @@ void Game::updateShotEntities()
         }
     }
 
-    if (closestEntity != nullptr && closestEntity->isDestroyable()) {
-        closestEntity->setHealth(closestEntity->getHealth() - 1);
-        if (closestEntity->getHealth() <= 0) {
+    if (closestEntity != nullptr && closestEntity->destroyable) {
+        closestEntity->health--;
+        if (closestEntity->health <= 0) {
             float newX = m_rng.getFloatInRange(-8, 8);
             float newY = m_rng.getFloatInRange(2, 8);
             float newZ = -8.0f;
@@ -299,7 +299,7 @@ void Game::render()
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    Scene scene(m_camera, m_window.getWidth(), m_window.getHeight());
+    Scene scene(m_camera, m_window.width, m_window.height);
     scene.globalLightSource = m_globalLightSource;
     scene.skybox = *m_skybox;
     scene.entities = m_entities;
@@ -325,7 +325,7 @@ void Game::render()
 void Game::mainLoopEnd()
 {
     m_inputManager.consolidateKeyStates();
-    glfwSwapBuffers(m_window.getPtr());
+    glfwSwapBuffers(m_window.ptr());
     glfwPollEvents();
 }
 

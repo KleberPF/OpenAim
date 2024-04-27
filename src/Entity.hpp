@@ -47,7 +47,6 @@ public:
         = 0;
 
     void setRotation(const Rotation& rotation);
-    std::optional<Rotation> getRotation() const;
 
     virtual void setSize(const glm::vec3& size) = 0;
 
@@ -107,34 +106,25 @@ public:
     Entity(Entity&& entity) = default;
     Entity& operator=(Entity&& entity) = default;
 
-    glm::mat4 getModelMatrix() const;
-    glm::mat3 getNormalMatrix() const;
+    glm::mat4 modelMatrix() const;
+    glm::mat3 normalMatrix() const;
 
-    std::optional<Rotation> getRotation() const;
-    const glm::vec3& getReferentialPos() const;
-    const glm::vec3& getCurrentPos() const;
-    const Shader& getShader() const;
-    const Material& getMaterial() const;
+    const Shader& shader() const;
+    const Material& material() const;
 
     void setRotation(float x, float y, float z);
     void move(const glm::vec3& newPos);
-    void moveReferential(const glm::vec3& newPos);
     // Moves relative to the referential
-    // Position after this should be referentialPos_ + newPos
+    // Position after this should be referentialPos + newPos
     void moveRelative(const glm::vec3& newPos);
 
-    const CollisionObject* getCollisionObject() const;
-
     void addCollisionObject(CollisionObjectType type);
+    const CollisionObject* collisionObject() const;
 
     bool isDestroyable() const;
     void setDestroyable(bool destroyable);
 
-    int getHealth() const;
-    void setHealth(int health);
-
     void setSize(const glm::vec3& size);
-    void setColor(const glm::vec3& color);
 
     const std::string& getName() const;
     void setName(const std::string& name);
@@ -148,6 +138,8 @@ public:
     // For example, the point where the entity is circling or
     // oscilating around
     glm::vec3 referentialPos;
+    bool destroyable = false;
+    int health = 1;
 
 private:
     // both are meant to be called after a move, resize or rotation
@@ -164,10 +156,7 @@ private:
     std::function<glm::vec3(float)> m_calculateNewPos = nullptr;
 
     std::string m_name;
-    bool m_destroyable = false;
-    int m_health = 1;
     glm::vec3 m_size = glm::vec3(1.0f);
-    glm::vec3 m_color = glm::vec3(0.0f);
     std::optional<Rotation> m_rotation;
 
     // This holds the actual position the entity is in

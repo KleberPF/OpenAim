@@ -12,19 +12,13 @@ public:
     bool shouldClose();
     void swapBuffers();
 
-    GLFWwindow* getPtr() const;
+    GLFWwindow* ptr() const;
 
-    int getWidth() const;
-    void setWidth(int width);
-
-    int getHeight() const;
-    void setHeight(int height);
+    int width;
+    int height;
 
 private:
     GLFWwindow* m_ptr;
     std::string m_title;
     bool m_fullscreen;
-
-    int m_width;
-    int m_height;
 };

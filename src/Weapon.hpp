@@ -15,11 +15,12 @@ public:
 
     bool tryShoot(float currentTimeMs, bool holdingMouseLeft);
 
+    Type type = Type::SemiAuto;
+
 private:
     const std::array<float, (int)Type::Last> m_shootDelaysMs
         = { 100.0f, 25.0f };
 
-    Type m_type = Type::SemiAuto;
     float m_lastTimeFiredMs = 0.0f;
     irrklang::ISoundEngine* m_soundEngine;
 };

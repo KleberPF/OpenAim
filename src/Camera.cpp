@@ -14,7 +14,7 @@ Camera::Camera(
     updateVectors();
 }
 
-glm::mat4 Camera::getViewMatrix() const
+glm::mat4 Camera::buildViewMatrix() const
 {
     return glm::lookAt(m_position, m_position + m_front, m_up);
 }
@@ -63,17 +63,17 @@ void Camera::processMouseMovement(float xoffset, float yoffset)
     updateVectors();
 }
 
-glm::vec3 Camera::getPosition() const
+glm::vec3 Camera::position() const
 {
     return m_position;
 }
 
-glm::vec3 Camera::getFront() const
+glm::vec3 Camera::front() const
 {
     return m_front;
 }
 
-float Camera::getZoom() const
+float Camera::zoom() const
 {
     return m_zoom;
 }

@@ -34,14 +34,14 @@ Texture::Texture(const std::string& path, Texture::Type type)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 }
 
+Texture::Type Texture::type() const
+{
+    return m_type;
+}
+
 void Texture::bind() const
 {
     glBindTexture(GL_TEXTURE_2D, m_id);
-}
-
-Texture::Type Texture::getType() const
-{
-    return m_type;
 }
 
 Cubemap::Cubemap(const std::array<std::string, 6>& paths)
@@ -118,7 +118,7 @@ void Material::bind(const Shader& shader) const
         const Texture& texture = m_textures[i];
         glActiveTexture(GL_TEXTURE0 + i);
 
-        shader.setInt(textureTypeToStr(texture.getType()), i);
+        shader.setInt(textureTypeToStr(texture.type()), i);
         texture.bind();
     }
 }

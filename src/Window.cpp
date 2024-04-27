@@ -9,15 +9,15 @@ static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
 {
     glViewport(0, 0, width, height);
     auto* windowObj = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    windowObj->setWidth(width);
-    windowObj->setHeight(height);
+    windowObj->width = width;
+    windowObj->height = height;
 }
 
 Window::Window(int width, int height, std::string title, bool fullscreen)
-    : m_title(std::move(title))
+    : width(width)
+    , height(height)
+    , m_title(std::move(title))
     , m_fullscreen(fullscreen)
-    , m_width(width)
-    , m_height(height)
 {
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
@@ -29,8 +29,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 #endif
 
     GLFWmonitor* monitor = fullscreen ? glfwGetPrimaryMonitor() : nullptr;
-    m_ptr = glfwCreateWindow(
-        m_width, m_height, m_title.c_str(), monitor, nullptr);
+    m_ptr = glfwCreateWindow(width, height, m_title.c_str(), monitor, nullptr);
     if (m_ptr == nullptr) {
         std::cerr << "Error creating GLFW window\n";
         glfwTerminate();
@@ -64,27 +63,7 @@ void Window::swapBuffers()
     glfwSwapBuffers(m_ptr);
 }
 
-GLFWwindow* Window::getPtr() const
+GLFWwindow* Window::ptr() const
 {
     return m_ptr;
-}
-
-int Window::getWidth() const
-{
-    return m_width;
-}
-
-void Window::setWidth(int width)
-{
-    m_width = width;
-}
-
-int Window::getHeight() const
-{
-    return m_height;
-}
-
-void Window::setHeight(int height)
-{
-    m_height = height;
 }

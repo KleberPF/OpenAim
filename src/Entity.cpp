@@ -18,11 +18,6 @@ void CollisionObject::setRotation(const Rotation& rotation)
     m_rotation = rotation;
 }
 
-std::optional<Rotation> CollisionObject::getRotation() const
-{
-    return m_rotation;
-}
-
 CollisionBox::CollisionBox(const glm::vec3& pos, const glm::vec3& size)
     : CollisionObject(pos)
 {
@@ -138,39 +133,24 @@ Entity::Entity(Model model, const glm::vec3& pos)
 {
 }
 
-glm::mat4 Entity::getModelMatrix() const
+glm::mat4 Entity::modelMatrix() const
 {
     return m_modelMatrix;
 }
 
-glm::mat3 Entity::getNormalMatrix() const
+glm::mat3 Entity::normalMatrix() const
 {
     return m_normalMatrix;
 }
 
-std::optional<Rotation> Entity::getRotation() const
+const Shader& Entity::shader() const
 {
-    return m_rotation;
+    return m_model.shader;
 }
 
-const glm::vec3& Entity::getReferentialPos() const
+const Material& Entity::material() const
 {
-    return referentialPos;
-}
-
-const glm::vec3& Entity::getCurrentPos() const
-{
-    return m_currentPos;
-}
-
-const Shader& Entity::getShader() const
-{
-    return m_model.getShader();
-}
-
-const Material& Entity::getMaterial() const
-{
-    return m_model.getMaterial();
+    return m_model.material;
 }
 
 void Entity::setRotation(float x, float y, float z)
@@ -193,20 +173,9 @@ void Entity::move(const glm::vec3& newPos)
     updateMatrices();
 }
 
-void Entity::moveReferential(const glm::vec3& newPos)
-{
-    referentialPos = newPos;
-    move(newPos);
-}
-
 void Entity::moveRelative(const glm::vec3& newPos)
 {
     move(referentialPos + newPos);
-}
-
-const CollisionObject* Entity::getCollisionObject() const
-{
-    return m_collisionObject.get();
 }
 
 void Entity::addCollisionObject(CollisionObjectType type)
@@ -227,24 +196,9 @@ void Entity::addCollisionObject(CollisionObjectType type)
     }
 }
 
-bool Entity::isDestroyable() const
+const CollisionObject* Entity::collisionObject() const
 {
-    return m_destroyable;
-}
-
-void Entity::setDestroyable(bool destroyable)
-{
-    m_destroyable = destroyable;
-}
-
-int Entity::getHealth() const
-{
-    return m_health;
-}
-
-void Entity::setHealth(int health)
-{
-    m_health = health;
+    return m_collisionObject.get();
 }
 
 void Entity::setSize(const glm::vec3& size)
@@ -255,11 +209,6 @@ void Entity::setSize(const glm::vec3& size)
     }
 
     updateMatrices();
-}
-
-void Entity::setColor(const glm::vec3& color)
-{
-    m_color = color;
 }
 
 const std::string& Entity::getName() const

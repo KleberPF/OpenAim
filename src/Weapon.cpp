@@ -13,7 +13,7 @@ bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 
     if (currentTimeMs - m_lastTimeFiredMs >= m_shootDelaysMs[(int)type]) {
         if (type == Type::SemiAuto && m_soundPlayer != nullptr) {
-            m_soundPlayer->play("pistol");
+            m_soundPlayer->playWithRandomPitch("pistol");
         }
         m_lastTimeFiredMs = currentTimeMs;
         return true;

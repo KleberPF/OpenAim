@@ -21,7 +21,7 @@
 #include <memory>
 
 Game::Game()
-    : m_window(SCR_WIDTH, SCR_HEIGHT, "Aim Trainer GL", FULLSCREEN)
+    : m_window(SCR_WIDTH, SCR_HEIGHT, "LibreAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
     , m_lastX((float)m_window.width / 2)
@@ -95,7 +95,7 @@ Game::Game()
 
     m_resourceManager.addSound("pistol", "../resources/sounds/pistol.ogg");
 
-    m_soundPlayer = std::make_unique<SoundPlayer>(m_resourceManager);
+    m_soundPlayer = std::make_unique<SoundPlayer>(m_resourceManager, m_rng);
     m_weapon = std::make_unique<Weapon>(m_soundPlayer.get());
     m_renderer = std::make_unique<Renderer>();
 

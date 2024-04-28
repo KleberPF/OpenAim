@@ -9,8 +9,9 @@
 #include <memory>
 #include <vector>
 
-SoundPlayer::SoundPlayer(const ResourceManager& resourceManager)
+SoundPlayer::SoundPlayer(const ResourceManager& resourceManager, RNG& rng)
     : m_resourceManager(resourceManager)
+    , m_rng(rng)
     , m_device(alcOpenDevice(nullptr))
 {
     if (!m_device) {
@@ -58,5 +59,13 @@ SoundPlayer::~SoundPlayer()
 void SoundPlayer::play(const std::string& soundName)
 {
     ALuint source = m_sources.at(soundName);
+    alSourcef(source, AL_PITCH, 1);
+    alSourcePlay(source);
+}
+
+void SoundPlayer::playWithRandomPitch(const std::string& soundName)
+{
+    ALuint source = m_sources.at(soundName);
+    alSourcef(source, AL_PITCH, m_rng.getFloatInRange(0.7f, 1.3f));
     alSourcePlay(source);
 }

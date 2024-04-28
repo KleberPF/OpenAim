@@ -40,10 +40,10 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     int texIndex = nk_glfw3_create_texture(pixels.data(), texWidth, texHeight);
     m_img = nk_image_id(texIndex);
 
-    m_bg.r = 1.0f;
-    m_bg.g = 0.0f;
-    m_bg.b = 0.0f;
-    m_bg.a = 1.0f;
+    m_settings.crosshairColor.r = 1.0f;
+    m_settings.crosshairColor.g = 0.0f;
+    m_settings.crosshairColor.b = 0.0f;
+    m_settings.crosshairColor.a = 1.0f;
 
     m_settings.sensitivity = 0.03f; // TODO: receive default settings
 }
@@ -64,6 +64,26 @@ void NuklearWrapper::renderPauseMenu()
         nk_layout_row_dynamic(m_ctx, 25, 1);
         nk_property_float(
             m_ctx, "Sensitivity:", 0, &m_settings.sensitivity, 1, 0.001, 0.001);
+
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, "Crosshair color:", NK_TEXT_LEFT);
+        nk_layout_row_dynamic(m_ctx, 25, 1);
+        if (nk_combo_begin_color(m_ctx, nk_rgb_cf(m_settings.crosshairColor),
+                nk_vec2(nk_widget_width(m_ctx), 400))) {
+            nk_layout_row_dynamic(m_ctx, 120, 1);
+            m_settings.crosshairColor
+                = nk_color_picker(m_ctx, m_settings.crosshairColor, NK_RGBA);
+            nk_layout_row_dynamic(m_ctx, 25, 1);
+            m_settings.crosshairColor.r = nk_propertyf(m_ctx, "#R:", 0,
+                m_settings.crosshairColor.r, 1.0f, 0.01f, 0.005f);
+            m_settings.crosshairColor.g = nk_propertyf(m_ctx, "#G:", 0,
+                m_settings.crosshairColor.g, 1.0f, 0.01f, 0.005f);
+            m_settings.crosshairColor.b = nk_propertyf(m_ctx, "#B:", 0,
+                m_settings.crosshairColor.b, 1.0f, 0.01f, 0.005f);
+            m_settings.crosshairColor.a = nk_propertyf(m_ctx, "#A:", 0,
+                m_settings.crosshairColor.a, 1.0f, 0.01f, 0.005f);
+            nk_combo_end(m_ctx);
+        }
     }
     nk_end(m_ctx);
 

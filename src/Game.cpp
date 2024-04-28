@@ -263,6 +263,10 @@ void Game::render()
 
         // TODO: probably encapsulate this in the future
         m_camera.setMouseSensitivity(m_nuklear.settings().sensitivity);
+        m_resourceManager.getMaterial("crosshair")
+            .setColor(glm::vec3(m_nuklear.settings().crosshairColor.r,
+                m_nuklear.settings().crosshairColor.g,
+                m_nuklear.settings().crosshairColor.b));
     } else {
         InputManager::setupInputCallbacks(m_window.ptr());
     }

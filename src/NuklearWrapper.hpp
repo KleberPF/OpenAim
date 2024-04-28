@@ -11,10 +11,12 @@
 #define NK_INCLUDE_FONT_BAKING
 #define NK_INCLUDE_DEFAULT_FONT
 #define NK_KEYSTATE_BASED_INPUT
+#include <glm/glm.hpp>
 #include <nuklear.h>
 
 struct SettingsData {
     float sensitivity;
+    nk_colorf crosshairColor;
 };
 
 class NuklearWrapper {

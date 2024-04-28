@@ -6,6 +6,7 @@
 #include "Material.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
+#include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -92,6 +93,10 @@ Game::Game()
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
+    m_resourceManager.addSound("pistol", "../resources/sounds/pistol.ogg");
+
+    m_soundPlayer = std::make_unique<SoundPlayer>(m_resourceManager);
+    m_weapon = std::make_unique<Weapon>(m_soundPlayer.get());
     m_renderer = std::make_unique<Renderer>();
 
     Sprite crosshair(m_resourceManager.getShader("sprite"),
@@ -211,7 +216,7 @@ void Game::updateShotEntities()
 
     bool isHoldingMouseButton
         = !m_inputManager.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT);
-    if (!m_weapon.tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
+    if (!m_weapon->tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
         return;
     }
 
@@ -322,7 +327,7 @@ void Game::buildPlayArea()
 
 void Game::createClickingScenario()
 {
-    m_weapon.type = Weapon::Type::SemiAuto;
+    m_weapon->type = Weapon::Type::SemiAuto;
 
     std::array<glm::vec3, 5> targetPositions = {
         glm::vec3(-8.13, 9.2, -8.0),
@@ -347,7 +352,7 @@ void Game::createClickingScenario()
 
 void Game::createTrackingScenario()
 {
-    m_weapon.type = Weapon::Type::Auto;
+    m_weapon->type = Weapon::Type::Auto;
 
     Entity entity(
         m_resourceManager.getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));

@@ -17,6 +17,7 @@ set(SOURCES
     src/Mesh.cpp
     src/Model.cpp
     src/stb_image.c
+    src/stb_vorbis.c
     src/Renderer.cpp
     src/ResourceManager.cpp
     src/InputManager.cpp
@@ -26,6 +27,8 @@ set(SOURCES
     src/Scene.cpp
     src/Weapon.cpp
     src/RNG.cpp
+    src/SoundPlayer.cpp
+    src/Sound.cpp
     include/imgui/imgui_demo.cpp
     include/imgui/imgui_draw.cpp
     include/imgui/imgui_tables.cpp
@@ -75,6 +78,7 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         glm
         assimp
+        openal
         # Add more libraries here as needed
 )
 

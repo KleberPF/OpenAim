@@ -6,6 +6,7 @@
 #include "RNG.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
+#include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -46,7 +47,8 @@ private:
     RNG m_rng;
     LightSource m_globalLightSource;
     std::unique_ptr<Skybox> m_skybox;
-    Weapon m_weapon;
+    std::unique_ptr<Weapon> m_weapon;
+    std::unique_ptr<SoundPlayer> m_soundPlayer;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

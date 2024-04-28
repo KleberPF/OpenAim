@@ -3,6 +3,7 @@
 #include "Material.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
+#include "Sound.hpp"
 
 void ResourceManager::addShader(const std::string& name,
     const std::string& vertexPath, const std::string& fragmentPath)
@@ -56,4 +57,14 @@ void ResourceManager::addMaterial(const std::string& name)
 Material& ResourceManager::getMaterial(const std::string& name)
 {
     return m_materials.at(name);
+}
+
+void ResourceManager::addSound(const std::string& name, const std::string& path)
+{
+    m_sounds.emplace_back(name, path);
+}
+
+const std::vector<Sound>& ResourceManager::getAllSounds() const
+{
+    return m_sounds;
 }

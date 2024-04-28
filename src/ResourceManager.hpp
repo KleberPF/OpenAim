@@ -6,6 +6,7 @@
 #include "Material.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
+#include "Sound.hpp"
 
 #include <array>
 #include <map>
@@ -33,6 +34,9 @@ public:
     void addMaterial(const std::string& name);
     Material& getMaterial(const std::string& name);
 
+    void addSound(const std::string& name, const std::string& path);
+    const std::vector<Sound>& getAllSounds() const;
+
 private:
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
@@ -41,4 +45,5 @@ private:
     std::map<std::string, Cubemap> m_cubemaps;
     std::map<std::string, Model> m_models;
     std::map<std::string, Material> m_materials;
+    std::vector<Sound> m_sounds;
 };

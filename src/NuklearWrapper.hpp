@@ -31,8 +31,7 @@ private:
     int m_width;
     int m_height;
     SettingsData m_settings;
+    SettingsData m_unsavedSettings;
 
     struct nk_context* m_ctx;
-    struct nk_colorf m_bg;
-    struct nk_image m_img;
 };

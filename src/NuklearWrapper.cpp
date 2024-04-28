@@ -33,19 +33,13 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     nk_glfw3_font_stash_begin(&atlas);
     nk_glfw3_font_stash_end();
 
-    const int texWidth = 256;
-    const int texHeight = 256;
-    std::array<char, (size_t)texWidth * texHeight * 4> pixels;
-    std::fill(pixels.begin(), pixels.end(), 128);
-    int texIndex = nk_glfw3_create_texture(pixels.data(), texWidth, texHeight);
-    m_img = nk_image_id(texIndex);
-
-    m_settings.crosshairColor.r = 1.0f;
-    m_settings.crosshairColor.g = 0.0f;
+    m_settings.crosshairColor.r = 0.0f;
+    m_settings.crosshairColor.g = 1.0f;
     m_settings.crosshairColor.b = 0.0f;
     m_settings.crosshairColor.a = 1.0f;
 
     m_settings.sensitivity = 0.03f; // TODO: receive default settings
+    m_unsavedSettings = m_settings;
 }
 
 void NuklearWrapper::renderPauseMenu()
@@ -62,27 +56,32 @@ void NuklearWrapper::renderPauseMenu()
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 
         nk_layout_row_dynamic(m_ctx, 25, 1);
-        nk_property_float(
-            m_ctx, "Sensitivity:", 0, &m_settings.sensitivity, 1, 0.001, 0.001);
+        nk_property_float(m_ctx, "Sensitivity:", 0,
+            &m_unsavedSettings.sensitivity, 1, 0.001, 0.001);
 
         nk_layout_row_dynamic(m_ctx, 20, 1);
         nk_label(m_ctx, "Crosshair color:", NK_TEXT_LEFT);
         nk_layout_row_dynamic(m_ctx, 25, 1);
-        if (nk_combo_begin_color(m_ctx, nk_rgb_cf(m_settings.crosshairColor),
+        if (nk_combo_begin_color(m_ctx,
+                nk_rgb_cf(m_unsavedSettings.crosshairColor),
                 nk_vec2(nk_widget_width(m_ctx), 400))) {
             nk_layout_row_dynamic(m_ctx, 120, 1);
-            m_settings.crosshairColor
-                = nk_color_picker(m_ctx, m_settings.crosshairColor, NK_RGBA);
+            m_unsavedSettings.crosshairColor = nk_color_picker(
+                m_ctx, m_unsavedSettings.crosshairColor, NK_RGBA);
             nk_layout_row_dynamic(m_ctx, 25, 1);
-            m_settings.crosshairColor.r = nk_propertyf(m_ctx, "#R:", 0,
-                m_settings.crosshairColor.r, 1.0f, 0.01f, 0.005f);
-            m_settings.crosshairColor.g = nk_propertyf(m_ctx, "#G:", 0,
-                m_settings.crosshairColor.g, 1.0f, 0.01f, 0.005f);
-            m_settings.crosshairColor.b = nk_propertyf(m_ctx, "#B:", 0,
-                m_settings.crosshairColor.b, 1.0f, 0.01f, 0.005f);
-            m_settings.crosshairColor.a = nk_propertyf(m_ctx, "#A:", 0,
-                m_settings.crosshairColor.a, 1.0f, 0.01f, 0.005f);
+            m_unsavedSettings.crosshairColor.r = nk_propertyf(m_ctx, "#R:", 0,
+                m_unsavedSettings.crosshairColor.r, 1.0f, 0.01f, 0.005f);
+            m_unsavedSettings.crosshairColor.g = nk_propertyf(m_ctx, "#G:", 0,
+                m_unsavedSettings.crosshairColor.g, 1.0f, 0.01f, 0.005f);
+            m_unsavedSettings.crosshairColor.b = nk_propertyf(m_ctx, "#B:", 0,
+                m_unsavedSettings.crosshairColor.b, 1.0f, 0.01f, 0.005f);
+            m_unsavedSettings.crosshairColor.a = nk_propertyf(m_ctx, "#A:", 0,
+                m_unsavedSettings.crosshairColor.a, 1.0f, 0.01f, 0.005f);
             nk_combo_end(m_ctx);
+        }
+
+        if (nk_button_label(m_ctx, "Save")) {
+            m_settings = m_unsavedSettings;
         }
     }
     nk_end(m_ctx);

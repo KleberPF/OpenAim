@@ -50,7 +50,7 @@ private:
     std::unique_ptr<Skybox> m_skybox;
     std::unique_ptr<Weapon> m_weapon;
     std::unique_ptr<SoundPlayer> m_soundPlayer;
-    NuklearWrapper m_nuk;
+    NuklearWrapper m_nuklear;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

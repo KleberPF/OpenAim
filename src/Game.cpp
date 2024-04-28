@@ -4,6 +4,7 @@
 #include "Entity.hpp"
 #include "InputManager.hpp"
 #include "Material.hpp"
+#include "NuklearWrapper.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "SoundPlayer.hpp"
@@ -21,7 +22,7 @@ Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "LibreAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
-    , m_nuk(m_window.ptr())
+    , m_nuklear(m_window.ptr())
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -258,7 +259,10 @@ void Game::render()
     m_renderer->renderScene(scene);
 
     if (m_paused) {
-        m_nuk.render();
+        m_nuklear.renderPauseMenu();
+
+        // TODO: probably encapsulate this in the future
+        m_camera.setMouseSensitivity(m_nuklear.settings().sensitivity);
     } else {
         InputManager::setupInputCallbacks(m_window.ptr());
     }

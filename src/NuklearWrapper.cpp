@@ -44,61 +44,33 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     m_bg.g = 0.0f;
     m_bg.b = 0.0f;
     m_bg.a = 1.0f;
+
+    m_settings.sensitivity = 0.03f; // TODO: receive default settings
 }
 
-void NuklearWrapper::render()
+void NuklearWrapper::renderPauseMenu()
 {
     nk_glfw3_set_callbacks();
     nk_glfw3_new_frame();
 
-    if (nk_begin(m_ctx, "Demo", nk_rect(50, 50, 230, 250),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE
-                | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
-        enum { EASY, HARD };
-        int op = EASY;
-        int property = 20;
-        nk_layout_row_static(m_ctx, 30, 80, 1);
-        // if (nk_button_label(m_ctx, "button")) {
-        //     std::cout << "button pressed\n";
-        // }
+    glfwGetWindowSize(m_window, &m_width, &m_height);
+    int rectSize = 300;
 
-        nk_layout_row_dynamic(m_ctx, 30, 2);
-        if (nk_option_label(m_ctx, "easy", op == EASY)) {
-            op = EASY;
-        }
-        if (nk_option_label(m_ctx, "hard", op == HARD)) {
-            op = HARD;
-        }
+    if (nk_begin(m_ctx, "Settings",
+            nk_rect((m_width - rectSize) / 2, (m_height - rectSize) / 2,
+                rectSize, rectSize),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 
         nk_layout_row_dynamic(m_ctx, 25, 1);
-        nk_property_int(m_ctx, "Compression:", 0, &property, 100, 10, 1);
-
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, "background:", NK_TEXT_LEFT);
-        nk_layout_row_dynamic(m_ctx, 25, 1);
-        if (nk_combo_begin_color(
-                m_ctx, nk_rgb_cf(m_bg), nk_vec2(nk_widget_width(m_ctx), 400))) {
-            nk_layout_row_dynamic(m_ctx, 120, 1);
-            m_bg = nk_color_picker(m_ctx, m_bg, NK_RGBA);
-            nk_layout_row_dynamic(m_ctx, 25, 1);
-            m_bg.r = nk_propertyf(m_ctx, "#R:", 0, m_bg.r, 1.0f, 0.01f, 0.005f);
-            m_bg.g = nk_propertyf(m_ctx, "#G:", 0, m_bg.g, 1.0f, 0.01f, 0.005f);
-            m_bg.b = nk_propertyf(m_ctx, "#B:", 0, m_bg.b, 1.0f, 0.01f, 0.005f);
-            m_bg.a = nk_propertyf(m_ctx, "#A:", 0, m_bg.a, 1.0f, 0.01f, 0.005f);
-            nk_combo_end(m_ctx);
-        }
-    }
-    nk_end(m_ctx);
-
-    /* Bindless Texture */
-    if (nk_begin(m_ctx, "Texture", nk_rect(250, 150, 230, 250),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE
-                | NK_WINDOW_MINIMIZABLE | NK_WINDOW_TITLE)) {
-        struct nk_command_buffer* canvas = nk_window_get_canvas(m_ctx);
-        struct nk_rect totalSpace = nk_window_get_content_region(m_ctx);
-        nk_draw_image(canvas, totalSpace, &m_img, nk_white);
+        nk_property_float(
+            m_ctx, "Sensitivity:", 0, &m_settings.sensitivity, 1, 0.001, 0.001);
     }
     nk_end(m_ctx);
 
     nk_glfw3_render(NK_ANTI_ALIASING_ON);
+}
+
+const SettingsData& NuklearWrapper::settings() const
+{
+    return m_settings;
 }

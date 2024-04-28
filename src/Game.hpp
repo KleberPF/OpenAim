@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "Entity.hpp"
 #include "InputManager.hpp"
+#include "NuklearWrapper.hpp"
 #include "RNG.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
@@ -49,6 +50,7 @@ private:
     std::unique_ptr<Skybox> m_skybox;
     std::unique_ptr<Weapon> m_weapon;
     std::unique_ptr<SoundPlayer> m_soundPlayer;
+    NuklearWrapper m_nuk;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

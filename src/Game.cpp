@@ -12,9 +12,6 @@
 #include "Window.hpp"
 
 #include <GLFW/glfw3.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <imgui.h>
 #include <stb_image.h>
 
 #include <iostream>
@@ -24,6 +21,7 @@ Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "LibreAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
+    , m_nuk(m_window.ptr())
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -37,11 +35,6 @@ Game::Game()
     glDebugMessageCallback(messageCallback, nullptr);
 
     InputManager::setupInputCallbacks(m_window.ptr());
-
-    // ImGui initialization
-    ImGui::CreateContext();
-    ImGui_ImplGlfw_InitForOpenGL(m_window.ptr(), true);
-    ImGui_ImplOpenGL3_Init("#version 130");
 
     // load shaders and models
     m_resourceManager.addShader("sprite", "../resources/shaders/sprite.vert",
@@ -264,18 +257,10 @@ void Game::render()
 
     m_renderer->renderScene(scene);
 
-    // render ImGui stuff
     if (m_paused) {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-
-        // Kinda out of place, just a proof of concept
-        ImGui::SliderFloat("Sensitivity", &m_mouseSensitivity, 0, 0.5);
-        m_camera.setMouseSensitivity(m_mouseSensitivity);
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        m_nuk.render();
+    } else {
+        InputManager::setupInputCallbacks(m_window.ptr());
     }
 }
 

@@ -7,9 +7,6 @@
 [submodule "lib/assimp"]
 	path = lib/assimp
 	url = https://github.com/assimp/assimp.git
-[submodule "include/imgui"]
-	path = include/imgui
-	url = https://github.com/ocornut/imgui.git
 [submodule "lib/openal-soft"]
 	path = lib/openal-soft
 	url = https://github.com/kcat/openal-soft.git

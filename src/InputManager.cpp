@@ -61,6 +61,8 @@ void InputManager::setupInputCallbacks(GLFWwindow* window)
     glfwSetKeyCallback(window, InputManager::keyCallback);
     glfwSetMouseButtonCallback(window, InputManager::mouseButtonCallback);
     glfwSetCursorPosCallback(window, InputManager::cursorPosCallback);
+    glfwSetScrollCallback(window, nullptr);
+    glfwSetCharCallback(window, nullptr);
 }
 
 void InputManager::setKeyPressed(int key, bool pressed)

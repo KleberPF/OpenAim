@@ -38,7 +38,7 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     m_settings.crosshairColor.b = 0.0f;
     m_settings.crosshairColor.a = 1.0f;
 
-    m_settings.sensitivity = 0.03f; // TODO: receive default settings
+    m_settings.sensitivity = 2.5f; // TODO: receive default settings
     m_unsavedSettings = m_settings;
 }
 
@@ -55,9 +55,13 @@ void NuklearWrapper::renderPauseMenu()
                 rectSize, rectSize),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 
-        nk_layout_row_dynamic(m_ctx, 25, 1);
+        nk_layout_row_dynamic(m_ctx, 30, 1);
+        nk_label_wrap(m_ctx,
+            "For now this number doesn't mean anything so play around with "
+            "it");
+        nk_layout_row_dynamic(m_ctx, 20, 1);
         nk_property_float(m_ctx, "Sensitivity:", 0,
-            &m_unsavedSettings.sensitivity, 1, 0.001, 0.001);
+            &m_unsavedSettings.sensitivity, 30, 0.1, 0.1);
 
         nk_layout_row_dynamic(m_ctx, 20, 1);
         nk_label(m_ctx, "Crosshair color:", NK_TEXT_LEFT);

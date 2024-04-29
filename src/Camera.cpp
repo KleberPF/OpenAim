@@ -47,8 +47,8 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime)
 
 void Camera::processMouseMovement(float xoffset, float yoffset)
 {
-    xoffset *= m_mouseSensitivity;
-    yoffset *= m_mouseSensitivity;
+    xoffset *= m_mouseSensitivity / 100;
+    yoffset *= m_mouseSensitivity / 100;
 
     m_yaw += xoffset;
     m_pitch += yoffset;

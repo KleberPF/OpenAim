@@ -59,7 +59,6 @@ private:
     bool m_ignoreCursorMovement = true;
     float m_lastX;
     float m_lastY;
-    float m_mouseSensitivity = 0.03;
 
     // timing
     float m_deltaTime = 0.0;

@@ -38,7 +38,7 @@ private:
 
     // options
     float m_movementSpeed = 8.0f;
-    float m_mouseSensitivity = 0.025;
+    float m_mouseSensitivity = 2.5f;
     float m_zoom = 45.0;
 
     void updateVectors();

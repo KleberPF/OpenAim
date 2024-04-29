@@ -40,6 +40,11 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     m_settings.crosshairColor.b = 0.0f;
     m_settings.crosshairColor.a = 1.0f;
 
+    m_settings.targetColor.r = 0.125f;
+    m_settings.targetColor.g = 0.55f;
+    m_settings.targetColor.b = 0.9f;
+    m_settings.targetColor.a = 1.0f;
+
     m_settings.sensitivity = 2.5f; // TODO: receive default settings
     m_unsavedSettings = m_settings;
 }
@@ -70,26 +75,8 @@ void NuklearWrapper::renderPauseMenu()
         nk_property_float(m_ctx, "Sensitivity:", 0,
             &m_unsavedSettings.sensitivity, 30, 0.1, 0.1);
 
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, "Crosshair color:", NK_TEXT_LEFT);
-        nk_layout_row_dynamic(m_ctx, 25, 1);
-        if (nk_combo_begin_color(m_ctx,
-                nk_rgb_cf(m_unsavedSettings.crosshairColor),
-                nk_vec2(nk_widget_width(m_ctx), 400))) {
-            nk_layout_row_dynamic(m_ctx, 120, 1);
-            m_unsavedSettings.crosshairColor = nk_color_picker(
-                m_ctx, m_unsavedSettings.crosshairColor, NK_RGBA);
-            nk_layout_row_dynamic(m_ctx, 25, 1);
-            m_unsavedSettings.crosshairColor.r = nk_propertyf(m_ctx, "#R:", 0,
-                m_unsavedSettings.crosshairColor.r, 1.0f, 0.01f, 0.005f);
-            m_unsavedSettings.crosshairColor.g = nk_propertyf(m_ctx, "#G:", 0,
-                m_unsavedSettings.crosshairColor.g, 1.0f, 0.01f, 0.005f);
-            m_unsavedSettings.crosshairColor.b = nk_propertyf(m_ctx, "#B:", 0,
-                m_unsavedSettings.crosshairColor.b, 1.0f, 0.01f, 0.005f);
-            m_unsavedSettings.crosshairColor.a = nk_propertyf(m_ctx, "#A:", 0,
-                m_unsavedSettings.crosshairColor.a, 1.0f, 0.01f, 0.005f);
-            nk_combo_end(m_ctx);
-        }
+        renderColorPicker("Crosshair color:", m_unsavedSettings.crosshairColor);
+        renderColorPicker("Target color:", m_unsavedSettings.targetColor);
 
         if (nk_button_label(m_ctx, "Save")) {
             m_settings = m_unsavedSettings;
@@ -142,4 +129,23 @@ void NuklearWrapper::renderEnd()
 const SettingsData& NuklearWrapper::settings() const
 {
     return m_settings;
+}
+
+void NuklearWrapper::renderColorPicker(
+    const std::string& name, nk_colorf& color)
+{
+    nk_layout_row_dynamic(m_ctx, 20, 1);
+    nk_label(m_ctx, name.c_str(), NK_TEXT_LEFT);
+    nk_layout_row_dynamic(m_ctx, 25, 1);
+    if (nk_combo_begin_color(
+            m_ctx, nk_rgb_cf(color), nk_vec2(nk_widget_width(m_ctx), 400))) {
+        nk_layout_row_dynamic(m_ctx, 120, 1);
+        color = nk_color_picker(m_ctx, color, NK_RGBA);
+        nk_layout_row_dynamic(m_ctx, 25, 1);
+        color.r = nk_propertyf(m_ctx, "#R:", 0, color.r, 1.0f, 0.01f, 0.005f);
+        color.g = nk_propertyf(m_ctx, "#G:", 0, color.g, 1.0f, 0.01f, 0.005f);
+        color.b = nk_propertyf(m_ctx, "#B:", 0, color.b, 1.0f, 0.01f, 0.005f);
+        color.a = nk_propertyf(m_ctx, "#A:", 0, color.a, 1.0f, 0.01f, 0.005f);
+        nk_combo_end(m_ctx);
+    }
 }

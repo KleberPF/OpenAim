@@ -273,6 +273,10 @@ void Game::render()
             .setColor(glm::vec3(m_nuklear.settings().crosshairColor.r,
                 m_nuklear.settings().crosshairColor.g,
                 m_nuklear.settings().crosshairColor.b));
+        m_resourceManager.getMaterial("targets").setColor(
+            glm::vec3(m_nuklear.settings().targetColor.r,
+                m_nuklear.settings().targetColor.g,
+                m_nuklear.settings().targetColor.b));
     } else {
         InputManager::setupInputCallbacks(m_window.ptr());
     }

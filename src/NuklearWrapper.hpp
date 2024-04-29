@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -17,6 +18,7 @@
 struct SettingsData {
     float sensitivity;
     nk_colorf crosshairColor;
+    nk_colorf targetColor;
 };
 
 class NuklearWrapper {
@@ -31,6 +33,8 @@ public:
     const SettingsData& settings() const;
 
 private:
+    void renderColorPicker(const std::string& name, nk_colorf& color);
+
     GLFWwindow* m_window;
     int m_width;
     int m_height;

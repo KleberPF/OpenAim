@@ -5,7 +5,9 @@
 
 #include <algorithm>
 #include <array>
+#include <format>
 #include <iostream>
+#include <string>
 
 #define NK_IMPLEMENTATION
 #define NK_GLFW_GL4_IMPLEMENTATION
@@ -42,10 +44,15 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     m_unsavedSettings = m_settings;
 }
 
+void NuklearWrapper::renderBegin()
+{
+    nk_glfw3_new_frame();
+}
+
 void NuklearWrapper::renderPauseMenu()
 {
     nk_glfw3_set_callbacks();
-    nk_glfw3_new_frame();
+    // nk_glfw3_new_frame();
 
     glfwGetWindowSize(m_window, &m_width, &m_height);
     int rectSize = 300;
@@ -90,6 +97,42 @@ void NuklearWrapper::renderPauseMenu()
     }
     nk_end(m_ctx);
 
+    // nk_glfw3_render(NK_ANTI_ALIASING_ON);
+}
+
+void NuklearWrapper::renderStats(
+    int shotsHit, int totalShots, float timeElapsedSeconds)
+{
+    // nk_glfw3_new_frame();
+
+    if (nk_begin(m_ctx, "Stats", nk_rect(10, 10, 200, 150),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        std::string shotsHitLabel = std::format("Shots hit: {}", shotsHit);
+        std::string totalShotsLabel
+            = std::format("Total shots: {}", totalShots);
+        float accuracy
+            = totalShots > 0 ? (float)shotsHit / totalShots * 100 : 0;
+        std::string accuracyLabel = std::format("Accuracy: {:.2f}%", accuracy);
+        std::string timeElapsedLabel
+            = std::format("Time elapsed: {:.2f}s", timeElapsedSeconds);
+
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, shotsHitLabel.c_str(), NK_TEXT_LEFT);
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, totalShotsLabel.c_str(), NK_TEXT_LEFT);
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, accuracyLabel.c_str(), NK_TEXT_LEFT);
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, timeElapsedLabel.c_str(), NK_TEXT_LEFT);
+    }
+
+    nk_end(m_ctx);
+
+    // nk_glfw3_render(NK_ANTI_ALIASING_ON);
+}
+
+void NuklearWrapper::renderEnd()
+{
     nk_glfw3_render(NK_ANTI_ALIASING_ON);
 }
 

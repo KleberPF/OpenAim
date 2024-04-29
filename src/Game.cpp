@@ -261,6 +261,8 @@ void Game::render()
     scene.sprites = m_sprites;
 
     m_renderer->renderScene(scene);
+    NuklearWrapper::renderBegin();
+    m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds);
 
     if (m_paused) {
         m_nuklear.renderPauseMenu();
@@ -274,6 +276,8 @@ void Game::render()
     } else {
         InputManager::setupInputCallbacks(m_window.ptr());
     }
+
+    NuklearWrapper::renderEnd();
 }
 
 void Game::mainLoopEnd()

@@ -23,7 +23,11 @@ class NuklearWrapper {
 public:
     NuklearWrapper(GLFWwindow* window);
 
+    static void renderBegin();
     void renderPauseMenu();
+    void renderStats(int shotsHit, int totalShots, float timeElapsedSeconds);
+    static void renderEnd();
+
     const SettingsData& settings() const;
 
 private:

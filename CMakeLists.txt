@@ -86,5 +86,6 @@ target_compile_options(${PROJECT_NAME}
 )
 
 # Optionally, set C++ standard
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+# set(CMAKE_CXX_STANDARD 20)
+# set(CMAKE_CXX_STANDARD_REQUIRED True)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)

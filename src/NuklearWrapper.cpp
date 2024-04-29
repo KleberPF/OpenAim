@@ -116,14 +116,17 @@ void NuklearWrapper::renderStats(
         std::string timeElapsedLabel
             = std::format("Time elapsed: {:.2f}s", timeElapsedSeconds);
 
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, shotsHitLabel.c_str(), NK_TEXT_LEFT);
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, totalShotsLabel.c_str(), NK_TEXT_LEFT);
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, accuracyLabel.c_str(), NK_TEXT_LEFT);
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_label(m_ctx, timeElapsedLabel.c_str(), NK_TEXT_LEFT);
+        std::array<std::string, 4> statsLabels = {
+            std::format("Shots hit: {}", shotsHit),
+            std::format("Total shots: {}", totalShots),
+            std::format("Accuracy: {:.2f}%", accuracy),
+            std::format("Time elapsed: {:.2f}s", timeElapsedSeconds),
+        };
+
+        for (auto& label : statsLabels) {
+            nk_layout_row_dynamic(m_ctx, 20, 1);
+            nk_label(m_ctx, label.c_str(), NK_TEXT_LEFT);
+        }
     }
 
     nk_end(m_ctx);

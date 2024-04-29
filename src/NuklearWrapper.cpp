@@ -63,7 +63,7 @@ void NuklearWrapper::renderPauseMenu()
     int rectSize = 300;
 
     if (nk_begin(m_ctx, "Settings",
-            nk_rect((m_width - rectSize) / 2, (m_height - rectSize) / 2,
+            nk_rect((m_width - rectSize) / 2 + 200, (m_height - rectSize) / 2,
                 rectSize, rectSize),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 

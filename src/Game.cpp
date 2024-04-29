@@ -19,7 +19,7 @@
 #include <memory>
 
 Game::Game()
-    : m_window(SCR_WIDTH, SCR_HEIGHT, "LibreAim", FULLSCREEN)
+    : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
     , m_nuklear(m_window.ptr())

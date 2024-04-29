@@ -100,8 +100,8 @@ Game::Game()
     m_sprites.push_back(crosshair);
 
     m_globalLightSource.direction = glm::vec3(-0.2f, -1.0f, -0.3f);
-    m_globalLightSource.ambient = glm::vec3(0.4f, 0.4f, 0.4f);
-    m_globalLightSource.diffuse = glm::vec3(0.7f, 0.7f, 0.7f);
+    m_globalLightSource.ambient = glm::vec3(0.6f, 0.6f, 0.6f);
+    m_globalLightSource.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     m_globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
     m_skybox = std::make_unique<Skybox>(m_resourceManager.getCubemap("skybox"),

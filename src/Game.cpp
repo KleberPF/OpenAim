@@ -128,6 +128,10 @@ void Game::mainLoopBegin()
     auto currentFrame = (float)glfwGetTime();
     m_deltaTime = currentFrame - m_lastFrame;
     m_lastFrame = currentFrame;
+
+    if (!m_paused) {
+        m_totalTimeSeconds += m_deltaTime;
+    }
 }
 
 void Game::processInput()
@@ -198,7 +202,7 @@ void Game::updateEntities()
     updateShotEntities();
 
     for (auto& entity : m_entities) {
-        entity.update(glfwGetTime());
+        entity.update(m_totalTimeSeconds);
     }
 }
 

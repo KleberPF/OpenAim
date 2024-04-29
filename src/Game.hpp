@@ -61,6 +61,9 @@ private:
     float m_lastY;
 
     // timing
+    // Time elapsed since the app started running
+    // without considering time spent paused
+    float m_totalTimeSeconds = 0.0f;
     float m_deltaTime = 0.0;
     float m_lastFrame = 0.0;
 

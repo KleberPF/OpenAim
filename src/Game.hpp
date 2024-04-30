@@ -42,15 +42,17 @@ private:
     Camera m_camera;
     std::vector<Entity> m_entities;
     std::vector<Sprite> m_sprites;
-    std::unique_ptr<Renderer> m_renderer;
-    ResourceManager m_resourceManager;
+    Renderer m_renderer;
     InputManager m_inputManager;
-    RNG m_rng;
     LightSource m_globalLightSource;
     std::unique_ptr<Skybox> m_skybox;
-    std::unique_ptr<Weapon> m_weapon;
-    std::unique_ptr<SoundPlayer> m_soundPlayer;
+    Weapon m_weapon;
     NuklearWrapper m_nuklear;
+
+    // globals
+    RNG m_rng;
+    ResourceManager m_resourceManager;
+    std::unique_ptr<SoundPlayer> m_soundPlayer;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

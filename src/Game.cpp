@@ -2,9 +2,12 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "Globals.hpp"
 #include "InputManager.hpp"
 #include "Material.hpp"
 #include "NuklearWrapper.hpp"
+#include "RNG.hpp"
+#include "ResourceManager.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "SoundPlayer.hpp"
@@ -17,6 +20,11 @@
 
 #include <iostream>
 #include <memory>
+
+// globals
+RNG* g_rng;
+ResourceManager* g_resourceManager;
+SoundPlayer* g_soundPlayer;
 
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
@@ -89,12 +97,14 @@ Game::Game()
 
     m_resourceManager.addSound("pistol", "../resources/sounds/pistol.ogg");
 
-    m_soundPlayer = std::make_unique<SoundPlayer>(m_resourceManager, m_rng);
-    m_weapon = std::make_unique<Weapon>(m_soundPlayer.get());
-    m_renderer = std::make_unique<Renderer>();
+    // set/create globals
+    g_rng = &m_rng;
+    g_resourceManager = &m_resourceManager;
+    m_soundPlayer = std::make_unique<SoundPlayer>();
+    g_soundPlayer = m_soundPlayer.get();
 
-    Sprite crosshair(m_resourceManager.getShader("sprite"),
-        m_resourceManager.getMaterial("crosshair"),
+    Sprite crosshair(g_resourceManager->getShader("sprite"),
+        g_resourceManager->getMaterial("crosshair"),
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f);
     m_sprites.push_back(crosshair);
@@ -104,8 +114,8 @@ Game::Game()
     m_globalLightSource.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     m_globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    m_skybox = std::make_unique<Skybox>(m_resourceManager.getCubemap("skybox"),
-        m_resourceManager.getShader("skybox"));
+    m_skybox = std::make_unique<Skybox>(g_resourceManager->getCubemap("skybox"),
+        g_resourceManager->getShader("skybox"));
 
     buildPlayArea();
     createClickingScenario();
@@ -212,8 +222,8 @@ void Game::updateEntities()
         if (it->type == Entity::Type::GONER) {
             it = m_entities.erase(it);
         } else if (it->type == Entity::Type::MOVER) {
-            float newX = m_rng.getFloatInRange(-8.0f, 8.0f);
-            float newY = m_rng.getFloatInRange(2.0f, 18.0f);
+            float newX = g_rng->getFloatInRange(-8.0f, 8.0f);
+            float newY = g_rng->getFloatInRange(2.0f, 18.0f);
             float newZ = -8.0f;
             it->referentialPos = glm::vec3(newX, newY, newZ);
             it->moveRelative(glm::vec3(0.0f, 0.0f,
@@ -231,7 +241,7 @@ void Game::updateShotEntities()
 
     bool isHoldingMouseButton
         = !m_inputManager.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT);
-    if (!m_weapon->tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
+    if (!m_weapon.tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
         return;
     }
 
@@ -270,7 +280,7 @@ void Game::render()
     scene.entities = m_entities;
     scene.sprites = m_sprites;
 
-    m_renderer->renderScene(scene);
+    m_renderer.renderScene(scene);
     NuklearWrapper::renderBegin();
     m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds);
 
@@ -279,11 +289,11 @@ void Game::render()
 
         // TODO: probably encapsulate this in the future
         m_camera.setMouseSensitivity(m_nuklear.settings().sensitivity);
-        m_resourceManager.getMaterial("crosshair")
+        g_resourceManager->getMaterial("crosshair")
             .setColor(glm::vec3(m_nuklear.settings().crosshairColor.r,
                 m_nuklear.settings().crosshairColor.g,
                 m_nuklear.settings().crosshairColor.b));
-        m_resourceManager.getMaterial("targets").setColor(
+        g_resourceManager->getMaterial("targets").setColor(
             glm::vec3(m_nuklear.settings().targetColor.r,
                 m_nuklear.settings().targetColor.g,
                 m_nuklear.settings().targetColor.b));
@@ -309,14 +319,14 @@ void Game::togglePaused()
 
 void Game::buildPlayArea()
 {
-    Entity floor(m_resourceManager.getModel("plane"), glm::vec3(0));
+    Entity floor(g_resourceManager->getModel("plane"), glm::vec3(0));
     floor.addCollisionObject(CollisionObjectType::AABB);
     floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     floor.setName("Floor");
     m_entities.push_back(std::move(floor));
 
     Entity frontWall(
-        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
+        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
     frontWall.addCollisionObject(CollisionObjectType::AABB);
     frontWall.setRotation(90, 0, 0);
     frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -324,7 +334,7 @@ void Game::buildPlayArea()
     m_entities.push_back(std::move(frontWall));
 
     Entity leftWall(
-        m_resourceManager.getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
+        g_resourceManager->getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
     leftWall.addCollisionObject(CollisionObjectType::AABB);
     leftWall.setRotation(90, 90, 0);
     leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -332,7 +342,7 @@ void Game::buildPlayArea()
     m_entities.push_back(std::move(leftWall));
 
     Entity rightWall(
-        m_resourceManager.getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
+        g_resourceManager->getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
     rightWall.addCollisionObject(CollisionObjectType::AABB);
     rightWall.setRotation(90, -90, 0);
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -340,7 +350,7 @@ void Game::buildPlayArea()
     m_entities.push_back(std::move(rightWall));
 
     Entity ceiling(
-        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 20.0f, 0.0f));
+        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 20.0f, 0.0f));
     ceiling.addCollisionObject(CollisionObjectType::AABB);
     ceiling.setRotation(180, 0, 0);
     ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -348,7 +358,7 @@ void Game::buildPlayArea()
     m_entities.push_back(std::move(ceiling));
 
     Entity backWall(
-        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, 10.0f));
+        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, 10.0f));
     backWall.addCollisionObject(CollisionObjectType::AABB);
     backWall.setRotation(90, 180, 0);
     backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -358,18 +368,18 @@ void Game::buildPlayArea()
 
 void Game::createClickingScenario()
 {
-    m_weapon->type = Weapon::Type::SemiAuto;
+    m_weapon.type = Weapon::Type::SemiAuto;
     m_camera.position = glm::vec3(0.0f, 10.0f, 8.0f);
 
     std::vector<glm::vec3> targetPositions;
     targetPositions.reserve(5);
     for (int i = 0; i < 5; i++) {
-        targetPositions.emplace_back(m_rng.getFloatInRange(-8.0f, 8.0f),
-            m_rng.getFloatInRange(2.0f, 18.0f), -8.0);
+        targetPositions.emplace_back(g_rng->getFloatInRange(-8.0f, 8.0f),
+            g_rng->getFloatInRange(2.0f, 18.0f), -8.0);
     }
 
     for (size_t i = 0; i < targetPositions.size(); i++) {
-        Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);
+        Entity entity(g_resourceManager->getModel("ball"), targetPositions[i]);
         entity.addCollisionObject(CollisionObjectType::SPHERE);
         entity.setSize(glm::vec3(0.3f));
         entity.destroyable = true;
@@ -381,10 +391,10 @@ void Game::createClickingScenario()
 
 void Game::createTrackingScenario()
 {
-    m_weapon->type = Weapon::Type::Auto;
+    m_weapon.type = Weapon::Type::Auto;
 
     Entity entity(
-        m_resourceManager.getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));
+        g_resourceManager->getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));
     entity.addCollisionObject(CollisionObjectType::AABB);
     entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
     entity.destroyable = true;

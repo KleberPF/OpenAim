@@ -1,5 +1,7 @@
 #include "SoundPlayer.hpp"
 
+#include "Globals.hpp"
+
 #include <AL/al.h>
 #include <stb_vorbis.h>
 
@@ -9,10 +11,8 @@
 #include <memory>
 #include <vector>
 
-SoundPlayer::SoundPlayer(const ResourceManager& resourceManager, RNG& rng)
-    : m_resourceManager(resourceManager)
-    , m_rng(rng)
-    , m_device(alcOpenDevice(nullptr))
+SoundPlayer::SoundPlayer()
+    : m_device(alcOpenDevice(nullptr))
 {
     if (!m_device) {
         std::cerr << "Failed to open ALC device\n";
@@ -25,7 +25,7 @@ SoundPlayer::SoundPlayer(const ResourceManager& resourceManager, RNG& rng)
     m_eax = alIsExtensionPresent("EAX2.0");
     alGetError(); // clear error code
 
-    auto sounds = m_resourceManager.getAllSounds();
+    auto sounds = g_resourceManager->getAllSounds();
     for (auto& sound : sounds) {
         ALuint buffer = 0;
         alGenBuffers(1, &buffer);
@@ -66,6 +66,6 @@ void SoundPlayer::play(const std::string& soundName)
 void SoundPlayer::playWithRandomPitch(const std::string& soundName)
 {
     ALuint source = m_sources.at(soundName);
-    alSourcef(source, AL_PITCH, m_rng.getFloatInRange(0.7f, 1.3f));
+    alSourcef(source, AL_PITCH, g_rng->getFloatInRange(0.7f, 1.3f));
     alSourcePlay(source);
 }

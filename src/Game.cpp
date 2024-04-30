@@ -212,8 +212,8 @@ void Game::updateEntities()
         if (it->type == Entity::Type::GONER) {
             it = m_entities.erase(it);
         } else if (it->type == Entity::Type::MOVER) {
-            float newX = m_rng.getFloatInRange(-8, 8);
-            float newY = m_rng.getFloatInRange(2, 8);
+            float newX = m_rng.getFloatInRange(-8.0f, 8.0f);
+            float newY = m_rng.getFloatInRange(2.0f, 18.0f);
             float newZ = -8.0f;
             it->referentialPos = glm::vec3(newX, newY, newZ);
             it->moveRelative(glm::vec3(0.0f, 0.0f,
@@ -361,13 +361,12 @@ void Game::createClickingScenario()
     m_weapon->type = Weapon::Type::SemiAuto;
     m_camera.position = glm::vec3(0.0f, 10.0f, 8.0f);
 
-    std::array<glm::vec3, 5> targetPositions = {
-        glm::vec3(-8.13, 9.2, -8.0),
-        glm::vec3(7.23, 6.6, -8.0),
-        glm::vec3(-4.27, 5.62, -8.0),
-        glm::vec3(5.04, 3.97, -8.0),
-        glm::vec3(-1.79, 1.26, -8.0),
-    };
+    std::vector<glm::vec3> targetPositions;
+    targetPositions.reserve(5);
+    for (int i = 0; i < 5; i++) {
+        targetPositions.emplace_back(m_rng.getFloatInRange(-8.0f, 8.0f),
+            m_rng.getFloatInRange(2.0f, 18.0f), -8.0);
+    }
 
     for (size_t i = 0; i < targetPositions.size(); i++) {
         Entity entity(m_resourceManager.getModel("ball"), targetPositions[i]);

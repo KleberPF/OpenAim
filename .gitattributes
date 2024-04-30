@@ -1,0 +1,4 @@
+include/** linguist-vendored
+src/glad.c -linguist-vendored
+src/stb_image.c -linguist-vendored
+src/stb_vorbis.c -linguist-vendored

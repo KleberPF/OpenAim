@@ -179,18 +179,18 @@ void Game::processInput()
 
     // camera keyboard processing
     // uncomment this to allow flying around
-    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-        m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-        m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-        m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-        m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
-    }
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+    //     m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
+    // }
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+    //     m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
+    // }
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+    //     m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
+    // }
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+    //     m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
+    // }
 }
 
 void Game::updateEntities()
@@ -201,8 +201,25 @@ void Game::updateEntities()
 
     updateShotEntities();
 
-    for (auto& entity : m_entities) {
-        entity.update(m_totalTimeSeconds);
+    auto it = m_entities.begin();
+    while (it != m_entities.end()) {
+        bool died = it->update(m_totalTimeSeconds);
+        if (!died) {
+            ++it;
+            continue;
+        }
+
+        if (it->type == Entity::Type::GONER) {
+            it = m_entities.erase(it);
+        } else if (it->type == Entity::Type::MOVER) {
+            float newX = m_rng.getFloatInRange(-8, 8);
+            float newY = m_rng.getFloatInRange(2, 8);
+            float newZ = -8.0f;
+            it->referentialPos = glm::vec3(newX, newY, newZ);
+            it->moveRelative(glm::vec3(0.0f, 0.0f,
+                0.0f)); // update position after changing referential
+            ++it;
+        }
     }
 }
 
@@ -224,7 +241,7 @@ void Game::updateShotEntities()
     for (auto it = m_entities.begin(); it != m_entities.end(); it++) {
         const auto& entity = *it;
         auto intersection = entity.collisionObject()->isIntersectedByLine(
-            m_camera.position(), m_camera.front());
+            m_camera.position, m_camera.front());
 
         if (intersection.has_value()) {
             if (intersection->dist < closestDist) {
@@ -235,14 +252,7 @@ void Game::updateShotEntities()
     }
 
     if (closestEntityIt != m_entities.end() && closestEntityIt->destroyable) {
-        closestEntityIt->health--;
-        if (closestEntityIt->health <= 0) {
-            float newX = m_rng.getFloatInRange(-8, 8);
-            float newY = m_rng.getFloatInRange(2, 8);
-            float newZ = -8.0f;
-            closestEntityIt->referentialPos = glm::vec3(newX, newY, newZ);
-            // m_entities.erase(closestEntityIt);
-        }
+        closestEntityIt->setDamagedThisFrame();
         m_shotsHit++;
     }
 
@@ -328,11 +338,28 @@ void Game::buildPlayArea()
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
     m_entities.push_back(std::move(rightWall));
+
+    Entity ceiling(
+        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 20.0f, 0.0f));
+    ceiling.addCollisionObject(CollisionObjectType::AABB);
+    ceiling.setRotation(180, 0, 0);
+    ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    ceiling.setName("Ceiling");
+    m_entities.push_back(std::move(ceiling));
+
+    Entity backWall(
+        m_resourceManager.getModel("plane"), glm::vec3(0.0f, 10.0f, 10.0f));
+    backWall.addCollisionObject(CollisionObjectType::AABB);
+    backWall.setRotation(90, 180, 0);
+    backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
+    backWall.setName("Back Wall");
+    m_entities.push_back(std::move(backWall));
 }
 
 void Game::createClickingScenario()
 {
     m_weapon->type = Weapon::Type::SemiAuto;
+    m_camera.position = glm::vec3(0.0f, 10.0f, 8.0f);
 
     std::array<glm::vec3, 5> targetPositions = {
         glm::vec3(-8.13, 9.2, -8.0),
@@ -347,10 +374,8 @@ void Game::createClickingScenario()
         entity.addCollisionObject(CollisionObjectType::SPHERE);
         entity.setSize(glm::vec3(0.3f));
         entity.destroyable = true;
+        entity.type = Entity::Type::MOVER;
         entity.setName("Ball " + std::to_string(i));
-        entity.setMovementPattern([](float timePassedSeconds) {
-            return glm::vec3(cos(4 * timePassedSeconds), 0.0f, 0.0f);
-        });
         m_entities.push_back(std::move(entity));
     }
 }
@@ -364,7 +389,8 @@ void Game::createTrackingScenario()
     entity.addCollisionObject(CollisionObjectType::AABB);
     entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
     entity.destroyable = true;
-    entity.health = 200;
+    entity.type = Entity::Type::GONER;
+    entity.setStartingHealth(200);
     entity.setName("Moving target");
     entity.setMovementPattern([](float timePassedSeconds) {
         return glm::vec3(5 * cos(2 * timePassedSeconds), 0.0f, 0.0f);

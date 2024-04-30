@@ -221,19 +221,41 @@ void Entity::setName(const std::string& name)
     m_name = name;
 }
 
+void Entity::setStartingHealth(int health)
+{
+    m_startingHealth = health;
+    m_currentHealth = health;
+}
+
+void Entity::setDamagedThisFrame()
+{
+    m_damagedThisFrame = true;
+}
+
 void Entity::setMovementPattern(std::function<glm::vec3(float)> callback)
 {
     m_calculateNewPos = std::move(callback);
 }
 
-void Entity::update(float timePassedSeconds)
+bool Entity::update(float timePassedSeconds)
 {
-    if (!m_calculateNewPos) {
-        return;
+    bool damaged = m_damagedThisFrame;
+    m_damagedThisFrame = false;
+
+    if (damaged) {
+        m_currentHealth--;
+        if (m_currentHealth <= 0) {
+            m_currentHealth = m_startingHealth;
+            return true;
+        }
     }
 
-    glm::vec3 newPos = m_calculateNewPos(timePassedSeconds);
-    moveRelative(newPos);
+    if (m_calculateNewPos) {
+        glm::vec3 newPos = m_calculateNewPos(timePassedSeconds);
+        moveRelative(newPos);
+    }
+
+    return false;
 }
 
 void Entity::render() const

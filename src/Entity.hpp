@@ -97,6 +97,11 @@ private:
 
 class Entity {
 public:
+    enum class Type {
+        MOVER, // when dead, move to a random place and regenerate health
+        GONER, // when dead, die for good
+    };
+
     Entity(Model model, const glm::vec3& pos);
     virtual ~Entity() = default;
 
@@ -129,8 +134,13 @@ public:
     const std::string& getName() const;
     void setName(const std::string& name);
 
+    void setStartingHealth(int health);
+    void setDamagedThisFrame();
+
     void setMovementPattern(std::function<glm::vec3(float)> callback);
-    void update(float timePassedSeconds);
+
+    // returns whether entity should die
+    bool update(float timePassedSeconds);
 
     void render() const;
 
@@ -139,7 +149,7 @@ public:
     // oscilating around
     glm::vec3 referentialPos;
     bool destroyable = false;
-    int health = 1;
+    Type type = Type::GONER;
 
 private:
     // both are meant to be called after a move, resize or rotation
@@ -156,6 +166,9 @@ private:
     std::function<glm::vec3(float)> m_calculateNewPos = nullptr;
 
     std::string m_name;
+    int m_startingHealth = 1;
+    int m_currentHealth = 1;
+    bool m_damagedThisFrame = false;
     glm::vec3 m_size = glm::vec3(1.0f);
     std::optional<Rotation> m_rotation;
 

@@ -6,7 +6,7 @@
 
 Camera::Camera(
     const glm::vec3& position, const glm::vec3& up, float yaw, float pitch)
-    : m_position(position)
+    : position(position)
     , m_worldUp(up)
     , m_yaw(yaw)
     , m_pitch(pitch)
@@ -16,7 +16,7 @@ Camera::Camera(
 
 glm::mat4 Camera::buildViewMatrix() const
 {
-    return glm::lookAt(m_position, m_position + m_front, m_up);
+    return glm::lookAt(position, position + m_front, m_up);
 }
 
 void Camera::processKeyboard(CameraMovement direction, float deltaTime)
@@ -37,11 +37,11 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime)
             projected *= -1;
         }
 
-        m_position += projected * velocity;
+        position += projected * velocity;
     } else if (direction == CameraMovement::LEFT) {
-        m_position -= m_right * velocity;
+        position -= m_right * velocity;
     } else if (direction == CameraMovement::RIGHT) {
-        m_position += m_right * velocity;
+        position += m_right * velocity;
     }
 }
 
@@ -61,11 +61,6 @@ void Camera::processMouseMovement(float xoffset, float yoffset)
     }
 
     updateVectors();
-}
-
-glm::vec3 Camera::position() const
-{
-    return m_position;
 }
 
 glm::vec3 Camera::front() const

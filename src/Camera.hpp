@@ -19,14 +19,14 @@ public:
     void processKeyboard(CameraMovement direction, float deltaTime);
     void processMouseMovement(float xoffset, float yoffset);
 
-    glm::vec3 position() const;
     glm::vec3 front() const;
     float zoom() const;
 
     void setMouseSensitivity(float sensitivity);
 
+    glm::vec3 position;
+
 private:
-    glm::vec3 m_position;
     glm::vec3 m_front;
     glm::vec3 m_up;
     glm::vec3 m_right;

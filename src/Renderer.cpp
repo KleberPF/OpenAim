@@ -57,7 +57,7 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 
     // lighting stuff
     if (scene.globalLightSource.has_value()) {
-        shader.setVec3("viewPos", scene.camera.position());
+        shader.setVec3("viewPos", scene.camera.position);
         shader.setVec3(
             "light.direction", scene.globalLightSource->get().direction);
         shader.setVec3("light.ambient", scene.globalLightSource->get().ambient);

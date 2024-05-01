@@ -2,6 +2,7 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "EntityManager.hpp"
 #include "InputManager.hpp"
 #include "NuklearWrapper.hpp"
 #include "RNG.hpp"
@@ -40,7 +41,7 @@ private:
 
     Window m_window;
     Camera m_camera;
-    std::vector<Entity> m_entities;
+    EntityManager m_entityManager;
     std::vector<Sprite> m_sprites;
     Renderer m_renderer;
     InputManager m_inputManager;

@@ -22,17 +22,17 @@ struct Intersection {
 
 using IntersectionResult = std::optional<Intersection>;
 
-enum class CollisionObjectType {
-    AABB,
-    SPHERE,
-};
-
 // Each coordinate represents the rotation along
 // the main axis
 using Rotation = glm::vec3;
 
 class CollisionObject {
 public:
+    enum class Type {
+        AABB,
+        SPHERE,
+    };
+
     CollisionObject(const glm::vec3& pos);
     virtual ~CollisionObject() = default;
 
@@ -50,7 +50,11 @@ public:
 
     virtual void setSize(const glm::vec3& size) = 0;
 
+    Type type() const;
+    const glm::vec3& pos() const;
+
 protected:
+    Type m_type;
     glm::vec3 m_pos;
 
     // As the name suggests, AABBs are axis aligned. Because the collision
@@ -91,6 +95,8 @@ public:
 
     void setSize(const glm::vec3& size) override;
 
+    float radius() const;
+
 private:
     float m_radius;
 };
@@ -123,7 +129,7 @@ public:
     // Position after this should be referentialPos + newPos
     void moveRelative(const glm::vec3& newPos);
 
-    void addCollisionObject(CollisionObjectType type);
+    void addCollisionObject(CollisionObject::Type type);
     const CollisionObject* collisionObject() const;
 
     bool isDestroyable() const;

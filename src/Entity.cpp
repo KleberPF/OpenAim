@@ -18,9 +18,20 @@ void CollisionObject::setRotation(const Rotation& rotation)
     m_rotation = rotation;
 }
 
+CollisionObject::Type CollisionObject::type() const
+{
+    return m_type;
+}
+
+const glm::vec3& CollisionObject::pos() const
+{
+    return m_pos;
+}
+
 CollisionBox::CollisionBox(const glm::vec3& pos, const glm::vec3& size)
     : CollisionObject(pos)
 {
+    m_type = CollisionObject::Type::AABB;
     setSize(size);
 }
 
@@ -94,6 +105,7 @@ CollisionSphere::CollisionSphere(const glm::vec3& pos, float radius)
     : CollisionObject(pos)
     , m_radius(radius)
 {
+    m_type = CollisionObject::Type::SPHERE;
 }
 
 void CollisionSphere::move(const glm::vec3& newPos)
@@ -124,6 +136,11 @@ IntersectionResult CollisionSphere::isIntersectedByLine(
 void CollisionSphere::setSize(const glm::vec3& size)
 {
     m_radius = size.x;
+}
+
+float CollisionSphere::radius() const
+{
+    return m_radius;
 }
 
 Entity::Entity(Model model, const glm::vec3& pos)
@@ -178,10 +195,10 @@ void Entity::moveRelative(const glm::vec3& newPos)
     move(referentialPos + newPos);
 }
 
-void Entity::addCollisionObject(CollisionObjectType type)
+void Entity::addCollisionObject(CollisionObject::Type type)
 {
     switch (type) {
-    case CollisionObjectType::SPHERE:
+    case CollisionObject::Type::SPHERE:
         m_collisionObject
             = std::make_unique<CollisionSphere>(m_currentPos, m_size.x);
         break;

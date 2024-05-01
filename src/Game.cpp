@@ -210,27 +210,7 @@ void Game::updateEntities()
     }
 
     updateShotEntities();
-
-    auto it = m_entities.begin();
-    while (it != m_entities.end()) {
-        bool died = it->update(m_totalTimeSeconds);
-        if (!died) {
-            ++it;
-            continue;
-        }
-
-        if (it->type == Entity::Type::GONER) {
-            it = m_entities.erase(it);
-        } else if (it->type == Entity::Type::MOVER) {
-            float newX = g_rng->getFloatInRange(-8.0f, 8.0f);
-            float newY = g_rng->getFloatInRange(2.0f, 18.0f);
-            float newZ = -8.0f;
-            it->referentialPos = glm::vec3(newX, newY, newZ);
-            it->moveRelative(glm::vec3(0.0f, 0.0f,
-                0.0f)); // update position after changing referential
-            ++it;
-        }
-    }
+    m_entityManager.updateEntities(m_totalTimeSeconds);
 }
 
 void Game::updateShotEntities()
@@ -245,24 +225,8 @@ void Game::updateShotEntities()
         return;
     }
 
-    auto closestEntityIt = m_entities.end();
-    float closestDist = FLT_MAX;
-
-    for (auto it = m_entities.begin(); it != m_entities.end(); it++) {
-        const auto& entity = *it;
-        auto intersection = entity.collisionObject()->isIntersectedByLine(
-            m_camera.position, m_camera.front());
-
-        if (intersection.has_value()) {
-            if (intersection->dist < closestDist) {
-                closestDist = intersection->dist;
-                closestEntityIt = it;
-            }
-        }
-    }
-
-    if (closestEntityIt != m_entities.end() && closestEntityIt->destroyable) {
-        closestEntityIt->setDamagedThisFrame();
+    if (m_entityManager.updateShotEntities(
+            m_camera.position, m_camera.front())) {
         m_shotsHit++;
     }
 
@@ -277,7 +241,7 @@ void Game::render()
     Scene scene(m_camera, m_window.width, m_window.height);
     scene.globalLightSource = m_globalLightSource;
     scene.skybox = *m_skybox;
-    scene.entities = m_entities;
+    scene.entities = m_entityManager.entities();
     scene.sprites = m_sprites;
 
     m_renderer.renderScene(scene);
@@ -320,50 +284,50 @@ void Game::togglePaused()
 void Game::buildPlayArea()
 {
     Entity floor(g_resourceManager->getModel("plane"), glm::vec3(0));
-    floor.addCollisionObject(CollisionObjectType::AABB);
+    floor.addCollisionObject(CollisionObject::Type::AABB);
     floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     floor.setName("Floor");
-    m_entities.push_back(std::move(floor));
+    m_entityManager.addEntity(std::move(floor));
 
     Entity frontWall(
         g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
-    frontWall.addCollisionObject(CollisionObjectType::AABB);
+    frontWall.addCollisionObject(CollisionObject::Type::AABB);
     frontWall.setRotation(90, 0, 0);
     frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     frontWall.setName("Front Wall");
-    m_entities.push_back(std::move(frontWall));
+    m_entityManager.addEntity(std::move(frontWall));
 
     Entity leftWall(
         g_resourceManager->getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
-    leftWall.addCollisionObject(CollisionObjectType::AABB);
+    leftWall.addCollisionObject(CollisionObject::Type::AABB);
     leftWall.setRotation(90, 90, 0);
     leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     leftWall.setName("Left Wall");
-    m_entities.push_back(std::move(leftWall));
+    m_entityManager.addEntity(std::move(leftWall));
 
     Entity rightWall(
         g_resourceManager->getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
-    rightWall.addCollisionObject(CollisionObjectType::AABB);
+    rightWall.addCollisionObject(CollisionObject::Type::AABB);
     rightWall.setRotation(90, -90, 0);
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
-    m_entities.push_back(std::move(rightWall));
+    m_entityManager.addEntity(std::move(rightWall));
 
     Entity ceiling(
         g_resourceManager->getModel("plane"), glm::vec3(0.0f, 20.0f, 0.0f));
-    ceiling.addCollisionObject(CollisionObjectType::AABB);
+    ceiling.addCollisionObject(CollisionObject::Type::AABB);
     ceiling.setRotation(180, 0, 0);
     ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     ceiling.setName("Ceiling");
-    m_entities.push_back(std::move(ceiling));
+    m_entityManager.addEntity(std::move(ceiling));
 
     Entity backWall(
         g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, 10.0f));
-    backWall.addCollisionObject(CollisionObjectType::AABB);
+    backWall.addCollisionObject(CollisionObject::Type::AABB);
     backWall.setRotation(90, 180, 0);
     backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     backWall.setName("Back Wall");
-    m_entities.push_back(std::move(backWall));
+    m_entityManager.addEntity(std::move(backWall));
 }
 
 void Game::createClickingScenario()
@@ -380,12 +344,12 @@ void Game::createClickingScenario()
 
     for (size_t i = 0; i < targetPositions.size(); i++) {
         Entity entity(g_resourceManager->getModel("ball"), targetPositions[i]);
-        entity.addCollisionObject(CollisionObjectType::SPHERE);
+        entity.addCollisionObject(CollisionObject::Type::SPHERE);
         entity.setSize(glm::vec3(0.3f));
         entity.destroyable = true;
         entity.type = Entity::Type::MOVER;
         entity.setName("Ball " + std::to_string(i));
-        m_entities.push_back(std::move(entity));
+        m_entityManager.addEntity(std::move(entity));
     }
 }
 
@@ -395,7 +359,7 @@ void Game::createTrackingScenario()
 
     Entity entity(
         g_resourceManager->getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));
-    entity.addCollisionObject(CollisionObjectType::AABB);
+    entity.addCollisionObject(CollisionObject::Type::AABB);
     entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
     entity.destroyable = true;
     entity.type = Entity::Type::GONER;
@@ -404,7 +368,7 @@ void Game::createTrackingScenario()
     entity.setMovementPattern([](float timePassedSeconds) {
         return glm::vec3(5 * cos(2 * timePassedSeconds), 0.0f, 0.0f);
     });
-    m_entities.push_back(std::move(entity));
+    m_entityManager.addEntity(std::move(entity));
 }
 
 void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,

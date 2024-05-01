@@ -46,6 +46,6 @@ struct Scene {
     int viewportHeight;
     std::optional<std::reference_wrapper<LightSource>> globalLightSource;
     std::optional<std::reference_wrapper<Skybox>> skybox;
-    std::optional<std::reference_wrapper<std::vector<Entity>>> entities;
+    std::optional<std::reference_wrapper<const std::vector<Entity>>> entities;
     std::optional<std::reference_wrapper<std::vector<Sprite>>> sprites;
 };

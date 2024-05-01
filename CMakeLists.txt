@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(AimTrainerGL)
+project(OpenAim)
 
 # List of source files
 set(SOURCES

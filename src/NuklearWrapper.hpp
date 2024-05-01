@@ -27,7 +27,8 @@ public:
 
     static void renderBegin();
     void renderPauseMenu();
-    void renderStats(int shotsHit, int totalShots, float timeElapsedSeconds);
+    void renderStats(
+        int shotsHit, int totalShots, float timeElapsedSeconds, float fps);
     static void renderEnd();
 
     const SettingsData& settings() const;

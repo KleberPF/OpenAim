@@ -57,7 +57,6 @@ void NuklearWrapper::renderBegin()
 void NuklearWrapper::renderPauseMenu()
 {
     nk_glfw3_set_callbacks();
-    // nk_glfw3_new_frame();
 
     glfwGetWindowSize(m_window, &m_width, &m_height);
     int rectSize = 300;
@@ -83,16 +82,12 @@ void NuklearWrapper::renderPauseMenu()
         }
     }
     nk_end(m_ctx);
-
-    // nk_glfw3_render(NK_ANTI_ALIASING_ON);
 }
 
 void NuklearWrapper::renderStats(
-    int shotsHit, int totalShots, float timeElapsedSeconds)
+    int shotsHit, int totalShots, float timeElapsedSeconds, float fps)
 {
-    // nk_glfw3_new_frame();
-
-    if (nk_begin(m_ctx, "Stats", nk_rect(10, 10, 200, 150),
+    if (nk_begin(m_ctx, "Stats", nk_rect(10, 10, 200, 180),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
         std::string shotsHitLabel = std::format("Shots hit: {}", shotsHit);
         std::string totalShotsLabel
@@ -103,7 +98,8 @@ void NuklearWrapper::renderStats(
         std::string timeElapsedLabel
             = std::format("Time elapsed: {:.2f}s", timeElapsedSeconds);
 
-        std::array<std::string, 4> statsLabels = {
+        std::array<std::string, 5> statsLabels = {
+            std::format("FPS: {}", fps),
             std::format("Shots hit: {}", shotsHit),
             std::format("Total shots: {}", totalShots),
             std::format("Accuracy: {:.2f}%", accuracy),
@@ -117,8 +113,6 @@ void NuklearWrapper::renderStats(
     }
 
     nk_end(m_ctx);
-
-    // nk_glfw3_render(NK_ANTI_ALIASING_ON);
 }
 
 void NuklearWrapper::renderEnd()

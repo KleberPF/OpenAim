@@ -246,7 +246,8 @@ void Game::render()
 
     m_renderer.renderScene(scene);
     NuklearWrapper::renderBegin();
-    m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds);
+    m_nuklear.renderStats(
+        m_shotsHit, m_totalShots, m_totalTimeSeconds, 1 / m_deltaTime);
 
     if (m_paused) {
         m_nuklear.renderPauseMenu();

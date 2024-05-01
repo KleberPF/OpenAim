@@ -48,12 +48,7 @@ void EntityManager::updateEntities(float timeElapsedSeconds)
         if (it->type == Entity::Type::GONER) {
             it = m_entities.erase(it);
         } else if (it->type == Entity::Type::MOVER) {
-            float newX = g_rng->getFloatInRange(-8.0f, 8.0f);
-            float newY = g_rng->getFloatInRange(2.0f, 18.0f);
-            float newZ = -8.0f;
-            it->referentialPos = glm::vec3(newX, newY, newZ);
-            it->moveRelative(glm::vec3(0.0f, 0.0f,
-                0.0f)); // update position after changing referential
+            moveEntityToFreePosition(*it);
             ++it;
         }
     }
@@ -88,4 +83,30 @@ CollisionResult EntityManager::areEntitiesColliding(
     }
 
     return std::nullopt;
+}
+
+// This is VERY naive, but still easily fast enough
+void EntityManager::moveEntityToFreePosition(Entity& entityToMove)
+{
+    while (true) {
+        float newX = g_rng->getFloatInRange(-8.0f, 8.0f);
+        float newY = g_rng->getFloatInRange(2.0f, 18.0f);
+        float newZ = -8.0f;
+        entityToMove.referentialPos = glm::vec3(newX, newY, newZ);
+        entityToMove.moveRelative(glm::vec3(0.0f, 0.0f,
+            0.0f)); // update position after changing referential
+
+        bool validPos = true;
+        for (auto& entity : m_entities) {
+            if (entity.getName() != entityToMove.getName()
+                && areEntitiesColliding(entity, entityToMove)) {
+                validPos = false;
+                break;
+            }
+        }
+
+        if (validPos) {
+            break;
+        }
+    }
 }

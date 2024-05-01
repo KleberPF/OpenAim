@@ -23,6 +23,7 @@ public:
 private:
     static CollisionResult areEntitiesColliding(
         const Entity& e1, const Entity& e2);
+    void moveEntityToFreePosition(Entity& entityToMove);
 
     std::vector<Entity> m_entities;
 };

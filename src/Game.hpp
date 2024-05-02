@@ -21,6 +21,12 @@ constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
 
 class Game {
 public:
+    enum class State {
+        Menu,
+        Paused,
+        Running,
+    };
+
     Game();
 
     void mainLoop();
@@ -75,7 +81,8 @@ private:
     int m_totalShots = 0;
 
     // game state
-    bool m_paused = false;
+    State m_state = State::Menu;
+    // bool m_paused = false;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

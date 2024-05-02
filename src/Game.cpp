@@ -118,7 +118,7 @@ Game::Game()
         g_resourceManager->getShader("skybox"));
 
     buildPlayArea();
-    createClickingScenario();
+    // createClickingScenario();
     // createTrackingScenario();
 }
 
@@ -139,7 +139,7 @@ void Game::mainLoopBegin()
     m_deltaTime = currentFrame - m_lastFrame;
     m_lastFrame = currentFrame;
 
-    if (!m_paused) {
+    if (m_state == Game::State::Running) {
         m_totalTimeSeconds += m_deltaTime;
     }
 }
@@ -160,7 +160,7 @@ void Game::processInput()
         togglePaused();
     }
 
-    if (m_paused) {
+    if (m_state != Game::State::Running) {
         glfwSetInputMode(m_window.ptr(), GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         return;
     }
@@ -205,7 +205,7 @@ void Game::processInput()
 
 void Game::updateEntities()
 {
-    if (m_paused) {
+    if (m_state != Game::State::Running) {
         return;
     }
 
@@ -245,11 +245,27 @@ void Game::render()
     scene.sprites = m_sprites;
 
     m_renderer.renderScene(scene);
+
     NuklearWrapper::renderBegin();
+    if (m_state == Game::State::Menu) {
+        std::optional<ScenarioType> scenario = m_nuklear.renderMainMenu();
+        if (scenario.has_value()) {
+            if (scenario == ScenarioType::Clicking) {
+                createClickingScenario();
+            } else if (scenario == ScenarioType::Tracking) {
+                createTrackingScenario();
+            }
+            m_state = Game::State::Running;
+        }
+
+        NuklearWrapper::renderEnd();
+        return;
+    }
+
     m_nuklear.renderStats(
         m_shotsHit, m_totalShots, m_totalTimeSeconds, 1 / m_deltaTime);
 
-    if (m_paused) {
+    if (m_state == Game::State::Paused) {
         m_nuklear.renderPauseMenu();
 
         // TODO: probably encapsulate this in the future
@@ -278,8 +294,12 @@ void Game::mainLoopEnd()
 
 void Game::togglePaused()
 {
-    m_paused = !m_paused;
-    m_ignoreCursorMovement = true;
+    if (m_state == Game::State::Running) {
+        m_state = Game::State::Paused;
+    } else if (m_state == Game::State::Paused) {
+        m_ignoreCursorMovement = true;
+        m_state = Game::State::Running;
+    }
 }
 
 void Game::buildPlayArea()

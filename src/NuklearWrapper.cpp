@@ -7,6 +7,7 @@
 #include <array>
 #include <format>
 #include <iostream>
+#include <optional>
 #include <string>
 
 #define NK_IMPLEMENTATION
@@ -52,6 +53,35 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
 void NuklearWrapper::renderBegin()
 {
     nk_glfw3_new_frame();
+}
+
+std::optional<ScenarioType> NuklearWrapper::renderMainMenu()
+{
+    nk_glfw3_set_callbacks();
+
+    glfwGetWindowSize(m_window, &m_width, &m_height);
+    int rectSize = 300;
+    std::optional<ScenarioType> selectedOption = std::nullopt;
+
+    if (nk_begin(m_ctx, "OpenAim",
+            nk_rect((m_width - rectSize) / 2, (m_height - rectSize) / 2,
+                rectSize, rectSize),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+
+        nk_layout_row_dynamic(m_ctx, 30, 1);
+        nk_label(m_ctx, "Select the scenenario:", NK_TEXT_CENTERED);
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        std::array<const char*, 2> scenarios = { "Clicking", "Tracking" };
+        nk_combobox(m_ctx, scenarios.data(), 2, &m_selectedScenario, 20,
+            nk_vec2(200, 200));
+
+        if (nk_button_label(m_ctx, "Play")) {
+            selectedOption = (ScenarioType)m_selectedScenario;
+        }
+    }
+    nk_end(m_ctx);
+
+    return selectedOption;
 }
 
 void NuklearWrapper::renderPauseMenu()

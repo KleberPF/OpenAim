@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -21,11 +22,17 @@ struct SettingsData {
     nk_colorf targetColor;
 };
 
+enum class ScenarioType {
+    Clicking = 0,
+    Tracking = 1,
+};
+
 class NuklearWrapper {
 public:
     NuklearWrapper(GLFWwindow* window);
 
     static void renderBegin();
+    std::optional<ScenarioType> renderMainMenu();
     void renderPauseMenu();
     void renderStats(
         int shotsHit, int totalShots, float timeElapsedSeconds, float fps);
@@ -41,6 +48,7 @@ private:
     int m_height;
     SettingsData m_settings;
     SettingsData m_unsavedSettings;
+    int m_selectedScenario = 0;
 
     struct nk_context* m_ctx;
 };

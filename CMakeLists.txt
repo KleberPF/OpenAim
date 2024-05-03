@@ -50,7 +50,12 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openal-soft)
 
 # Add an executable target
-add_executable(${PROJECT_NAME} ${SOURCES})
+if (MSVC)
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+else()
+    add_executable(${PROJECT_NAME} ${SOURCES})
+endif()
 
 # Set include directories
 target_include_directories(${PROJECT_NAME}

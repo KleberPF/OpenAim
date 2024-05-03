@@ -72,21 +72,25 @@ target_link_libraries(${PROJECT_NAME}
         glfw
         glm
         assimp
-        openal
+        OpenAL::OpenAL
         # Add more libraries here as needed
 )
 
 # If you have any custom CMake modules, you can include them here
 # include(CMakeModuleFile.cmake)
 
-# Optionally, you can add additional compiler flags or definitions
-target_compile_options(${PROJECT_NAME}
-    PRIVATE
-        -Wall
-        -Wextra
-)
+if (MSVC)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+else()
+    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+endif()
 
 # Optionally, set C++ standard
 # set(CMAKE_CXX_STANDARD 20)
 # set(CMAKE_CXX_STANDARD_REQUIRED True)
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+
+if (MSVC)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/../resources)
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32d.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+endif()

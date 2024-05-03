@@ -81,6 +81,13 @@ target_link_libraries(${PROJECT_NAME}
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    target_compile_definitions(${PROJECT_NAME}
+        PUBLIC
+            $<$<CONFIG:Debug>:OE_DEBUG>
+            $<$<CONFIG:RelWithDebInfo>:OE_DEBUG>
+            $<$<CONFIG:Release>:OE_RELEASE>
+            $<$<CONFIG:MinSizeRel>:OE_RELEASE>
+)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
 endif()
@@ -91,6 +98,11 @@ endif()
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
 
 if (MSVC)
+    if (OE_DEBUG)
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32d.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    else()
+        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+    endif()
+
     add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/../resources)
-    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32d.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 endif()

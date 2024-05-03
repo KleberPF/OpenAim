@@ -46,29 +46,29 @@ Game::Game()
     InputManager::setupInputCallbacks(m_window.ptr());
 
     // load shaders and models
-    m_resourceManager.addShader("sprite", "../resources/shaders/sprite.vert",
-        "../resources/shaders/sprite.frag");
-    m_resourceManager.addShader("textured", "../resources/shaders/model.vert",
-        "../resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("targets", "../resources/shaders/model.vert",
-        "../resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("skybox", "../resources/shaders/skybox.vert",
-        "../resources/shaders/skybox.frag");
+    m_resourceManager.addShader("sprite", "./resources/shaders/sprite.vert",
+        "./resources/shaders/sprite.frag");
+    m_resourceManager.addShader("textured", "./resources/shaders/model.vert",
+        "./resources/shaders/model_lighting.frag");
+    m_resourceManager.addShader("targets", "./resources/shaders/model.vert",
+        "./resources/shaders/model_lighting.frag");
+    m_resourceManager.addShader("skybox", "./resources/shaders/skybox.vert",
+        "./resources/shaders/skybox.frag");
 
     m_resourceManager.addCubemap("skybox",
-        { "../resources/textures/skybox/right.bmp",
-            "../resources/textures/skybox/left.bmp",
-            "../resources/textures/skybox/top.bmp",
-            "../resources/textures/skybox/bottom.bmp",
-            "../resources/textures/skybox/front.bmp",
-            "../resources/textures/skybox/back.bmp" });
+        { "./resources/textures/skybox/right.bmp",
+            "./resources/textures/skybox/left.bmp",
+            "./resources/textures/skybox/top.bmp",
+            "./resources/textures/skybox/bottom.bmp",
+            "./resources/textures/skybox/front.bmp",
+            "./resources/textures/skybox/back.bmp" });
 
     m_resourceManager.addTexture(
-        "bricks", "../resources/textures/bricks.png", Texture::Type::Diffuse);
+        "bricks", "./resources/textures/bricks.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture("crosshair",
-        "../resources/textures/crosshair.png", Texture::Type::Diffuse);
+        "./resources/textures/crosshair.png", Texture::Type::Diffuse);
     m_resourceManager.addTexture("white_pixel",
-        "../resources/textures/white_pixel.png", Texture::Type::Diffuse);
+        "./resources/textures/white_pixel.png", Texture::Type::Diffuse);
 
     m_resourceManager.addMaterial("targets");
     m_resourceManager.getMaterial("targets")
@@ -85,17 +85,17 @@ Game::Game()
         .addTexture(m_resourceManager.getTexture("crosshair"))
         .setColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_resourceManager.addModel("cube", "../resources/objects/cube/cube.obj",
+    m_resourceManager.addModel("cube", "./resources/objects/cube/cube.obj",
         m_resourceManager.getMaterial("targets"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("ball", "../resources/objects/ball/ball.obj",
+    m_resourceManager.addModel("ball", "./resources/objects/ball/ball.obj",
         m_resourceManager.getMaterial("targets"),
         m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("plane", "../resources/objects/plane/plane.obj",
+    m_resourceManager.addModel("plane", "./resources/objects/plane/plane.obj",
         m_resourceManager.getMaterial("bricks"),
         m_resourceManager.getShader("textured"));
 
-    m_resourceManager.addSound("pistol", "../resources/sounds/pistol.ogg");
+    m_resourceManager.addSound("pistol", "./resources/sounds/pistol.ogg");
 
     // set/create globals
     g_rng = &m_rng;

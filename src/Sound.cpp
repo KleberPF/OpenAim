@@ -9,7 +9,7 @@ Sound::Sound(std::string name, const std::string& path)
 {
     int error = 0;
     stb_vorbis* audioFile = stb_vorbis_open_filename(
-        "../resources/sounds/pistol.ogg", &error, nullptr);
+        "./resources/sounds/pistol.ogg", &error, nullptr);
 
     if (!audioFile) {
         std::cerr << "File " << path << "not found\n";

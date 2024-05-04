@@ -21,10 +21,15 @@ To run the game
 
 ## Building on Windows
 
-I managed to compile it using VS, but some changes had to be made, mainly to the file paths used inside the code. I plan to make it easier to compile on Windows, but for now I won't provide any instructions. It should be easy enough with some tweaks.
+Right now it should work out of the box with Visual Studio. Open the CMake project and compile the OpenAim.exe target. There are also pre-compiled versions released semi-frequently in the Releases section.
 
 ## Media
 
-https://github.com/KleberPF/OpenAim/assets/43550602/8ee21462-c848-48d8-a98f-80ac2731eeed
+### Main Menu
+![image](https://github.com/KleberPF/OpenAim/assets/43550602/7e19f89f-596f-4de0-90f9-36026a27ece2)
 
-![image](https://github.com/KleberPF/OpenAim/assets/43550602/552fe82b-ca0f-4de7-be14-5e14a9a95e3c)
+### Settings
+![image](https://github.com/KleberPF/OpenAim/assets/43550602/8660a748-d1b4-4350-84ac-b955207169e9)
+
+### Demo
+https://github.com/KleberPF/OpenAim/assets/43550602/8ee21462-c848-48d8-a98f-80ac2731eeed

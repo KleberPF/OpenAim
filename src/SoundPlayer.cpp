@@ -39,6 +39,9 @@ SoundPlayer::SoundPlayer()
         ALuint source = 0;
         alGenSources(1, &source);
         alSourcei(source, AL_BUFFER, buffer);
+        // for now we just hardcode this to make the sounds not REALLY loud
+        // could be a parameter in the play functions later if needed
+        alSourcef(source, AL_GAIN, 0.1f);
 
         m_sources.insert({ sound.name(), source });
     }
@@ -67,5 +70,16 @@ void SoundPlayer::playWithRandomPitch(const std::string& soundName)
 {
     ALuint source = m_sources.at(soundName);
     alSourcef(source, AL_PITCH, g_rng->getFloatInRange(0.9f, 1.1f));
+    alSourcePlay(source);
+}
+
+void SoundPlayer::playIfNotAlreadyPlaying(const std::string& soundName)
+{
+    ALuint source = m_sources.at(soundName);
+    ALint state = 0;
+    alGetSourcei(source, AL_SOURCE_STATE, &state);
+    if (state == AL_PLAYING) {
+        return;
+    }
     alSourcePlay(source);
 }

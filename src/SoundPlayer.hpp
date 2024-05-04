@@ -16,6 +16,7 @@ public:
 
     void play(const std::string& soundName);
     void playWithRandomPitch(const std::string& soundName);
+    void playIfNotAlreadyPlaying(const std::string& soundName);
 
 private:
     std::map<std::string, ALuint> m_sources;

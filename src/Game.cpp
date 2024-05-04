@@ -97,6 +97,8 @@ Game::Game()
         m_resourceManager.getShader("textured"));
 
     m_resourceManager.addSound("pistol", "./resources/sounds/pistol.ogg");
+    m_resourceManager.addSound(
+        "machine_gun", "./resources/sounds/machine_gun.ogg");
 
     // set/create globals
     g_rng = &m_rng;

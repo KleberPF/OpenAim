@@ -73,8 +73,12 @@ private:
     // Time elapsed since the app started running
     // without considering time spent paused
     float m_totalTimeSeconds = 0.0f;
-    float m_deltaTime = 0.0;
-    float m_lastFrame = 0.0;
+    float m_deltaTime = 0.0f;
+    float m_lastFrame = 0.0f;
+    float m_timeNow = 0.0f;
+    float m_lastUpdate = 0.0f;
+    bool m_fpsCapped = true;
+    float m_fpsLimit = 300.0f;
 
     // objective related stuff
     int m_shotsHit = 0;
@@ -82,7 +86,6 @@ private:
 
     // game state
     State m_state = State::Menu;
-    // bool m_paused = false;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

@@ -20,6 +20,7 @@
 
 #include <iostream>
 #include <memory>
+#include <string>
 
 // globals
 RNG* g_rng;
@@ -135,9 +136,8 @@ void Game::mainLoop()
 
 void Game::mainLoopBegin()
 {
-    auto currentFrame = (float)glfwGetTime();
-    m_deltaTime = currentFrame - m_lastFrame;
-    m_lastFrame = currentFrame;
+    m_timeNow = (float)glfwGetTime();
+    m_deltaTime = m_timeNow - m_lastUpdate;
 
     if (m_state == Game::State::Running) {
         m_totalTimeSeconds += m_deltaTime;
@@ -262,22 +262,33 @@ void Game::render()
         return;
     }
 
-    m_nuklear.renderStats(
-        m_shotsHit, m_totalShots, m_totalTimeSeconds, 1 / m_deltaTime);
+    m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds,
+        1 / (m_timeNow - m_lastFrame));
 
     if (m_state == Game::State::Paused) {
-        m_nuklear.renderPauseMenu();
-
         // TODO: probably encapsulate this in the future
-        m_camera.setMouseSensitivity(m_nuklear.settings().sensitivity);
-        g_resourceManager->getMaterial("crosshair")
-            .setColor(glm::vec3(m_nuklear.settings().crosshairColor.r,
-                m_nuklear.settings().crosshairColor.g,
-                m_nuklear.settings().crosshairColor.b));
-        g_resourceManager->getMaterial("targets").setColor(
-            glm::vec3(m_nuklear.settings().targetColor.r,
-                m_nuklear.settings().targetColor.g,
-                m_nuklear.settings().targetColor.b));
+        auto settings = m_nuklear.renderPauseMenu();
+        if (settings.has_value()) {
+            if (settings->sensitivity.has_value()) {
+                m_camera.setMouseSensitivity(settings->sensitivity.value());
+            }
+            if (settings->maxFps.has_value()) {
+                float fps = settings->maxFps.value();
+                if (fps == 0) {
+                    m_fpsCapped = false;
+                } else {
+                    m_fpsLimit = fps;
+                    m_fpsCapped = true;
+                }
+            }
+
+            g_resourceManager->getMaterial("crosshair")
+                .setColor(glm::vec3(settings->crosshairColor.r,
+                    settings->crosshairColor.g, settings->crosshairColor.b));
+            g_resourceManager->getMaterial("targets").setColor(
+                glm::vec3(settings->targetColor.r, settings->targetColor.g,
+                    settings->targetColor.b));
+        }
     } else {
         InputManager::setupInputCallbacks(m_window.ptr());
     }
@@ -288,8 +299,14 @@ void Game::render()
 void Game::mainLoopEnd()
 {
     m_inputManager.consolidateKeyStates();
-    glfwSwapBuffers(m_window.ptr());
     glfwPollEvents();
+
+    if (m_fpsCapped && m_timeNow - m_lastFrame >= 1 / m_fpsLimit) {
+        glfwSwapBuffers(m_window.ptr());
+        m_lastFrame = m_timeNow;
+    }
+
+    m_lastUpdate = m_timeNow;
 }
 
 void Game::togglePaused()

@@ -5,8 +5,10 @@
 
 #include <algorithm>
 #include <array>
+#include <cassert>
+#include <cctype>
+#include <cstring>
 #include <format>
-#include <iostream>
 #include <optional>
 #include <string>
 
@@ -25,6 +27,44 @@
 
 #define MAX_VERTEX_BUFFER 512 * 1024
 #define MAX_ELEMENT_BUFFER 128 * 1024
+#define MAX_FIELD_SIZE 32
+
+// this whole function is bad...
+// interfacing with C strings is annoying
+SettingsData::SettingsData(const InternalSettingsData& data)
+{
+    assert(data.sensitivity.string.len < MAX_FIELD_SIZE - 1);
+    assert(data.maxFps.string.len < MAX_FIELD_SIZE - 1);
+
+    char* endPtr = nullptr;
+    char buf[MAX_FIELD_SIZE] = { '\0' };
+    std::strncpy(buf, nk_str_get_const(&data.sensitivity.string),
+        data.sensitivity.string.len);
+    float value = std::strtof(buf, &endPtr);
+    if (endPtr - buf == data.sensitivity.string.len) { // no error
+        sensitivity = value;
+    } else {
+        sensitivity = std::nullopt;
+    }
+
+    std::memset(buf, 0, MAX_FIELD_SIZE);
+    std::strncpy(
+        buf, nk_str_get_const(&data.maxFps.string), data.maxFps.string.len);
+    value = std::strtof(buf, &endPtr);
+    if (endPtr - buf == data.maxFps.string.len) { // no error
+        maxFps = value;
+    } else {
+        maxFps = std::nullopt;
+    }
+
+    crosshairColor.r = data.crosshairColor.r;
+    crosshairColor.g = data.crosshairColor.g;
+    crosshairColor.b = data.crosshairColor.b;
+
+    targetColor.r = data.targetColor.r;
+    targetColor.g = data.targetColor.g;
+    targetColor.b = data.targetColor.b;
+}
 
 NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     : m_window(window)
@@ -36,18 +76,21 @@ NuklearWrapper::NuklearWrapper(GLFWwindow* window)
     nk_glfw3_font_stash_begin(&atlas);
     nk_glfw3_font_stash_end();
 
-    m_settings.crosshairColor.r = 0.0f;
-    m_settings.crosshairColor.g = 1.0f;
-    m_settings.crosshairColor.b = 0.0f;
-    m_settings.crosshairColor.a = 1.0f;
+    // TODO: receive default settings
+    m_unsavedSettings.crosshairColor.r = 0.0f;
+    m_unsavedSettings.crosshairColor.g = 1.0f;
+    m_unsavedSettings.crosshairColor.b = 0.0f;
+    m_unsavedSettings.crosshairColor.a = 1.0f;
 
-    m_settings.targetColor.r = 0.125f;
-    m_settings.targetColor.g = 0.55f;
-    m_settings.targetColor.b = 0.9f;
-    m_settings.targetColor.a = 1.0f;
+    m_unsavedSettings.targetColor.r = 0.125f;
+    m_unsavedSettings.targetColor.g = 0.55f;
+    m_unsavedSettings.targetColor.b = 0.9f;
+    m_unsavedSettings.targetColor.a = 1.0f;
 
-    m_settings.sensitivity = 2.5f; // TODO: receive default settings
-    m_unsavedSettings = m_settings;
+    nk_textedit_init_default(&m_unsavedSettings.sensitivity);
+    nk_str_append_str_char(&m_unsavedSettings.sensitivity.string, "2.5");
+    nk_textedit_init_default(&m_unsavedSettings.maxFps);
+    nk_str_append_str_char(&m_unsavedSettings.maxFps.string, "300");
 }
 
 void NuklearWrapper::renderBegin()
@@ -84,34 +127,32 @@ std::optional<ScenarioType> NuklearWrapper::renderMainMenu()
     return selectedOption;
 }
 
-void NuklearWrapper::renderPauseMenu()
+std::optional<SettingsData> NuklearWrapper::renderPauseMenu()
 {
     nk_glfw3_set_callbacks();
 
     glfwGetWindowSize(m_window, &m_width, &m_height);
-    int rectSize = 300;
+    int rectSize = 350;
+    std::optional<SettingsData> result = std::nullopt;
 
     if (nk_begin(m_ctx, "Settings",
             nk_rect((m_width - rectSize) / 2 + 200, (m_height - rectSize) / 2,
                 rectSize, rectSize),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 
-        nk_layout_row_dynamic(m_ctx, 30, 1);
-        nk_label_wrap(m_ctx,
-            "For now this number doesn't mean anything so play around with "
-            "it");
-        nk_layout_row_dynamic(m_ctx, 20, 1);
-        nk_property_float(m_ctx, "Sensitivity:", 0,
-            &m_unsavedSettings.sensitivity, 30, 0.1, 0.1);
-
+        renderNumberTextField(
+            "Max FPS (0 for uncapped): ", m_unsavedSettings.maxFps);
+        renderNumberTextField("Sensitivity:", m_unsavedSettings.sensitivity);
         renderColorPicker("Crosshair color:", m_unsavedSettings.crosshairColor);
         renderColorPicker("Target color:", m_unsavedSettings.targetColor);
 
         if (nk_button_label(m_ctx, "Save")) {
-            m_settings = m_unsavedSettings;
+            result = SettingsData(m_unsavedSettings);
         }
     }
     nk_end(m_ctx);
+
+    return result;
 }
 
 void NuklearWrapper::renderStats(
@@ -150,11 +191,6 @@ void NuklearWrapper::renderEnd()
     nk_glfw3_render(NK_ANTI_ALIASING_ON);
 }
 
-const SettingsData& NuklearWrapper::settings() const
-{
-    return m_settings;
-}
-
 void NuklearWrapper::renderColorPicker(
     const std::string& name, nk_colorf& color)
 {
@@ -172,4 +208,39 @@ void NuklearWrapper::renderColorPicker(
         color.a = nk_propertyf(m_ctx, "#A:", 0, color.a, 1.0f, 0.01f, 0.005f);
         nk_combo_end(m_ctx);
     }
+}
+
+void NuklearWrapper::renderNumberTextField(
+    const std::string& label, nk_text_edit& edit)
+{
+    nk_layout_row_begin(m_ctx, NK_DYNAMIC, 20, 2);
+    nk_layout_row_push(m_ctx, 0.75f);
+    nk_label(m_ctx, label.c_str(), NK_TEXT_ALIGN_LEFT);
+    nk_layout_row_push(m_ctx, 0.25f);
+    nk_edit_buffer(
+        m_ctx, NK_EDIT_FIELD, &edit, NuklearWrapper::numbersOnlyFilter);
+    nk_layout_row_end(m_ctx);
+}
+
+// This is probably easy to break
+nk_bool NuklearWrapper::numbersOnlyFilter(
+    const nk_text_edit* edit, nk_rune unicode)
+{
+    const char* text = nk_str_get_const(&edit->string);
+    int len = edit->string.len;
+
+    if (len == 0 && unicode == '.') {
+        return false;
+    }
+
+    bool hasDot = false;
+    for (int i = 0; i < len; i++) {
+        if (text[i] == '.') {
+            hasDot = true;
+            break;
+        }
+    }
+
+    return edit->string.len <= 3
+        && (isdigit(unicode) || (!hasDot && unicode == '.'));
 }

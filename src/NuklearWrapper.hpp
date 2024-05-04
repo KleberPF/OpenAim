@@ -2,6 +2,7 @@
 
 #include <optional>
 #include <string>
+#include <vector>
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -16,10 +17,20 @@
 #include <glm/glm.hpp>
 #include <nuklear.h>
 
-struct SettingsData {
-    float sensitivity;
+struct InternalSettingsData {
+    nk_text_edit sensitivity;
     nk_colorf crosshairColor;
     nk_colorf targetColor;
+    nk_text_edit maxFps;
+};
+
+struct SettingsData {
+    SettingsData(const InternalSettingsData& data);
+
+    std::optional<float> sensitivity;
+    std::optional<float> maxFps;
+    glm::vec3 crosshairColor;
+    glm::vec3 targetColor;
 };
 
 enum class ScenarioType {
@@ -33,21 +44,21 @@ public:
 
     static void renderBegin();
     std::optional<ScenarioType> renderMainMenu();
-    void renderPauseMenu();
+    std::optional<SettingsData> renderPauseMenu();
     void renderStats(
         int shotsHit, int totalShots, float timeElapsedSeconds, float fps);
     static void renderEnd();
 
-    const SettingsData& settings() const;
-
 private:
     void renderColorPicker(const std::string& name, nk_colorf& color);
+    void renderNumberTextField(const std::string& label, nk_text_edit& edit);
+
+    static nk_bool numbersOnlyFilter(const nk_text_edit*, nk_rune unicode);
 
     GLFWwindow* m_window;
     int m_width;
     int m_height;
-    SettingsData m_settings;
-    SettingsData m_unsavedSettings;
+    InternalSettingsData m_unsavedSettings;
     int m_selectedScenario = 0;
 
     struct nk_context* m_ctx;

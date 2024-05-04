@@ -7,14 +7,14 @@ public:
     Weapon() = default;
 
     enum class Type {
-        SemiAuto,
-        Auto,
+        Pistol,
+        Machine_Gun,
         Last,
     };
 
     bool tryShoot(float currentTimeMs, bool holdingMouseLeft);
 
-    Type type = Type::SemiAuto;
+    Type type = Type::Pistol;
 
 private:
     const std::array<float, (int)Type::Last> m_shootDelaysMs

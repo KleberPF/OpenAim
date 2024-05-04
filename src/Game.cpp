@@ -372,7 +372,7 @@ void Game::buildPlayArea()
 
 void Game::createClickingScenario()
 {
-    m_weapon.type = Weapon::Type::SemiAuto;
+    m_weapon.type = Weapon::Type::Pistol;
     m_camera.position = glm::vec3(0.0f, 10.0f, 8.0f);
 
     std::vector<glm::vec3> targetPositions;
@@ -395,7 +395,7 @@ void Game::createClickingScenario()
 
 void Game::createTrackingScenario()
 {
-    m_weapon.type = Weapon::Type::Auto;
+    m_weapon.type = Weapon::Type::Machine_Gun;
 
     Entity entity(
         g_resourceManager->getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));

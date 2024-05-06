@@ -1,13 +1,13 @@
 #pragma once
 
 #include "Camera.hpp"
-#include "Entity.hpp"
 #include "EntityManager.hpp"
 #include "InputManager.hpp"
 #include "NuklearWrapper.hpp"
 #include "RNG.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
+#include "Scenario.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
@@ -45,6 +45,9 @@ private:
     void createClickingScenario();
     void createTrackingScenario();
 
+    void parseScenariosFromFile(const std::string& scenarioFolder);
+    void createScenario(size_t index);
+
     Window m_window;
     Camera m_camera;
     EntityManager m_entityManager;
@@ -55,6 +58,7 @@ private:
     std::unique_ptr<Skybox> m_skybox;
     Weapon m_weapon;
     NuklearWrapper m_nuklear;
+    std::vector<Scenario> m_scenarios;
 
     // globals
     RNG m_rng;

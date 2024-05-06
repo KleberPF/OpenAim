@@ -10,3 +10,6 @@
 [submodule "lib/openal-soft"]
 	path = lib/openal-soft
 	url = https://github.com/kcat/openal-soft.git
+[submodule "lib/nlohmann_json"]
+	path = lib/nlohmann_json
+	url = https://github.com/nlohmann/json.git

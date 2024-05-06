@@ -8,19 +8,27 @@
 #include "NuklearWrapper.hpp"
 #include "RNG.hpp"
 #include "ResourceManager.hpp"
+#include "Scenario.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
+#include "utils.hpp"
 
 #include <GLFW/glfw3.h>
+#include <nlohmann/json.hpp>
 #include <stb_image.h>
 
+#include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <memory>
+#include <sstream>
 #include <string>
+
+using json = nlohmann::json;
 
 // globals
 RNG* g_rng;
@@ -121,6 +129,7 @@ Game::Game()
         g_resourceManager->getShader("skybox"));
 
     buildPlayArea();
+    parseScenariosFromFile("./resources/levels");
     // createClickingScenario();
     // createTrackingScenario();
 }
@@ -250,13 +259,14 @@ void Game::render()
 
     NuklearWrapper::renderBegin();
     if (m_state == Game::State::Menu) {
-        std::optional<ScenarioType> scenario = m_nuklear.renderMainMenu();
+        std::optional<size_t> scenario = m_nuklear.renderMainMenu(m_scenarios);
         if (scenario.has_value()) {
-            if (scenario == ScenarioType::Clicking) {
-                createClickingScenario();
-            } else if (scenario == ScenarioType::Tracking) {
-                createTrackingScenario();
-            }
+            createScenario(scenario.value());
+            // if (scenario == ScenarioType::Clicking) {
+            //     createClickingScenario();
+            // } else if (scenario == ScenarioType::Tracking) {
+            //     createTrackingScenario();
+            // }
             m_state = Game::State::Running;
         }
 
@@ -409,6 +419,106 @@ void Game::createTrackingScenario()
         return glm::vec3(5 * cos(2 * timePassedSeconds), 0.0f, 0.0f);
     });
     m_entityManager.addEntity(std::move(entity));
+}
+
+void Game::parseScenariosFromFile(const std::string& scenarioFolder)
+{
+    for (const auto& entry :
+        std::filesystem::directory_iterator(scenarioFolder)) {
+        if (entry.path().extension() != ".json") {
+            continue;
+        }
+
+        std::ifstream f(entry.path());
+        json data = json::parse(f);
+
+        Scenario scenario;
+
+        std::string filename = entry.path().filename().string();
+        scenario.name = filename.substr(0, filename.find('.'));
+
+        std::string weaponType = data["weapon"];
+
+        if (caseInsensitiveEquals(weaponType, "pistol")) {
+            scenario.weaponType = Weapon::Type::Pistol;
+        } else if (caseInsensitiveEquals(weaponType, "machine_gun")) {
+            scenario.weaponType = Weapon::Type::Machine_Gun;
+        }
+
+        // parse player position
+        std::string playerPos = data["playerPos"];
+        auto playerPosSs = std::istringstream(playerPos);
+        playerPosSs >> scenario.playerPos.x;
+        playerPosSs >> scenario.playerPos.y;
+        playerPosSs >> scenario.playerPos.z;
+
+        scenario.canPlayerMove = data["canPlayerMove"];
+
+        auto targets = data["targets"];
+        for (auto& target : targets) {
+            Target newTarget;
+
+            newTarget.scale = target["scale"];
+
+            if (bool randomSpawn = target["randomSpawn"]) {
+                newTarget.randomSpawn = randomSpawn;
+            }
+
+            std::string minCoords = target["minCoords"];
+            auto minCoordsSs = std::istringstream(std::move(minCoords));
+            minCoordsSs >> newTarget.minCoords.x;
+            minCoordsSs >> newTarget.minCoords.y;
+            minCoordsSs >> newTarget.minCoords.z;
+
+            std::string maxCoords = target["maxCoords"];
+            auto maxCoordsSs = std::istringstream(std::move(maxCoords));
+            maxCoordsSs >> newTarget.maxCoords.x;
+            maxCoordsSs >> newTarget.maxCoords.y;
+            maxCoordsSs >> newTarget.maxCoords.z;
+
+            std::string onDestroy = target["onDestroy"];
+            if (caseInsensitiveEquals(onDestroy, "move")) {
+                newTarget.type = Entity::Type::MOVER;
+            } else {
+                newTarget.type = Entity::Type::GONER;
+            }
+
+            scenario.targets.push_back(newTarget);
+        }
+
+        m_scenarios.push_back(std::move(scenario));
+    }
+}
+
+void Game::createScenario(size_t index)
+{
+    const Scenario& chosenScenario = m_scenarios[index];
+
+    m_weapon.type = chosenScenario.weaponType;
+    m_camera.position = chosenScenario.playerPos;
+    // canPlayerMove is not used for now (always false)
+
+    for (size_t i = 0; i < chosenScenario.targets.size(); i++) {
+        const auto& target = chosenScenario.targets[i];
+
+        glm::vec3 spawnPoint;
+        if (target.randomSpawn) {
+            spawnPoint = glm::vec3(
+                g_rng->getFloatInRange(target.minCoords.x, target.maxCoords.x),
+                g_rng->getFloatInRange(target.minCoords.y, target.maxCoords.y),
+                g_rng->getFloatInRange(target.minCoords.z, target.maxCoords.z));
+        } else {
+            spawnPoint = target.spawnCoords;
+        }
+
+        Entity entity(g_resourceManager->getModel("ball"), spawnPoint);
+        entity.addCollisionObject(CollisionObject::Type::SPHERE);
+        entity.setSize(glm::vec3(target.scale));
+        entity.destroyable = true;
+        entity.type = target.type;
+        entity.setName("Ball " + std::to_string(i));
+        m_entityManager.addEntity(std::move(entity));
+    }
 }
 
 void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Scenario.hpp"
+
 #include <optional>
 #include <string>
 #include <vector>
@@ -33,17 +35,13 @@ struct SettingsData {
     glm::vec3 targetColor;
 };
 
-enum class ScenarioType {
-    Clicking = 0,
-    Tracking = 1,
-};
-
 class NuklearWrapper {
 public:
     NuklearWrapper(GLFWwindow* window);
 
     static void renderBegin();
-    std::optional<ScenarioType> renderMainMenu();
+    std::optional<size_t> renderMainMenu(
+        const std::vector<Scenario>& scenarios);
     std::optional<SettingsData> renderPauseMenu();
     void renderStats(
         int shotsHit, int totalShots, float timeElapsedSeconds, float fps);

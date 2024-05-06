@@ -1,0 +1,42 @@
+{
+    "weapon": "Pistol",
+    "playerPos": "0.0 10.0 8.0",
+    "canPlayerMove": false,
+    "targets": [
+        {
+            "scale": 0.3,
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "die"
+        },
+        {
+            "scale": 0.3,
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move"
+        },
+        {
+            "scale": 0.3,
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move"
+        },
+        {
+            "scale": 0.3,
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move"
+        },
+        {
+            "scale": 0.3,
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move"
+        }
+    ]
+}

@@ -49,6 +49,9 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
 # Add openal-soft submodule
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openal-soft)
 
+# Add nlohmann_json submodule
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/nlohmann_json)
+
 # Add an executable target
 if (MSVC)
     add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
@@ -78,6 +81,7 @@ target_link_libraries(${PROJECT_NAME}
         glm
         assimp
         OpenAL::OpenAL
+        nlohmann_json::nlohmann_json
         # Add more libraries here as needed
 )
 

@@ -453,17 +453,24 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
 
             newTarget.scale = readVec3FromJSONString(target["scale"]);
 
-            if (target.contains("randomSpawn")) {
-                newTarget.randomSpawn = target["randomSpawn"];
-                if (newTarget.randomSpawn) {
-                    newTarget.minCoords
-                        = readVec3FromJSONString(target["minCoords"]);
-                    newTarget.maxCoords
-                        = readVec3FromJSONString(target["maxCoords"]);
-                } else {
-                    newTarget.spawnCoords
-                        = readVec3FromJSONString(target["spawnCoords"]);
-                }
+            std::string shape = target["shape"];
+            if (caseInsensitiveEquals(shape, "box")) {
+                newTarget.shape = Target::Shape::Box;
+            } else if (caseInsensitiveEquals(shape, "ball")) {
+                newTarget.shape = Target::Shape::Ball;
+            }
+
+            newTarget.randomSpawn
+                = target.contains("randomSpawn") && target["randomSpawn"];
+            if (newTarget.randomSpawn) {
+                newTarget.minCoords
+                    = readVec3FromJSONString(target["minCoords"]);
+                newTarget.maxCoords
+                    = readVec3FromJSONString(target["maxCoords"]);
+            } else {
+                newTarget.randomSpawn = false;
+                newTarget.spawnCoords
+                    = readVec3FromJSONString(target["spawnCoords"]);
             }
 
             std::string onDestroy = target["onDestroy"];
@@ -471,6 +478,20 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
                 newTarget.type = Entity::Type::MOVER;
             } else {
                 newTarget.type = Entity::Type::GONER;
+            }
+
+            if (target.contains("moves")) {
+                newTarget.moves = target["moves"];
+                if (newTarget.moves) {
+                    newTarget.movementDirection
+                        = readVec3FromJSONString(target["movementDirection"]);
+                    newTarget.movementAmplitude = target["movementAmplitude"];
+                    newTarget.movementSpeed = target["movementSpeed"];
+                }
+            }
+
+            if (target.contains("health")) {
+                newTarget.health = target["health"];
             }
 
             scenario.targets.push_back(newTarget);
@@ -500,12 +521,32 @@ void Game::createScenario(size_t index)
             spawnPoint = target.spawnCoords;
         }
 
-        Entity entity(g_resourceManager->getModel("ball"), spawnPoint);
-        entity.addCollisionObject(CollisionObject::Type::SPHERE);
+        const Model* model;
+        CollisionObject::Type collisionObjType;
+        if (target.shape == Target::Shape::Box) {
+            model = &g_resourceManager->getModel("cube");
+            collisionObjType = CollisionObject::Type::AABB;
+        } else {
+            model = &g_resourceManager->getModel("ball");
+            collisionObjType = CollisionObject::Type::SPHERE;
+        }
+
+        Entity entity(*model, spawnPoint);
+        entity.addCollisionObject(collisionObjType);
         entity.setSize(target.scale);
         entity.destroyable = true;
         entity.type = target.type;
         entity.setName("Ball " + std::to_string(i));
+        entity.setStartingHealth(target.health);
+        if (target.moves) {
+            float amplitude = target.movementAmplitude;
+            float speed = target.movementSpeed;
+            entity.setMovementPattern(
+                [amplitude, speed](float timePassedSeconds) {
+                    return glm::vec3(
+                        amplitude * cos(speed * timePassedSeconds), 0.0f, 0.0f);
+                });
+        }
         m_entityManager.addEntity(std::move(entity));
     }
 }

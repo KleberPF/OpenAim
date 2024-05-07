@@ -1,0 +1,17 @@
+{
+    "weapon": "machine_gun",
+    "playerPos": "0.0 1.5 8.0",
+    "targets": [
+        {
+            "shape": "box",
+            "scale": "0.3 3.0 0.3",
+            "spawnCoords": "0.0 1.55 -8.0",
+            "onDestroy": "die",
+            "health": 200,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        }
+    ]
+}

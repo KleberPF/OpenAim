@@ -1,0 +1,71 @@
+{
+    "weapon": "machine_gun",
+    "playerPos": "0.0 10.0 8.0",
+    "targets": [
+        {
+            "shape": "ball",
+            "scale": "0.3",
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move",
+            "health": 20,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        },
+        {
+            "shape": "ball",
+            "scale": "0.3",
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move",
+            "health": 20,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        },
+        {
+            "shape": "ball",
+            "scale": "0.3",
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move",
+            "health": 20,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        },
+        {
+            "shape": "ball",
+            "scale": "0.3",
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move",
+            "health": 20,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        },
+        {
+            "shape": "ball",
+            "scale": "0.3",
+            "randomSpawn": true,
+            "minCoords": "-8.0 2.0 -8.0",
+            "maxCoords": "8.0 18.0 -8.0",
+            "onDestroy": "move",
+            "health": 20,
+            "moves": true,
+            "movementDirection": "1 0 0",
+            "movementAmplitude": 5,
+            "movementSpeed": 2
+        }
+    ]
+}

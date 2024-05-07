@@ -200,18 +200,18 @@ void Game::processInput()
 
     // camera keyboard processing
     // uncomment this to allow flying around
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-    //     m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
-    // }
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-    //     m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
-    // }
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-    //     m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
-    // }
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-    //     m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
-    // }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+        m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+        m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+        m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+        m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
+    }
 }
 
 void Game::updateEntities()
@@ -445,36 +445,26 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
             scenario.weaponType = Weapon::Type::Machine_Gun;
         }
 
-        // parse player position
-        std::string playerPos = data["playerPos"];
-        auto playerPosSs = std::istringstream(playerPos);
-        playerPosSs >> scenario.playerPos.x;
-        playerPosSs >> scenario.playerPos.y;
-        playerPosSs >> scenario.playerPos.z;
-
-        scenario.canPlayerMove = data["canPlayerMove"];
+        scenario.playerPos = readVec3FromJSONString(data["playerPos"]);
 
         auto targets = data["targets"];
         for (auto& target : targets) {
             Target newTarget;
 
-            newTarget.scale = target["scale"];
+            newTarget.scale = readVec3FromJSONString(target["scale"]);
 
-            if (bool randomSpawn = target["randomSpawn"]) {
-                newTarget.randomSpawn = randomSpawn;
+            if (target.contains("randomSpawn")) {
+                newTarget.randomSpawn = target["randomSpawn"];
+                if (newTarget.randomSpawn) {
+                    newTarget.minCoords
+                        = readVec3FromJSONString(target["minCoords"]);
+                    newTarget.maxCoords
+                        = readVec3FromJSONString(target["maxCoords"]);
+                } else {
+                    newTarget.spawnCoords
+                        = readVec3FromJSONString(target["spawnCoords"]);
+                }
             }
-
-            std::string minCoords = target["minCoords"];
-            auto minCoordsSs = std::istringstream(std::move(minCoords));
-            minCoordsSs >> newTarget.minCoords.x;
-            minCoordsSs >> newTarget.minCoords.y;
-            minCoordsSs >> newTarget.minCoords.z;
-
-            std::string maxCoords = target["maxCoords"];
-            auto maxCoordsSs = std::istringstream(std::move(maxCoords));
-            maxCoordsSs >> newTarget.maxCoords.x;
-            maxCoordsSs >> newTarget.maxCoords.y;
-            maxCoordsSs >> newTarget.maxCoords.z;
 
             std::string onDestroy = target["onDestroy"];
             if (caseInsensitiveEquals(onDestroy, "move")) {
@@ -496,7 +486,6 @@ void Game::createScenario(size_t index)
 
     m_weapon.type = chosenScenario.weaponType;
     m_camera.position = chosenScenario.playerPos;
-    // canPlayerMove is not used for now (always false)
 
     for (size_t i = 0; i < chosenScenario.targets.size(); i++) {
         const auto& target = chosenScenario.targets[i];
@@ -513,7 +502,7 @@ void Game::createScenario(size_t index)
 
         Entity entity(g_resourceManager->getModel("ball"), spawnPoint);
         entity.addCollisionObject(CollisionObject::Type::SPHERE);
-        entity.setSize(glm::vec3(target.scale));
+        entity.setSize(target.scale);
         entity.destroyable = true;
         entity.type = target.type;
         entity.setName("Ball " + std::to_string(i));

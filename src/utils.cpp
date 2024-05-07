@@ -3,6 +3,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <array>
+#include <sstream>
 
 glm::mat4 anglesToRotationMatrix(const glm::vec3& rotation)
 {
@@ -30,4 +31,23 @@ bool caseInsensitiveEquals(const std::string& str1, const std::string& str2)
     };
 
     return std::equal(str1.begin(), str1.end(), str2.begin(), str2.end(), cmp);
+}
+
+glm::vec3 readVec3FromJSONString(const std::string& str)
+{
+    auto ss = std::istringstream(str);
+    auto result = glm::vec3(0.0f);
+    // this starts at -1 because the ss tries to read one more time after the
+    // whole string ends
+    int index = -1;
+
+    while (index < 2 && ss) {
+        ss >> result[++index];
+    }
+
+    if (index == 1) {
+        return glm::vec3(result.x);
+    }
+
+    return result;
 }

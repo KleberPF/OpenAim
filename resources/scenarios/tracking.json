@@ -9,7 +9,6 @@
             "onDestroy": "die",
             "health": 200,
             "moves": true,
-            "movementDirection": "1 0 0",
             "movementAmplitude": 5,
             "movementSpeed": 2
         }

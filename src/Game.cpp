@@ -129,9 +129,7 @@ Game::Game()
         g_resourceManager->getShader("skybox"));
 
     buildPlayArea();
-    parseScenariosFromFile("./resources/levels");
-    // createClickingScenario();
-    // createTrackingScenario();
+    parseScenariosFromFile("./resources/scenarios");
 }
 
 void Game::mainLoop()
@@ -429,75 +427,79 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
             continue;
         }
 
-        std::ifstream f(entry.path());
-        json data = json::parse(f);
+        try {
+            std::ifstream f(entry.path());
+            json data = json::parse(f);
 
-        Scenario scenario;
+            Scenario scenario;
 
-        std::string filename = entry.path().filename().string();
-        scenario.name = filename.substr(0, filename.find('.'));
+            std::string filename = entry.path().filename().string();
+            scenario.name = filename.substr(0, filename.find('.'));
 
-        std::string weaponType = data["weapon"];
+            std::string weaponType = data["weapon"];
 
-        if (caseInsensitiveEquals(weaponType, "pistol")) {
-            scenario.weaponType = Weapon::Type::Pistol;
-        } else if (caseInsensitiveEquals(weaponType, "machine_gun")) {
-            scenario.weaponType = Weapon::Type::Machine_Gun;
-        }
-
-        scenario.playerPos = readVec3FromJSONString(data["playerPos"]);
-
-        auto targets = data["targets"];
-        for (auto& target : targets) {
-            Target newTarget;
-
-            newTarget.scale = readVec3FromJSONString(target["scale"]);
-
-            std::string shape = target["shape"];
-            if (caseInsensitiveEquals(shape, "box")) {
-                newTarget.shape = Target::Shape::Box;
-            } else if (caseInsensitiveEquals(shape, "ball")) {
-                newTarget.shape = Target::Shape::Ball;
+            if (caseInsensitiveEquals(weaponType, "pistol")) {
+                scenario.weaponType = Weapon::Type::Pistol;
+            } else if (caseInsensitiveEquals(weaponType, "machine_gun")) {
+                scenario.weaponType = Weapon::Type::Machine_Gun;
             }
 
-            newTarget.randomSpawn
-                = target.contains("randomSpawn") && target["randomSpawn"];
-            if (newTarget.randomSpawn) {
-                newTarget.minCoords
-                    = readVec3FromJSONString(target["minCoords"]);
-                newTarget.maxCoords
-                    = readVec3FromJSONString(target["maxCoords"]);
-            } else {
-                newTarget.randomSpawn = false;
-                newTarget.spawnCoords
-                    = readVec3FromJSONString(target["spawnCoords"]);
-            }
+            scenario.playerPos = readVec3FromJSONString(data["playerPos"]);
 
-            std::string onDestroy = target["onDestroy"];
-            if (caseInsensitiveEquals(onDestroy, "move")) {
-                newTarget.type = Entity::Type::MOVER;
-            } else {
-                newTarget.type = Entity::Type::GONER;
-            }
+            auto targets = data["targets"];
+            for (auto& target : targets) {
+                Target newTarget;
 
-            if (target.contains("moves")) {
-                newTarget.moves = target["moves"];
-                if (newTarget.moves) {
-                    newTarget.movementDirection
-                        = readVec3FromJSONString(target["movementDirection"]);
-                    newTarget.movementAmplitude = target["movementAmplitude"];
-                    newTarget.movementSpeed = target["movementSpeed"];
+                newTarget.scale = readVec3FromJSONString(target["scale"]);
+
+                std::string shape = target["shape"];
+                if (caseInsensitiveEquals(shape, "box")) {
+                    newTarget.shape = Target::Shape::Box;
+                } else if (caseInsensitiveEquals(shape, "ball")) {
+                    newTarget.shape = Target::Shape::Ball;
                 }
+
+                newTarget.randomSpawn
+                    = target.contains("randomSpawn") && target["randomSpawn"];
+                if (newTarget.randomSpawn) {
+                    newTarget.minCoords
+                        = readVec3FromJSONString(target["minCoords"]);
+                    newTarget.maxCoords
+                        = readVec3FromJSONString(target["maxCoords"]);
+                } else {
+                    newTarget.randomSpawn = false;
+                    newTarget.spawnCoords
+                        = readVec3FromJSONString(target["spawnCoords"]);
+                }
+
+                std::string onDestroy = target["onDestroy"];
+                if (caseInsensitiveEquals(onDestroy, "move")) {
+                    newTarget.type = Entity::Type::MOVER;
+                } else {
+                    newTarget.type = Entity::Type::GONER;
+                }
+
+                if (target.contains("moves")) {
+                    newTarget.moves = target["moves"];
+                    if (newTarget.moves) {
+                        newTarget.movementAmplitude
+                            = target["movementAmplitude"];
+                        newTarget.movementSpeed = target["movementSpeed"];
+                    }
+                }
+
+                if (target.contains("health")) {
+                    newTarget.health = target["health"];
+                }
+
+                scenario.targets.push_back(newTarget);
             }
 
-            if (target.contains("health")) {
-                newTarget.health = target["health"];
-            }
-
-            scenario.targets.push_back(newTarget);
+            m_scenarios.push_back(std::move(scenario));
+        } catch (...) {
+            // probably some JSON format error
+            // just skips the file
         }
-
-        m_scenarios.push_back(std::move(scenario));
     }
 }
 

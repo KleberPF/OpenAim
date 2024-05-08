@@ -11,18 +11,17 @@ struct Target {
         Ball,
     };
 
+    Entity::Type type = Entity::Type::GONER;
+    Shape shape = Shape::Ball;
     glm::vec3 scale = glm::vec3(1.0f);
-    bool randomSpawn = true;
     glm::vec3 spawnCoords;
     glm::vec3 minCoords;
     glm::vec3 maxCoords;
-    Entity::Type type;
+    bool randomSpawn = true;
     bool moves = false;
-    glm::vec3 movementDirection = glm::vec3(1.0f, 0.0f, 0.0f);
     float movementAmplitude;
     float movementSpeed;
     int health = 1;
-    Shape shape;
 };
 
 struct Scenario {

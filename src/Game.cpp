@@ -311,7 +311,7 @@ void Game::mainLoopEnd()
     m_inputManager.consolidateKeyStates();
     glfwPollEvents();
 
-    if (m_fpsCapped && m_timeNow - m_lastFrame >= 1 / m_fpsLimit) {
+    if (!m_fpsCapped || m_timeNow - m_lastFrame >= 1 / m_fpsLimit) {
         glfwSwapBuffers(m_window.ptr());
         m_lastFrame = m_timeNow;
     }

@@ -21,7 +21,7 @@ To run the game
 
 ## Building on Windows
 
-Right now it should work out of the box with Visual Studio. Open the CMake project and compile the OpenAim.exe target. There are also pre-compiled versions released semi-frequently in the Releases section.
+Right now it should work out of the box with Visual Studio, just open the CMake project and compile the OpenAim.exe target.
 
 ## Media
 

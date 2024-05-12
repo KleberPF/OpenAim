@@ -52,7 +52,7 @@ Renderer::~Renderer()
 
 void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 {
-    const Shader& shader = entity.shader();
+    const Shader& shader = entity.shader2.get();
     shader.use();
 
     // lighting stuff
@@ -79,8 +79,26 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
     glm::mat4 mvp = projection * view * model;
     shader.setMat4("mvp", mvp);
 
-    entity.material().bind(shader);
+    entity.material2.get().bind(shader);
     entity.render();
+
+    if (entity.destroyable) {
+        const Shader& healthbarShader = entity.healthbarShader;
+        Material& healthbarMaterial = entity.healthbarMaterial;
+
+        healthbarShader.use();
+
+        model = entity.buildHealthbarModelMatrix(
+            scene.camera.position, scene.camera.front());
+        mvp = projection * view * model;
+
+        healthbarShader.setMat4("mvp", mvp);
+        healthbarShader.setFloat(
+            "healthPercentage", entity.getHealthPercentage());
+        healthbarMaterial.setColor(entity.getHealthBarColor());
+        healthbarMaterial.bind(healthbarShader);
+        entity.renderHealthBar();
+    }
 }
 
 void Renderer::renderSprite(const Scene& scene, const Sprite& sprite) const

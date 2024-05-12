@@ -27,8 +27,7 @@ public:
         const std::string& name, const std::string& path, Texture::Type type);
     const Texture& getTexture(const std::string& name);
 
-    void addModel(const std::string& name, const std::string& path,
-        const Material& material, const Shader& shader);
+    void addModel(const std::string& name, const std::string& path);
     const Model& getModel(const std::string& name);
 
     void addMaterial(const std::string& name);

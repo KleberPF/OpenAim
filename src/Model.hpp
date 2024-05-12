@@ -11,13 +11,9 @@
 
 class Model {
 public:
-    Model(const std::string& path, const Material& material,
-        const Shader& shader);
+    Model(const std::string& path);
 
     void render() const;
-
-    std::reference_wrapper<const Material> material;
-    std::reference_wrapper<const Shader> shader;
 
 private:
     void processNode(aiNode* node, const aiScene* scene);

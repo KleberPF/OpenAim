@@ -1,7 +1,9 @@
 #include "Entity.hpp"
 
+#include "Globals.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
+#include "glm/fwd.hpp"
 #include "utils.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
@@ -143,10 +145,16 @@ float CollisionSphere::radius() const
     return m_radius;
 }
 
-Entity::Entity(Model model, const glm::vec3& pos)
+Entity::Entity(Model model, const Material& material, const Shader& shader,
+    const glm::vec3& pos)
     : referentialPos(pos)
+    , material2(material)
+    , shader2(shader)
+    , healthbarMaterial(g_resourceManager->getMaterial("healthbar"))
+    , healthbarShader(g_resourceManager->getShader("healthbar"))
     , m_currentPos(pos)
     , m_model(std::move(model))
+    , m_healthbarQuad(g_resourceManager->getModel("plane"))
 {
 }
 
@@ -160,14 +168,42 @@ glm::mat3 Entity::normalMatrix() const
     return m_normalMatrix;
 }
 
-const Shader& Entity::shader() const
+glm::mat4 Entity::buildHealthbarModelMatrix(
+    const glm::vec3& viewPos, const glm::vec3& viewDir) const
 {
-    return m_model.shader;
+    // translation
+    auto model = glm::identity<glm::mat4>();
+    model = glm::translate(
+        model, m_currentPos + glm::vec3(0.0f, m_size.y + 0.1f, 0.0f));
+
+    // rotation
+    model *= anglesToRotationMatrix(Rotation(90.0f, 0.0f, 0.0f));
+
+    // scaling
+    model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.1f));
+
+    return model;
 }
 
-const Material& Entity::material() const
+float Entity::getHealthPercentage() const
 {
-    return m_model.material;
+    return (float)m_currentHealth / m_startingHealth;
+}
+
+glm::vec3 Entity::getHealthBarColor() const
+{
+    float healthPercentage = getHealthPercentage();
+
+    if (healthPercentage >= 0.75f) {
+        return { 0.0f, 1.0f, 0.0f };
+    }
+    if (healthPercentage >= 0.5f) {
+        return { 1.0f, 0.66f, 0.0f };
+    }
+    if (healthPercentage >= 0.25f) {
+        return { 1.0f, 0.33f, 0.0f };
+    }
+    return { 1.0f, 0.0f, 0.0f };
 }
 
 void Entity::setRotation(float x, float y, float z)
@@ -278,6 +314,11 @@ bool Entity::update(float timePassedSeconds)
 void Entity::render() const
 {
     m_model.render();
+}
+
+void Entity::renderHealthBar() const
+{
+    m_healthbarQuad.render();
 }
 
 void Entity::updateMatrices()

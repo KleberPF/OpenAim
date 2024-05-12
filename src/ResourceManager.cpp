@@ -38,10 +38,9 @@ const Texture& ResourceManager::getTexture(const std::string& name)
     return m_textures.at(name);
 }
 
-void ResourceManager::addModel(const std::string& name, const std::string& path,
-    const Material& material, const Shader& shader)
+void ResourceManager::addModel(const std::string& name, const std::string& path)
 {
-    m_models.insert({ name, Model(path, material, shader) });
+    m_models.insert({ name, Model(path) });
 }
 
 const Model& ResourceManager::getModel(const std::string& name)

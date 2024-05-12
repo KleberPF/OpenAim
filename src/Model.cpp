@@ -6,10 +6,7 @@
 
 #include <iostream>
 
-Model::Model(
-    const std::string& path, const Material& material, const Shader& shader)
-    : material(material)
-    , shader(shader)
+Model::Model(const std::string& path)
 {
     Assimp::Importer importer;
     const aiScene* scene = importer.ReadFile(path,

@@ -63,6 +63,9 @@ Game::Game()
         "./resources/shaders/model_lighting.frag");
     m_resourceManager.addShader("skybox", "./resources/shaders/skybox.vert",
         "./resources/shaders/skybox.frag");
+    m_resourceManager.addShader("healthbar",
+        "./resources/shaders/healthbar.vert",
+        "./resources/shaders/healthbar.frag");
 
     m_resourceManager.addCubemap("skybox",
         { "./resources/textures/skybox/right.bmp",
@@ -94,15 +97,13 @@ Game::Game()
         .addTexture(m_resourceManager.getTexture("crosshair"))
         .setColor(glm::vec3(0.0f, 1.0f, 0.0f));
 
-    m_resourceManager.addModel("cube", "./resources/objects/cube/cube.obj",
-        m_resourceManager.getMaterial("targets"),
-        m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("ball", "./resources/objects/ball/ball.obj",
-        m_resourceManager.getMaterial("targets"),
-        m_resourceManager.getShader("targets"));
-    m_resourceManager.addModel("plane", "./resources/objects/plane/plane.obj",
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"));
+    m_resourceManager.addMaterial("healthbar");
+    m_resourceManager.getMaterial("healthbar")
+        .addTexture(m_resourceManager.getTexture("white_pixel"));
+
+    m_resourceManager.addModel("cube", "./resources/objects/cube/cube.obj");
+    m_resourceManager.addModel("ball", "./resources/objects/ball/ball.obj");
+    m_resourceManager.addModel("plane", "./resources/objects/plane/plane.obj");
 
     m_resourceManager.addSound("pistol", "./resources/sounds/pistol.ogg");
     m_resourceManager.addSound(
@@ -331,46 +332,55 @@ void Game::togglePaused()
 
 void Game::buildPlayArea()
 {
-    Entity floor(g_resourceManager->getModel("plane"), glm::vec3(0));
+    Entity floor(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"), glm::vec3(0));
     floor.addCollisionObject(CollisionObject::Type::AABB);
     floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     floor.setName("Floor");
     m_entityManager.addEntity(std::move(floor));
 
-    Entity frontWall(
-        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, -10.0f));
+    Entity frontWall(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"),
+        glm::vec3(0.0f, 10.0f, -10.0f));
     frontWall.addCollisionObject(CollisionObject::Type::AABB);
     frontWall.setRotation(90, 0, 0);
     frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     frontWall.setName("Front Wall");
     m_entityManager.addEntity(std::move(frontWall));
 
-    Entity leftWall(
-        g_resourceManager->getModel("plane"), glm::vec3(-10.0f, 10.0f, 0.0f));
+    Entity leftWall(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"),
+        glm::vec3(-10.0f, 10.0f, 0.0f));
     leftWall.addCollisionObject(CollisionObject::Type::AABB);
     leftWall.setRotation(90, 90, 0);
     leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     leftWall.setName("Left Wall");
     m_entityManager.addEntity(std::move(leftWall));
 
-    Entity rightWall(
-        g_resourceManager->getModel("plane"), glm::vec3(10.0f, 10.0f, 0.0f));
+    Entity rightWall(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"), glm::vec3(10.0f, 10.0f, 0.0f));
     rightWall.addCollisionObject(CollisionObject::Type::AABB);
     rightWall.setRotation(90, -90, 0);
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
     m_entityManager.addEntity(std::move(rightWall));
 
-    Entity ceiling(
-        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 20.0f, 0.0f));
+    Entity ceiling(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"), glm::vec3(0.0f, 20.0f, 0.0f));
     ceiling.addCollisionObject(CollisionObject::Type::AABB);
     ceiling.setRotation(180, 0, 0);
     ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     ceiling.setName("Ceiling");
     m_entityManager.addEntity(std::move(ceiling));
 
-    Entity backWall(
-        g_resourceManager->getModel("plane"), glm::vec3(0.0f, 10.0f, 10.0f));
+    Entity backWall(g_resourceManager->getModel("plane"),
+        m_resourceManager.getMaterial("bricks"),
+        m_resourceManager.getShader("textured"), glm::vec3(0.0f, 10.0f, 10.0f));
     backWall.addCollisionObject(CollisionObject::Type::AABB);
     backWall.setRotation(90, 180, 0);
     backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -391,7 +401,9 @@ void Game::createClickingScenario()
     }
 
     for (size_t i = 0; i < targetPositions.size(); i++) {
-        Entity entity(g_resourceManager->getModel("ball"), targetPositions[i]);
+        Entity entity(g_resourceManager->getModel("ball"),
+            m_resourceManager.getMaterial("targets"),
+            m_resourceManager.getShader("targets"), targetPositions[i]);
         entity.addCollisionObject(CollisionObject::Type::SPHERE);
         entity.setSize(glm::vec3(0.3f));
         entity.destroyable = true;
@@ -405,8 +417,9 @@ void Game::createTrackingScenario()
 {
     m_weapon.type = Weapon::Type::Machine_Gun;
 
-    Entity entity(
-        g_resourceManager->getModel("cube"), glm::vec3(0.0f, 1.55f, -8.0f));
+    Entity entity(g_resourceManager->getModel("cube"),
+        m_resourceManager.getMaterial("targets"),
+        m_resourceManager.getShader("targets"), glm::vec3(0.0f, 1.55f, -8.0f));
     entity.addCollisionObject(CollisionObject::Type::AABB);
     entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
     entity.destroyable = true;
@@ -533,7 +546,8 @@ void Game::createScenario(size_t index)
             collisionObjType = CollisionObject::Type::SPHERE;
         }
 
-        Entity entity(*model, spawnPoint);
+        Entity entity(*model, m_resourceManager.getMaterial("targets"),
+            m_resourceManager.getShader("targets"), spawnPoint);
         entity.addCollisionObject(collisionObjType);
         entity.setSize(target.scale);
         entity.destroyable = true;

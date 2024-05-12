@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Material.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
 
@@ -108,7 +109,8 @@ public:
         GONER, // when dead, die for good
     };
 
-    Entity(Model model, const glm::vec3& pos);
+    Entity(Model model, const Material& material, const Shader& shader,
+        const glm::vec3& pos);
     virtual ~Entity() = default;
 
     Entity(const Entity& entity) = delete;
@@ -119,9 +121,11 @@ public:
 
     glm::mat4 modelMatrix() const;
     glm::mat3 normalMatrix() const;
+    glm::mat4 buildHealthbarModelMatrix(
+        const glm::vec3& viewPos, const glm::vec3& viewDir) const;
 
-    const Shader& shader() const;
-    const Material& material() const;
+    float getHealthPercentage() const;
+    glm::vec3 getHealthBarColor() const;
 
     void setRotation(float x, float y, float z);
     void move(const glm::vec3& newPos);
@@ -149,6 +153,7 @@ public:
     bool update(float timePassedSeconds);
 
     void render() const;
+    void renderHealthBar() const;
 
     // This holds a reference position used for entity movement.
     // For example, the point where the entity is circling or
@@ -157,12 +162,19 @@ public:
     bool destroyable = false;
     Type type = Type::GONER;
 
+    std::reference_wrapper<const Material> material2;
+    std::reference_wrapper<const Shader> shader2;
+
+    std::reference_wrapper<Material> healthbarMaterial;
+    std::reference_wrapper<const Shader> healthbarShader;
+
 private:
     // both are meant to be called after a move, resize or rotation
     void updateMatrices();
 
     glm::mat4 m_modelMatrix;
     glm::mat3 m_normalMatrix;
+    glm::mat4 m_healthbarModelMatrix;
 
     std::unique_ptr<CollisionObject> m_collisionObject = nullptr;
 
@@ -182,4 +194,6 @@ private:
     glm::vec3 m_currentPos;
 
     Model m_model;
+
+    Model m_healthbarQuad;
 };

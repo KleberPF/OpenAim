@@ -311,6 +311,11 @@ bool Entity::update(float timePassedSeconds)
     return false;
 }
 
+bool Entity::shouldRenderHealthBar() const
+{
+    return destroyable && m_startingHealth != 1;
+}
+
 void Entity::render() const
 {
     m_model.render();

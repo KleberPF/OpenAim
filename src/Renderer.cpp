@@ -82,7 +82,7 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
     entity.material2.get().bind(shader);
     entity.render();
 
-    if (entity.destroyable) {
+    if (entity.shouldRenderHealthBar()) {
         const Shader& healthbarShader = entity.healthbarShader;
         Material& healthbarMaterial = entity.healthbarMaterial;
 

@@ -152,6 +152,8 @@ public:
     // returns whether entity should die
     bool update(float timePassedSeconds);
 
+    bool shouldRenderHealthBar() const;
+
     void render() const;
     void renderHealthBar() const;
 

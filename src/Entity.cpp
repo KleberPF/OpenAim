@@ -137,7 +137,7 @@ IntersectionResult CollisionSphere::isIntersectedByLine(
 
 void CollisionSphere::setSize(const glm::vec3& size)
 {
-    m_radius = size.x;
+    m_radius = size.x / 2;
 }
 
 float CollisionSphere::radius() const
@@ -174,7 +174,7 @@ glm::mat4 Entity::buildHealthbarModelMatrix(
     // translation
     auto model = glm::identity<glm::mat4>();
     model = glm::translate(
-        model, m_currentPos + glm::vec3(0.0f, m_size.y + 0.1f, 0.0f));
+        model, m_currentPos + glm::vec3(0.0f, m_size.y / 2 + 0.1f, 0.0f));
 
     // rotation
     model *= anglesToRotationMatrix(Rotation(90.0f, 0.0f, 0.0f));
@@ -236,7 +236,7 @@ void Entity::addCollisionObject(CollisionObject::Type type)
     switch (type) {
     case CollisionObject::Type::SPHERE:
         m_collisionObject
-            = std::make_unique<CollisionSphere>(m_currentPos, m_size.x);
+            = std::make_unique<CollisionSphere>(m_currentPos, m_size.x / 2);
         break;
     default:
         m_collisionObject

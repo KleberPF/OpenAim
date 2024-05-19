@@ -4,7 +4,7 @@
     "targets": [
         {
             "shape": "ball",
-            "scale": "0.3",
+            "scale": "0.6",
             "randomSpawn": true,
             "minCoords": "-8.0 2.0 -8.0",
             "maxCoords": "8.0 18.0 -8.0",
@@ -12,7 +12,7 @@
         },
         {
             "shape": "ball",
-            "scale": "0.3",
+            "scale": "0.6",
             "randomSpawn": true,
             "minCoords": "-8.0 2.0 -8.0",
             "maxCoords": "8.0 18.0 -8.0",
@@ -20,7 +20,7 @@
         },
         {
             "shape": "ball",
-            "scale": "0.3",
+            "scale": "0.6",
             "randomSpawn": true,
             "minCoords": "-8.0 2.0 -8.0",
             "maxCoords": "8.0 18.0 -8.0",
@@ -28,7 +28,7 @@
         },
         {
             "shape": "ball",
-            "scale": "0.3",
+            "scale": "0.6",
             "randomSpawn": true,
             "minCoords": "-8.0 2.0 -8.0",
             "maxCoords": "8.0 18.0 -8.0",
@@ -36,7 +36,7 @@
         },
         {
             "shape": "ball",
-            "scale": "0.3",
+            "scale": "0.6",
             "randomSpawn": true,
             "minCoords": "-8.0 2.0 -8.0",
             "maxCoords": "8.0 18.0 -8.0",

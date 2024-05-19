@@ -189,6 +189,14 @@ private:
     int m_startingHealth = 1;
     int m_currentHealth = 1;
     bool m_damagedThisFrame = false;
+
+    /*
+     * This is basically the scale of the entity
+     * The default sizes of the models are:
+     * Cube: 1x1x1
+     * Plane: 1x1
+     * Sphere: Diameter 1
+     */
     glm::vec3 m_size = glm::vec3(1.0f);
     std::optional<Rotation> m_rotation;
 

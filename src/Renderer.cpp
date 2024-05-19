@@ -88,8 +88,7 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 
         healthbarShader.use();
 
-        model = entity.buildHealthbarModelMatrix(
-            scene.camera.position, scene.camera.front());
+        model = entity.buildHealthbarModelMatrix();
         mvp = projection * view * model;
 
         healthbarShader.setMat4("mvp", mvp);

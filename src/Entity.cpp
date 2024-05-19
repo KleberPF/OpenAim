@@ -168,8 +168,7 @@ glm::mat3 Entity::normalMatrix() const
     return m_normalMatrix;
 }
 
-glm::mat4 Entity::buildHealthbarModelMatrix(
-    const glm::vec3& viewPos, const glm::vec3& viewDir) const
+glm::mat4 Entity::buildHealthbarModelMatrix() const
 {
     // translation
     auto model = glm::identity<glm::mat4>();

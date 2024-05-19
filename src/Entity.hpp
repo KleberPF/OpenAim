@@ -121,8 +121,7 @@ public:
 
     glm::mat4 modelMatrix() const;
     glm::mat3 normalMatrix() const;
-    glm::mat4 buildHealthbarModelMatrix(
-        const glm::vec3& viewPos, const glm::vec3& viewDir) const;
+    glm::mat4 buildHealthbarModelMatrix() const;
 
     float getHealthPercentage() const;
     glm::vec3 getHealthBarColor() const;

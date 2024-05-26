@@ -123,8 +123,6 @@ nk_glfw3_device_create()
     GLint len = 0;
     static const GLchar *vertex_shader =
         NK_SHADER_VERSION
-        NK_SHADER_BINDLESS
-        NK_SHADER_64BIT
         "uniform mat4 ProjMtx;\n"
         "in vec2 Position;\n"
         "in vec2 TexCoord;\n"
@@ -139,9 +137,8 @@ nk_glfw3_device_create()
     static const GLchar *fragment_shader =
         NK_SHADER_VERSION
         NK_SHADER_BINDLESS
-        NK_SHADER_64BIT
         "precision mediump float;\n"
-        "uniform uint64_t Texture;\n"
+        "uniform uvec2 Texture;\n"
         "in vec2 Frag_UV;\n"
         "in vec4 Frag_Color;\n"
         "out vec4 Out_Color;\n"
@@ -440,7 +437,10 @@ nk_glfw3_render(enum nk_anti_aliasing AA)
             if (!glIsTextureHandleResidentARB(tex_handle))
                 glMakeTextureHandleResidentARB(tex_handle);
 
-            glUniformHandleui64ARB(dev->uniform_tex, tex_handle);
+            //glUniformHandleui64ARB(dev->uniform_tex, tex_handle);
+            GLuint v0 = tex_handle;
+            GLuint v1 = tex_handle >> 32;
+            glUniform2ui(dev->uniform_tex, v0, v1);
             glScissor(
                 (GLint)(cmd->clip_rect.x * glfw.fb_scale.x),
                 (GLint)((glfw.height - (GLint)(cmd->clip_rect.y + cmd->clip_rect.h)) * glfw.fb_scale.y),

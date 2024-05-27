@@ -21,7 +21,15 @@ To run the game
 
 ## Building on Windows
 
-Right now it should work out of the box with Visual Studio, just open the CMake project and compile the OpenAim.exe target.
+```
+git clone --recurse-submodules https://github.com/KleberPF/OpenAim.git
+```
+
+Inside Visual Studio, open the CMake project and select the OpenAim.exe target
+
+![image](https://github.com/KleberPF/OpenAim/assets/43550602/17f8bb7a-f460-45a6-9fbf-c8fc51befc11)
+
+![image](https://github.com/KleberPF/OpenAim/assets/43550602/afa865c6-c61e-49b0-b809-b38d74a1b7e3)
 
 ## Media
 

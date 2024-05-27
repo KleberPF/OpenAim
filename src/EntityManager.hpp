@@ -14,6 +14,8 @@ public:
     EntityManager() = default;
 
     void addEntity(Entity entity);
+    void removeAllTargets();
+
     // returns whether an entity was hit
     bool updateShotEntities(const glm::vec3& eyePos, const glm::vec3& eyeDir);
     void updateEntities(float timeElapsedSeconds);

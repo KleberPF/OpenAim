@@ -35,16 +35,30 @@ struct SettingsData {
     glm::vec3 targetColor;
 };
 
+struct MenuData {
+    MenuData(int scenarioOption, bool challenge)
+        : scenarioOption(scenarioOption)
+        , challenge(challenge)
+    {
+    }
+
+    int scenarioOption;
+    bool challenge;
+};
+
 class NuklearWrapper {
 public:
     NuklearWrapper(GLFWwindow* window);
 
     static void renderBegin();
-    std::optional<size_t> renderMainMenu(
+    std::optional<MenuData> renderMainMenu(
         const std::vector<Scenario>& scenarios);
     std::optional<SettingsData> renderPauseMenu();
     void renderStats(
         int shotsHit, int totalShots, float timeElapsedSeconds, float fps);
+    void renderChallengeData(
+        int shotsHit, int totalShots, float timeRemainingSeconds, float fps);
+    bool renderChallengeEndStats(int shotsHit, int totalShots);
     static void renderEnd();
 
 private:
@@ -60,4 +74,17 @@ private:
     int m_selectedScenario = 0;
 
     struct nk_context* m_ctx;
+};
+
+// Questionable name
+struct NuklearRenderScope {
+    NuklearRenderScope()
+    {
+        NuklearWrapper::renderBegin();
+    }
+
+    ~NuklearRenderScope()
+    {
+        NuklearWrapper::renderEnd();
+    }
 };

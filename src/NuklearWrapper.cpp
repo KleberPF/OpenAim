@@ -37,9 +37,10 @@ SettingsData::SettingsData(const InternalSettingsData& data)
     assert(data.maxFps.string.len < MAX_FIELD_SIZE - 1);
 
     char* endPtr = nullptr;
-    char buf[MAX_FIELD_SIZE] = { '\0' };
+    char buf[MAX_FIELD_SIZE];
     std::strncpy(buf, nk_str_get_const(&data.sensitivity.string),
         data.sensitivity.string.len);
+    buf[MAX_FIELD_SIZE - 1] = '\0';
     float value = std::strtof(buf, &endPtr);
     if (endPtr - buf == data.sensitivity.string.len) { // no error
         sensitivity = value;
@@ -50,6 +51,7 @@ SettingsData::SettingsData(const InternalSettingsData& data)
     std::memset(buf, 0, MAX_FIELD_SIZE);
     std::strncpy(
         buf, nk_str_get_const(&data.maxFps.string), data.maxFps.string.len);
+    buf[MAX_FIELD_SIZE - 1] = '\0';
     value = std::strtof(buf, &endPtr);
     if (endPtr - buf == data.maxFps.string.len) { // no error
         maxFps = value;
@@ -98,18 +100,20 @@ void NuklearWrapper::renderBegin()
     nk_glfw3_new_frame();
 }
 
-std::optional<size_t> NuklearWrapper::renderMainMenu(
+std::optional<MenuData> NuklearWrapper::renderMainMenu(
     const std::vector<Scenario>& scenarios)
 {
     nk_glfw3_set_callbacks();
-
     glfwGetWindowSize(m_window, &m_width, &m_height);
-    int rectSize = 300;
-    std::optional<size_t> selectedOption = std::nullopt;
+
+    const int rectWidth = 300;
+    const int rectHeight = 180;
+
+    std::optional<MenuData> result = std::nullopt;
 
     if (nk_begin(m_ctx, "OpenAim",
-            nk_rect((m_width - rectSize) / 2, (m_height - rectSize) / 2,
-                rectSize, rectSize),
+            nk_rect((m_width - rectWidth) / 2, (m_height - rectHeight) / 2,
+                rectWidth, rectHeight),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
 
         nk_layout_row_dynamic(m_ctx, 30, 1);
@@ -124,13 +128,27 @@ std::optional<size_t> NuklearWrapper::renderMainMenu(
         nk_combobox(m_ctx, scenariosNames.data(), scenariosNames.size(),
             &m_selectedScenario, 20, nk_vec2(200, 200));
 
-        if (nk_button_label(m_ctx, "Play")) {
-            selectedOption = m_selectedScenario;
+        nk_layout_row_dynamic(m_ctx, 10, 1);
+        nk_spacer(m_ctx);
+
+        nk_layout_row_begin(m_ctx, NK_DYNAMIC, 30, 4);
+        nk_layout_row_push(m_ctx, 0.10f);
+        nk_spacer(m_ctx);
+        nk_layout_row_push(m_ctx, 0.50f);
+        bool freePlay = nk_button_label(m_ctx, "Free Play");
+        nk_layout_row_push(m_ctx, 0.30f);
+        bool challenge = nk_button_label(m_ctx, "Challenge");
+        nk_layout_row_push(m_ctx, 0.10f);
+        nk_spacer(m_ctx);
+        nk_layout_row_end(m_ctx);
+
+        if (freePlay || challenge) {
+            result = MenuData(m_selectedScenario, challenge);
         }
     }
     nk_end(m_ctx);
 
-    return selectedOption;
+    return result;
 }
 
 std::optional<SettingsData> NuklearWrapper::renderPauseMenu()
@@ -166,14 +184,8 @@ void NuklearWrapper::renderStats(
 {
     if (nk_begin(m_ctx, "Stats", nk_rect(10, 10, 200, 180),
             NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
-        std::string shotsHitLabel = std::format("Shots hit: {}", shotsHit);
-        std::string totalShotsLabel
-            = std::format("Total shots: {}", totalShots);
         float accuracy
             = totalShots > 0 ? (float)shotsHit / totalShots * 100 : 0;
-        std::string accuracyLabel = std::format("Accuracy: {:.2f}%", accuracy);
-        std::string timeElapsedLabel
-            = std::format("Time elapsed: {:.2f}s", timeElapsedSeconds);
 
         std::array<std::string, 5> statsLabels = {
             std::format("FPS: {}", fps),
@@ -190,6 +202,60 @@ void NuklearWrapper::renderStats(
     }
 
     nk_end(m_ctx);
+}
+
+void NuklearWrapper::renderChallengeData(
+    int shotsHit, int totalShots, float timeRemainingSeconds, float fps)
+{
+    if (nk_begin(m_ctx, "Stats", nk_rect(10, 10, 200, 250),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        float accuracy = totalShots > 0 ? (float)shotsHit / totalShots : 0;
+        int score = shotsHit * accuracy * 1000;
+
+        std::array<std::string, 6> statsLabels = {
+            std::format("FPS: {}", fps),
+            std::format("Shots hit: {}", shotsHit),
+            std::format("Total shots: {}", totalShots),
+            std::format("Accuracy: {:.2f}%", accuracy * 100),
+            std::format("Score: {}", score),
+            std::format("Time remaining: {:.2f}s", timeRemainingSeconds),
+        };
+
+        for (auto& label : statsLabels) {
+            nk_layout_row_dynamic(m_ctx, 20, 1);
+            nk_label(m_ctx, label.c_str(), NK_TEXT_LEFT);
+        }
+    }
+
+    nk_end(m_ctx);
+}
+
+bool NuklearWrapper::renderChallengeEndStats(int shotsHit, int totalShots)
+{
+    const int rectWidth = 300;
+    const int rectHeight = 100;
+
+    bool result = false;
+
+    if (nk_begin(m_ctx, "Finished",
+            nk_rect((m_width - rectWidth) / 2, (m_height - rectHeight) / 2,
+                rectWidth, rectHeight),
+            NK_WINDOW_BORDER | NK_WINDOW_TITLE)) {
+        float accuracy = totalShots > 0 ? (float)shotsHit / totalShots : 0;
+        std::string score
+            = std::format("Score: {}", shotsHit * accuracy * 1000);
+
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        nk_label(m_ctx, score.c_str(), NK_TEXT_CENTERED);
+
+        nk_layout_row_dynamic(m_ctx, 20, 1);
+        if (nk_button_label(m_ctx, "OK")) {
+            result = true;
+        }
+    }
+
+    nk_end(m_ctx);
+    return result;
 }
 
 void NuklearWrapper::renderEnd()

@@ -151,8 +151,24 @@ void Game::mainLoopBegin()
     m_deltaTime = m_timeNow - m_lastUpdate;
 
     if (m_state == Game::State::Running) {
+        // whenever we go from a free cursor back to playing a scenario
+        // we need to ignore the first cursor movement to prevent snapping
+        if (m_prevState != m_state) {
+            m_ignoreCursorMovement = true;
+        }
+
         m_totalTimeSeconds += m_deltaTime;
+        if (m_challengeState.happening) {
+            m_challengeState.timeRemainingSeconds -= m_deltaTime;
+            if (m_challengeState.timeRemainingSeconds <= 0) {
+                m_state = Game::State::ChallengeEnded;
+                // to prevent rounding issues
+                m_challengeState.timeRemainingSeconds = 0;
+            }
+        }
     }
+
+    m_prevState = m_state;
 }
 
 void Game::processInput()
@@ -200,18 +216,18 @@ void Game::processInput()
 
     // camera keyboard processing
     // uncomment this to allow flying around
-    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-        m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-        m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-        m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
-    }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-        m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
-    }
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+    //    m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
+    //}
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+    //    m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
+    //}
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+    //    m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
+    //}
+    // if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+    //    m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
+    //}
 }
 
 void Game::updateEntities()
@@ -257,25 +273,36 @@ void Game::render()
 
     m_renderer.renderScene(scene);
 
-    NuklearWrapper::renderBegin();
+    // this signals the beggining of the nuklear rendering when created
+    // and the end when destructed (by going out of scope)
+    NuklearRenderScope scope;
+
     if (m_state == Game::State::Menu) {
-        std::optional<size_t> scenario = m_nuklear.renderMainMenu(m_scenarios);
-        if (scenario.has_value()) {
-            createScenario(scenario.value());
-            // if (scenario == ScenarioType::Clicking) {
-            //     createClickingScenario();
-            // } else if (scenario == ScenarioType::Tracking) {
-            //     createTrackingScenario();
-            // }
+        std::optional<MenuData> menuData
+            = m_nuklear.renderMainMenu(m_scenarios);
+        if (menuData.has_value()) {
+            createScenario(menuData->scenarioOption);
+            m_challengeState.happening = menuData->challenge;
             m_state = Game::State::Running;
         }
 
-        NuklearWrapper::renderEnd();
         return;
     }
 
-    m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds,
-        1 / (m_timeNow - m_lastFrame));
+    if (m_state == Game::State::ChallengeEnded) {
+        bool ok = m_nuklear.renderChallengeEndStats(m_shotsHit, m_totalShots);
+        if (ok) {
+            reset();
+            m_state = Game::State::Menu;
+        }
+    } else if (m_challengeState.happening) {
+        m_nuklear.renderChallengeData(m_shotsHit, m_totalShots,
+            m_challengeState.timeRemainingSeconds,
+            1 / (m_timeNow - m_lastFrame));
+    } else {
+        m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds,
+            1 / (m_timeNow - m_lastFrame));
+    }
 
     if (m_state == Game::State::Paused) {
         // TODO: probably encapsulate this in the future
@@ -302,10 +329,10 @@ void Game::render()
                     settings->targetColor.b));
         }
     } else {
+        // taking input control back from nuklear
+        // restore callbacks that were possibly overwritten
         InputManager::setupInputCallbacks(m_window.ptr());
     }
-
-    NuklearWrapper::renderEnd();
 }
 
 void Game::mainLoopEnd()
@@ -326,7 +353,6 @@ void Game::togglePaused()
     if (m_state == Game::State::Running) {
         m_state = Game::State::Paused;
     } else if (m_state == Game::State::Paused) {
-        m_ignoreCursorMovement = true;
         m_state = Game::State::Running;
     }
 }
@@ -389,48 +415,13 @@ void Game::buildPlayArea()
     m_entityManager.addEntity(std::move(backWall));
 }
 
-void Game::createClickingScenario()
+void Game::reset()
 {
-    m_weapon.type = Weapon::Type::Pistol;
-    m_camera.position = glm::vec3(0.0f, 10.0f, 8.0f);
-
-    std::vector<glm::vec3> targetPositions;
-    targetPositions.reserve(5);
-    for (int i = 0; i < 5; i++) {
-        targetPositions.emplace_back(g_rng->getFloatInRange(-8.0f, 8.0f),
-            g_rng->getFloatInRange(2.0f, 18.0f), -8.0);
-    }
-
-    for (size_t i = 0; i < targetPositions.size(); i++) {
-        Entity entity(g_resourceManager->getModel("ball"),
-            m_resourceManager.getMaterial("targets"),
-            m_resourceManager.getShader("targets"), targetPositions[i]);
-        entity.addCollisionObject(CollisionObject::Type::SPHERE);
-        entity.setSize(glm::vec3(0.3f));
-        entity.destroyable = true;
-        entity.type = Entity::Type::MOVER;
-        entity.setName("Ball " + std::to_string(i));
-        m_entityManager.addEntity(std::move(entity));
-    }
-}
-
-void Game::createTrackingScenario()
-{
-    m_weapon.type = Weapon::Type::Machine_Gun;
-
-    Entity entity(g_resourceManager->getModel("cube"),
-        m_resourceManager.getMaterial("targets"),
-        m_resourceManager.getShader("targets"), glm::vec3(0.0f, 1.55f, -8.0f));
-    entity.addCollisionObject(CollisionObject::Type::AABB);
-    entity.setSize(glm::vec3(0.3f, 3.0f, 0.3f));
-    entity.destroyable = true;
-    entity.type = Entity::Type::GONER;
-    entity.setStartingHealth(200);
-    entity.setName("Moving target");
-    entity.setMovementPattern([](float timePassedSeconds) {
-        return glm::vec3(5 * cos(2 * timePassedSeconds), 0.0f, 0.0f);
-    });
-    m_entityManager.addEntity(std::move(entity));
+    m_shotsHit = 0;
+    m_totalShots = 0;
+    m_totalTimeSeconds = 0;
+    m_challengeState = {};
+    m_entityManager.removeAllTargets();
 }
 
 void Game::parseScenariosFromFile(const std::string& scenarioFolder)

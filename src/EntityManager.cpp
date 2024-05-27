@@ -8,6 +8,14 @@ void EntityManager::addEntity(Entity entity)
     m_entities.push_back(std::move(entity));
 }
 
+void EntityManager::removeAllTargets()
+{
+    m_entities.erase(
+        std::remove_if(m_entities.begin(), m_entities.end(),
+            [](const Entity& entity) { return entity.destroyable; }),
+        m_entities.end());
+}
+
 bool EntityManager::updateShotEntities(
     const glm::vec3& eyePos, const glm::vec3& eyeDir)
 {

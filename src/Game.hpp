@@ -18,12 +18,19 @@ constexpr auto SCR_WIDTH = 1920;
 constexpr auto SCR_HEIGHT = 1080;
 constexpr auto FULLSCREEN = true;
 constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
+constexpr auto CHALLENGE_DURATION = 30.0f;
+
+struct ChallengeState {
+    bool happening = false;
+    float timeRemainingSeconds = CHALLENGE_DURATION;
+};
 
 class Game {
 public:
     enum class State {
         Menu,
         Paused,
+        ChallengeEnded,
         Running,
     };
 
@@ -42,8 +49,7 @@ private:
     void togglePaused();
 
     void buildPlayArea();
-    void createClickingScenario();
-    void createTrackingScenario();
+    void reset();
 
     void parseScenariosFromFile(const std::string& scenarioFolder);
     void createScenario(size_t index);
@@ -68,7 +74,6 @@ private:
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to
     // one locked in the middle of the screen.
-    // Right now, this happens when launching the game and after unpausing
     bool m_ignoreCursorMovement = true;
     float m_lastX;
     float m_lastY;
@@ -88,8 +93,12 @@ private:
     int m_shotsHit = 0;
     int m_totalShots = 0;
 
+    // challenge tracking
+    ChallengeState m_challengeState;
+
     // game state
     State m_state = State::Menu;
+    State m_prevState = State::Menu;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

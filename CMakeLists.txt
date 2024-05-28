@@ -38,18 +38,35 @@ set(SOURCES
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # Add GLFW submodule
+option(GLFW_BUILD_EXAMPLES "" OFF)
+option(GLFW_BUILD_TESTS "" OFF)
+option(GLFW_BUILD_DOCS "" OFF)
+option(GLFW_INSTALL "" OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw)
 
 # Add GLM submodule
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
 
 # Add assimp submodule
+option(ASSIMP_BUILD_TESTS "" OFF)
+option(ASSIMP_INSTALL "" OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
 
 # Add openal-soft submodule
+option(ALSOFT_UTILS "" OFF)
+option(ALSOFT_EXAMPLES "" OFF)
+option(ALSOFT_INSTALL "" OFF)
+option(ALSOFT_INSTALL_CONFIG "" OFF)
+option(ALSOFT_INSTALL_HRTF_DATA "" OFF)
+option(ALSOFT_INSTALL_AMBDEC_PRESETS "" OFF)
+option(ALSOFT_INSTALL_EXAMPLES "" OFF)
+option(ALSOFT_INSTALL_UTILS "" OFF)
+option(ALSOFT_UPDATE_BUILD_VERSION "" OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openal-soft)
 
 # Add nlohmann_json submodule
+option(JSON_BuildTests "" OFF)
+option(JSON_Install "" OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/nlohmann_json)
 
 # Add an executable target

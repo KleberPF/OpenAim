@@ -514,6 +514,7 @@ void Game::createScenario(size_t index)
 
     m_weapon.type = chosenScenario.weaponType;
     m_camera.position = chosenScenario.playerPos;
+    m_camera.lookForward();
 
     for (size_t i = 0; i < chosenScenario.targets.size(); i++) {
         const auto& target = chosenScenario.targets[i];

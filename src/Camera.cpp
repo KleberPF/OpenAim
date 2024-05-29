@@ -78,6 +78,13 @@ void Camera::setMouseSensitivity(float sensitivity)
     m_mouseSensitivity = sensitivity;
 }
 
+void Camera::lookForward()
+{
+    m_yaw = -90.0f;
+    m_pitch = 0.0f;
+    updateVectors();
+}
+
 void Camera::updateVectors()
 {
     // calculate the new front vector

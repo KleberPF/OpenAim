@@ -23,6 +23,7 @@ public:
     float zoom() const;
 
     void setMouseSensitivity(float sensitivity);
+    void lookForward();
 
     glm::vec3 position;
 

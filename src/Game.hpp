@@ -65,6 +65,7 @@ private:
     Weapon m_weapon;
     NuklearWrapper m_nuklear;
     std::vector<Scenario> m_scenarios;
+    Scenario* m_currentScenario = nullptr;
 
     // globals
     RNG m_rng;

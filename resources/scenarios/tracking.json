@@ -1,6 +1,8 @@
 {
     "weapon": "machine_gun",
     "playerPos": "0.0 1.5 8.0",
+    "winCondition": "ClearTargets",
+    "challengeDuration": 60,
     "targets": [
         {
             "shape": "box",

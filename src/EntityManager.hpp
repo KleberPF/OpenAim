@@ -15,6 +15,7 @@ public:
 
     void addEntity(Entity entity);
     void removeAllTargets();
+    size_t targetCount() const;
 
     // returns whether an entity was hit
     bool updateShotEntities(const glm::vec3& eyePos, const glm::vec3& eyeDir);

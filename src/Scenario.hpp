@@ -25,8 +25,15 @@ struct Target {
 };
 
 struct Scenario {
+    enum class WinCondition {
+        ClearTargets,
+        Time,
+    };
+
     std::string name;
     Weapon::Type weaponType = Weapon::Type::Pistol;
     glm::vec3 playerPos;
+    WinCondition winCondition = WinCondition::Time;
+    float challengeDurationSeconds;
     std::vector<Target> targets;
 };

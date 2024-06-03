@@ -10,7 +10,6 @@
 #include "ResourceManager.hpp"
 #include "Scenario.hpp"
 #include "Scene.hpp"
-#include "Shader.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
@@ -21,11 +20,11 @@
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
-#include <sstream>
 #include <string>
 
 using json = nlohmann::json;
@@ -158,13 +157,19 @@ void Game::mainLoopBegin()
         }
 
         m_totalTimeSeconds += m_deltaTime;
-        if (m_challengeState.happening) {
-            m_challengeState.timeRemainingSeconds -= m_deltaTime;
-            if (m_challengeState.timeRemainingSeconds <= 0) {
-                m_state = Game::State::ChallengeEnded;
-                // to prevent rounding issues
-                m_challengeState.timeRemainingSeconds = 0;
-            }
+        if (!m_challengeState.happening) {
+            return;
+        }
+        m_challengeState.timeRemainingSeconds -= m_deltaTime;
+
+        if ((m_currentScenario
+                && m_currentScenario->winCondition
+                    == Scenario::WinCondition::ClearTargets
+                && m_entityManager.targetCount() == 0)
+            || (m_challengeState.timeRemainingSeconds <= 0)) {
+            m_state = Game::State::ChallengeEnded;
+            // to prevent rounding issues
+            m_challengeState.timeRemainingSeconds = 0;
         }
     }
 
@@ -421,6 +426,7 @@ void Game::reset()
     m_totalShots = 0;
     m_totalTimeSeconds = 0;
     m_challengeState = {};
+    m_currentScenario = nullptr;
     m_entityManager.removeAllTargets();
 }
 
@@ -450,6 +456,14 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
             }
 
             scenario.playerPos = readVec3FromJSONString(data["playerPos"]);
+
+            if (data.contains("winCondition")
+                && caseInsensitiveEquals(
+                    data["winCondition"], "cleartargets")) {
+                scenario.winCondition = Scenario::WinCondition::ClearTargets;
+            }
+
+            scenario.challengeDurationSeconds = data["challengeDuration"];
 
             auto targets = data["targets"];
             for (auto& target : targets) {
@@ -510,14 +524,14 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
 
 void Game::createScenario(size_t index)
 {
-    const Scenario& chosenScenario = m_scenarios[index];
+    m_currentScenario = &m_scenarios[index];
 
-    m_weapon.type = chosenScenario.weaponType;
-    m_camera.position = chosenScenario.playerPos;
+    m_weapon.type = m_currentScenario->weaponType;
+    m_camera.position = m_currentScenario->playerPos;
     m_camera.lookForward();
 
-    for (size_t i = 0; i < chosenScenario.targets.size(); i++) {
-        const auto& target = chosenScenario.targets[i];
+    for (size_t i = 0; i < m_currentScenario->targets.size(); i++) {
+        const auto& target = m_currentScenario->targets[i];
 
         glm::vec3 spawnPoint;
         if (target.randomSpawn) {
@@ -553,7 +567,8 @@ void Game::createScenario(size_t index)
             entity.setMovementPattern(
                 [amplitude, speed](float timePassedSeconds) {
                     return glm::vec3(
-                        amplitude * cos(speed * timePassedSeconds), 0.0f, 0.0f);
+                        amplitude * std::cos(speed * timePassedSeconds), 0.0f,
+                        0.0f);
                 });
         }
         m_entityManager.addEntity(std::move(entity));

@@ -1,7 +1,7 @@
 {
     "weapon": "machine_gun",
     "playerPos": "0.0 10.0 8.0",
-    "challengeDuration": 60,
+    "challengeDuration": 30,
     "targets": [
         {
             "shape": "ball",

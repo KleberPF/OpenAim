@@ -172,8 +172,6 @@ void Game::mainLoopBegin()
             m_challengeState.timeRemainingSeconds = 0;
         }
     }
-
-    m_prevState = m_state;
 }
 
 void Game::processInput()
@@ -221,18 +219,18 @@ void Game::processInput()
 
     // camera keyboard processing
     // uncomment this to allow flying around
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
-    //    m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
-    //}
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
-    //    m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
-    //}
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
-    //    m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
-    //}
-    // if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
-    //    m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
-    //}
+    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+        m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+        m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+        m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
+    }
+    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+        m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
+    }
 }
 
 void Game::updateEntities()
@@ -351,6 +349,7 @@ void Game::mainLoopEnd()
     }
 
     m_lastUpdate = m_timeNow;
+    m_prevState = m_state;
 }
 
 void Game::togglePaused()

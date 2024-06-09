@@ -52,7 +52,7 @@ Renderer::~Renderer()
 
 void Renderer::renderEntity(const Scene& scene, const Entity& entity)
 {
-    const Shader& shader = entity.shader2.get();
+    const Shader& shader = entity.shader.get();
     shader.use();
 
     // lighting stuff
@@ -79,7 +79,7 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
     glm::mat4 mvp = projection * view * model;
     shader.setMat4("mvp", mvp);
 
-    entity.material2.get().bind(shader);
+    entity.material.get().bind(shader);
     entity.render();
 
     if (entity.shouldRenderHealthBar()) {

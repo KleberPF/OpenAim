@@ -148,8 +148,8 @@ float CollisionSphere::radius() const
 Entity::Entity(Model model, const Material& material, const Shader& shader,
     const glm::vec3& pos)
     : referentialPos(pos)
-    , material2(material)
-    , shader2(shader)
+    , material(material)
+    , shader(shader)
     , healthbarMaterial(g_resourceManager->getMaterial("healthbar"))
     , healthbarShader(g_resourceManager->getShader("healthbar"))
     , m_currentPos(pos)

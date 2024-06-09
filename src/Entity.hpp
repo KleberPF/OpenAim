@@ -163,8 +163,8 @@ public:
     bool destroyable = false;
     Type type = Type::GONER;
 
-    std::reference_wrapper<const Material> material2;
-    std::reference_wrapper<const Shader> shader2;
+    std::reference_wrapper<const Material> material;
+    std::reference_wrapper<const Shader> shader;
 
     std::reference_wrapper<Material> healthbarMaterial;
     std::reference_wrapper<const Shader> healthbarShader;

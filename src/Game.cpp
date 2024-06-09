@@ -149,28 +149,24 @@ void Game::mainLoopBegin()
     m_timeNow = (float)glfwGetTime();
     m_deltaTime = m_timeNow - m_lastUpdate;
 
-    if (m_state == Game::State::Running) {
-        // whenever we go from a free cursor back to playing a scenario
-        // we need to ignore the first cursor movement to prevent snapping
-        if (m_prevState != m_state) {
-            m_ignoreCursorMovement = true;
-        }
+    if (m_state != Game::State::Running) {
+        return;
+    }
 
-        m_totalTimeSeconds += m_deltaTime;
-        if (!m_challengeState.happening) {
-            return;
-        }
-        m_challengeState.timeRemainingSeconds -= m_deltaTime;
+    m_totalTimeSeconds += m_deltaTime;
+    if (!m_challengeState.happening) {
+        return;
+    }
+    m_challengeState.timeRemainingSeconds -= m_deltaTime;
 
-        if ((m_currentScenario
-                && m_currentScenario->winCondition
-                    == Scenario::WinCondition::ClearTargets
-                && m_entityManager.targetCount() == 0)
-            || (m_challengeState.timeRemainingSeconds <= 0)) {
-            m_state = Game::State::ChallengeEnded;
-            // to prevent rounding issues
-            m_challengeState.timeRemainingSeconds = 0;
-        }
+    if ((m_currentScenario
+            && m_currentScenario->winCondition
+                == Scenario::WinCondition::ClearTargets
+            && m_entityManager.targetCount() == 0)
+        || (m_challengeState.timeRemainingSeconds <= 0)) {
+        changeState(Game::State::ChallengeEnded);
+        // to prevent rounding issues
+        m_challengeState.timeRemainingSeconds = 0;
     }
 }
 
@@ -286,7 +282,7 @@ void Game::render()
         if (menuData.has_value()) {
             createScenario(menuData->scenarioOption);
             m_challengeState.happening = menuData->challenge;
-            m_state = Game::State::Running;
+            changeState(Game::State::Running);
         }
 
         return;
@@ -296,7 +292,7 @@ void Game::render()
         bool ok = m_nuklear.renderChallengeEndStats(m_shotsHit, m_totalShots);
         if (ok) {
             reset();
-            m_state = Game::State::Menu;
+            changeState(Game::State::Menu);
         }
     } else if (m_challengeState.happening) {
         m_nuklear.renderChallengeData(m_shotsHit, m_totalShots,
@@ -355,10 +351,25 @@ void Game::mainLoopEnd()
 void Game::togglePaused()
 {
     if (m_state == Game::State::Running) {
-        m_state = Game::State::Paused;
+        changeState(Game::State::Paused);
     } else if (m_state == Game::State::Paused) {
-        m_state = Game::State::Running;
+        changeState(Game::State::Running);
     }
+}
+
+void Game::changeState(State newState)
+{
+    if (newState == m_state) {
+        return;
+    }
+
+    if (newState == Game::State::Running) {
+        // whenever we go from a free cursor back to playing a scenario
+        // we need to ignore the first cursor movement to prevent snapping
+        m_ignoreCursorMovement = true;
+    }
+
+    m_state = newState;
 }
 
 void Game::buildPlayArea()

@@ -47,6 +47,7 @@ private:
     void mainLoopEnd();
 
     void togglePaused();
+    void changeState(State newState);
 
     void buildPlayArea();
     void reset();

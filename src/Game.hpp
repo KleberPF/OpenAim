@@ -3,7 +3,6 @@
 #include "Camera.hpp"
 #include "EntityManager.hpp"
 #include "InputManager.hpp"
-#include "NuklearWrapper.hpp"
 #include "RNG.hpp"
 #include "Renderer.hpp"
 #include "ResourceManager.hpp"
@@ -16,7 +15,7 @@
 // settings
 constexpr auto SCR_WIDTH = 1920;
 constexpr auto SCR_HEIGHT = 1080;
-constexpr auto FULLSCREEN = true;
+constexpr auto FULLSCREEN = false;
 constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
 constexpr auto CHALLENGE_DURATION = 30.0f;
 
@@ -64,7 +63,6 @@ private:
     LightSource m_globalLightSource;
     std::unique_ptr<Skybox> m_skybox;
     Weapon m_weapon;
-    NuklearWrapper m_nuklear;
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
 
@@ -99,8 +97,8 @@ private:
     ChallengeState m_challengeState;
 
     // game state
-    State m_state = State::Menu;
-    State m_prevState = State::Menu;
+    State m_state = State::Running;
+    State m_prevState = State::Running;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

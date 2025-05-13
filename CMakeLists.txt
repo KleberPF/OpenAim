@@ -29,7 +29,6 @@ set(SOURCES
     src/RNG.cpp
     src/SoundPlayer.cpp
     src/Sound.cpp
-    src/NuklearWrapper.cpp
     src/EntityManager.cpp
     # Add more source files here as needed
 )

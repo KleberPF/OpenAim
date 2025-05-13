@@ -5,7 +5,6 @@
 #include "Globals.hpp"
 #include "InputManager.hpp"
 #include "Material.hpp"
-#include "NuklearWrapper.hpp"
 #include "RNG.hpp"
 #include "ResourceManager.hpp"
 #include "Scenario.hpp"
@@ -38,7 +37,6 @@ Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
-    , m_nuklear(m_window.ptr())
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -131,6 +129,7 @@ Game::Game()
 
     buildPlayArea();
     parseScenariosFromFile("./resources/scenarios");
+    createScenario(0);
 }
 
 void Game::mainLoop()
@@ -271,67 +270,6 @@ void Game::render()
     scene.sprites = m_sprites;
 
     m_renderer.renderScene(scene);
-
-    // this signals the beggining of the nuklear rendering when created
-    // and the end when destructed (by going out of scope)
-    NuklearRenderScope scope;
-
-    if (m_state == Game::State::Menu) {
-        std::optional<MenuData> menuData
-            = m_nuklear.renderMainMenu(m_scenarios);
-        if (menuData.has_value()) {
-            createScenario(menuData->scenarioOption);
-            m_challengeState.happening = menuData->challenge;
-            changeState(Game::State::Running);
-        }
-
-        return;
-    }
-
-    if (m_state == Game::State::ChallengeEnded) {
-        bool ok = m_nuklear.renderChallengeEndStats(m_shotsHit, m_totalShots);
-        if (ok) {
-            reset();
-            changeState(Game::State::Menu);
-        }
-    } else if (m_challengeState.happening) {
-        m_nuklear.renderChallengeData(m_shotsHit, m_totalShots,
-            m_challengeState.timeRemainingSeconds,
-            1 / (m_timeNow - m_lastFrame));
-    } else {
-        m_nuklear.renderStats(m_shotsHit, m_totalShots, m_totalTimeSeconds,
-            1 / (m_timeNow - m_lastFrame));
-    }
-
-    if (m_state == Game::State::Paused) {
-        // TODO: probably encapsulate this in the future
-        auto settings = m_nuklear.renderPauseMenu();
-        if (settings.has_value()) {
-            if (settings->sensitivity.has_value()) {
-                m_camera.setMouseSensitivity(settings->sensitivity.value());
-            }
-            if (settings->maxFps.has_value()) {
-                float fps = settings->maxFps.value();
-                if (fps == 0) {
-                    m_fpsCapped = false;
-                } else {
-                    m_fpsLimit = fps;
-                    m_fpsCapped = true;
-                }
-            }
-
-            g_resourceManager->getMaterial("crosshair")
-                .setColor(glm::vec3(settings->crosshairColor.r,
-                    settings->crosshairColor.g, settings->crosshairColor.b));
-            g_resourceManager->getMaterial("targets").setColor(
-                glm::vec3(settings->targetColor.r, settings->targetColor.g,
-                    settings->targetColor.b));
-        }
-    } else {
-        // taking input control back from nuklear
-        // restore callbacks that were possibly overwritten
-        InputManager::setupInputCallbacks(m_window.ptr());
-    }
 }
 
 void Game::mainLoopEnd()

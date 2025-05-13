@@ -42,7 +42,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
     glfwSetWindowUserPointer(m_ptr, this);
     glfwSetFramebufferSizeCallback(m_ptr, framebufferSizeCallback);
 
-    // glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     if (glfwRawMouseMotionSupported()) {
         glfwSetInputMode(m_ptr, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);

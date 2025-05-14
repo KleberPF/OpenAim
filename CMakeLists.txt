@@ -69,6 +69,9 @@ option(JSON_BuildTests "" OFF)
 option(JSON_Install "" OFF)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/nlohmann_json)
 
+# Add freetype submodule
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype)
+
 # Add an executable target
 if (MSVC)
     add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
@@ -99,6 +102,7 @@ target_link_libraries(${PROJECT_NAME}
         assimp
         OpenAL::OpenAL
         nlohmann_json::nlohmann_json
+        freetype
         # Add more libraries here as needed
 )
 

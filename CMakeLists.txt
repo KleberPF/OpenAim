@@ -30,6 +30,7 @@ set(SOURCES
     src/SoundPlayer.cpp
     src/Sound.cpp
     src/EntityManager.cpp
+    src/ClayWrapper.cpp
     # Add more source files here as needed
 )
 
@@ -111,7 +112,7 @@ else()
 endif()
 
 # Optionally, set C++ standard
-set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 20)
+set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 26)
 
 if (MSVC)
     if(CMAKE_BUILD_TYPE STREQUAL "Debug")

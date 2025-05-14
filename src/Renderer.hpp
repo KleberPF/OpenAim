@@ -4,6 +4,9 @@
 #include "Scene.hpp"
 #include "Shader.hpp"
 #include "Sprite.hpp"
+#include "ClayWrapper.hpp"
+
+#include <glm/gtc/matrix_transform.hpp>
 
 #include <array>
 
@@ -22,8 +25,18 @@ private:
     void renderSkybox(
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
 
+    // primitives clay uses to render UI
+    void renderClayUi();
+
+    ClayWrapper m_clayWrapper;
+    glm::mat4 m_orthoProjection
+        = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f); // TODO: temp
+
+    void renderRectangle(
+        float x, float y, float width, float height, glm::vec3 color);
+
     // clang-format off
-    std::array<float, 24> m_spriteVertices = {
+    std::array<float, 24> m_rectangleVertices = {
         // pos      tex
         0.0f, 0.0f, 0.0f, 0.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
@@ -78,8 +91,8 @@ private:
     };
     // clang-format on
 
-    GLuint m_spriteVao;
-    GLuint m_spriteVbo;
+    GLuint m_rectangleVao;
+    GLuint m_rectangleVbo;
     GLuint m_skyboxVao;
     GLuint m_skyboxVbo;
 };

@@ -51,3 +51,12 @@ glm::vec3 readVec3FromJSONString(const std::string& str)
 
     return result;
 }
+
+glm::vec3 normalizeRGBColor(glm::vec3 color)
+{
+    color.r /= 255.0f;
+    color.g /= 255.0f;
+    color.b /= 255.0f;
+
+    return color;
+}

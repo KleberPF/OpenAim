@@ -1,23 +1,31 @@
 #include "Renderer.hpp"
 
 #include "Entity.hpp"
+#include "Globals.hpp"
 #include "Material.hpp"
 #include "Shader.hpp"
+#include "clay.h"
+#include "glad/glad.h"
+#include "utils.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <iostream>
+#include <memory>
+
 Renderer::Renderer()
+    : m_clayWrapper(800, 600) // TODO: temp
 {
     // sprite
-    glGenVertexArrays(1, &m_spriteVao);
-    glGenBuffers(1, &m_spriteVbo);
+    glGenVertexArrays(1, &m_rectangleVao);
+    glGenBuffers(1, &m_rectangleVbo);
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_spriteVbo);
+    glBindBuffer(GL_ARRAY_BUFFER, m_rectangleVbo);
     glBufferData(GL_ARRAY_BUFFER,
-        sizeof(m_spriteVertices[0]) * m_spriteVertices.size(),
-        m_spriteVertices.data(), GL_STATIC_DRAW);
+        sizeof(m_rectangleVertices[0]) * m_rectangleVertices.size(),
+        m_rectangleVertices.data(), GL_STATIC_DRAW);
 
-    glBindVertexArray(m_spriteVao);
+    glBindVertexArray(m_rectangleVao);
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(
         0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)nullptr);
@@ -44,8 +52,8 @@ Renderer::Renderer()
 
 Renderer::~Renderer()
 {
-    glDeleteVertexArrays(1, &m_spriteVao);
-    glDeleteBuffers(1, &m_spriteVbo);
+    glDeleteVertexArrays(1, &m_rectangleVao);
+    glDeleteBuffers(1, &m_rectangleVbo);
     glDeleteVertexArrays(1, &m_skyboxVao);
     glDeleteBuffers(1, &m_skyboxVbo);
 }
@@ -127,7 +135,7 @@ void Renderer::renderSprite(const Scene& scene, const Sprite& sprite) const
     glm::mat4 mvp = projection * model;
     sprite.shader.get().setMat4("mvp", mvp);
 
-    glBindVertexArray(m_spriteVao);
+    glBindVertexArray(m_rectangleVao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
@@ -149,6 +157,47 @@ void Renderer::renderSkybox(
     cubemap.bind();
     glDrawArrays(GL_TRIANGLES, 0, m_skyboxVertices.size() / 3);
     glDepthFunc(GL_LESS);
+}
+
+void Renderer::renderClayUi()
+{
+    glDepthFunc(GL_ALWAYS);
+
+    Clay_RenderCommandArray renderCommands = m_clayWrapper.buildRedSquare();
+
+    for (int i = 0; i < renderCommands.length; i++) {
+        Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);
+        Clay_BoundingBox boundingBox = renderCommand->boundingBox;
+
+        switch (renderCommand->commandType) {
+        case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
+            const Clay_RectangleRenderData& config = renderCommand->renderData.rectangle;
+            Clay_Color color = config.backgroundColor;
+            renderRectangle(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, normalizeRGBColor({ color.r, color.g, color.b }));
+        } break;
+        default:
+            std::cout << "Render command type not supported: " << renderCommand->commandType;
+        }
+    }
+
+    glDepthFunc(GL_LESS);
+}
+
+void Renderer::renderRectangle(
+    float x, float y, float width, float height, glm::vec3 color)
+{
+    const Shader& shader = g_resourceManager->getShader("color");
+    shader.use();
+    shader.setVec3("color", color);
+
+    glm::mat4 model
+        = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
+    model = glm::scale(model, glm::vec3(width, height, 0));
+
+    shader.setMat4("mvp", m_orthoProjection * model);
+
+    glBindVertexArray(m_rectangleVao);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void Renderer::renderScene(const Scene& scene)
@@ -177,4 +226,6 @@ void Renderer::renderScene(const Scene& scene)
             renderSprite(scene, sprite);
         }
     }
+
+    renderClayUi();
 }

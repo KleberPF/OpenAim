@@ -53,6 +53,8 @@ Game::Game()
     InputManager::setupInputCallbacks(m_window.ptr());
 
     // load shaders and models
+    m_resourceManager.addShader("color", "./resources/shaders/sprite.vert",
+        "./resources/shaders/color.frag");
     m_resourceManager.addShader("sprite", "./resources/shaders/sprite.vert",
         "./resources/shaders/sprite.frag");
     m_resourceManager.addShader("textured", "./resources/shaders/model.vert",

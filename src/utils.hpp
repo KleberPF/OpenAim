@@ -12,3 +12,5 @@ bool caseInsensitiveEquals(const std::string& str1, const std::string& str2);
 
 // if the string only contains one number, fills out the vec3 with that number
 glm::vec3 readVec3FromJSONString(const std::string& str);
+
+glm::vec3 normalizeRGBColor(glm::vec3 color);

@@ -13,8 +13,8 @@
 #include "Window.hpp"
 
 // settings
-constexpr auto SCR_WIDTH = 1920;
-constexpr auto SCR_HEIGHT = 1080;
+constexpr auto SCR_WIDTH = 800;
+constexpr auto SCR_HEIGHT = 600;
 constexpr auto FULLSCREEN = false;
 constexpr auto CROSSHAIR_SIZE_PX = 32.0f;
 constexpr auto CHALLENGE_DURATION = 30.0f;

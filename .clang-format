@@ -1,7 +1,6 @@
 Language: Cpp
 
 BasedOnStyle: WebKit
-ColumnLimit: 80
 AllowShortFunctionsOnASingleLine: false
 IncludeBlocks: Regroup
 IncludeCategories:

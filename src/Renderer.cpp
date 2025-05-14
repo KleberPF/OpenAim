@@ -11,7 +11,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <iostream>
-#include <memory>
 
 Renderer::Renderer()
     : m_clayWrapper(800, 600) // TODO: temp
@@ -159,11 +158,9 @@ void Renderer::renderSkybox(
     glDepthFunc(GL_LESS);
 }
 
-void Renderer::renderClayUi()
+void Renderer::renderClayUi(Clay_RenderCommandArray& renderCommands)
 {
     glDepthFunc(GL_ALWAYS);
-
-    Clay_RenderCommandArray renderCommands = m_clayWrapper.buildRedSquare();
 
     for (int i = 0; i < renderCommands.length; i++) {
         Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);
@@ -190,8 +187,7 @@ void Renderer::renderRectangle(
     shader.use();
     shader.setVec3("color", color);
 
-    glm::mat4 model
-        = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
+    glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
     model = glm::scale(model, glm::vec3(width, height, 0));
 
     shader.setMat4("mvp", m_orthoProjection * model);
@@ -211,7 +207,7 @@ void Renderer::renderScene(const Scene& scene)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (scene.entities.has_value()) {
-        for (auto& entity : scene.entities->get()) {
+        for (const auto& entity : scene.entities->get()) {
             renderEntity(scene, entity);
         }
     }
@@ -226,6 +222,4 @@ void Renderer::renderScene(const Scene& scene)
             renderSprite(scene, sprite);
         }
     }
-
-    renderClayUi();
 }

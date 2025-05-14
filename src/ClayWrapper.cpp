@@ -26,16 +26,23 @@ ClayWrapper::ClayWrapper(float screenWidth, float screenHeight)
         (Clay_ErrorHandler) { handleClayErrors, nullptr });
 }
 
-Clay_RenderCommandArray ClayWrapper::buildRedSquare()
+Clay_RenderCommandArray ClayWrapper::buildTestUi()
 {
     const Clay_Color COLOR_RED = (Clay_Color) { 168, 66, 28, 255 };
-    const Clay_Color COLOR_LIGHT = (Clay_Color) {224, 215, 210, 255};
+    const Clay_Color COLOR_LIGHT = (Clay_Color) { 224, 215, 210, 255 };
 
     Clay_BeginLayout();
     // clang-format off
-    CLAY({ .layout = { .sizing = { .width = CLAY_SIZING_FIXED(799), .height = CLAY_SIZING_FIXED(300) } }, .backgroundColor = COLOR_RED })
+    CLAY({
+        .id = CLAY_ID("OuterContainer"),
+        .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
+        .backgroundColor = {250, 250, 255, 255} })
     {
-        CLAY({ .layout = { .sizing = { .width = CLAY_SIZING_FIXED(100), .height = CLAY_SIZING_FIXED(100) } }, .backgroundColor = COLOR_LIGHT }) {}
+        CLAY({
+            .id = CLAY_ID("SideBar"),
+            .layout = { .sizing = { .width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_GROW(0) }, .padding = CLAY_PADDING_ALL(16), .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM },
+            .backgroundColor = COLOR_LIGHT
+        }) { }
     }
     // clang-format on
     return Clay_EndLayout();

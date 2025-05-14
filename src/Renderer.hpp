@@ -16,6 +16,7 @@ public:
     ~Renderer();
 
     void renderScene(const Scene& scene);
+    void renderClayUi(Clay_RenderCommandArray& renderCommands);
 
 private:
     // Should probably change this later, having to always pass the scene
@@ -26,7 +27,7 @@ private:
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
 
     // primitives clay uses to render UI
-    void renderClayUi();
+    
 
     ClayWrapper m_clayWrapper;
     glm::mat4 m_orthoProjection

@@ -5,12 +5,12 @@
 #include <cstdint>
 #include <vector>
 
-class ClayWrapper
-{
+class ClayWrapper {
 public:
     ClayWrapper(float screenWidth, float screenHeight);
 
-    Clay_RenderCommandArray buildRedSquare();
+    Clay_RenderCommandArray buildTestUi();
+
 private:
     std::vector<uint8_t> m_clayBuffer;
 };

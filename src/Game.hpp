@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Camera.hpp"
+#include "ClayWrapper.hpp"
 #include "EntityManager.hpp"
 #include "InputManager.hpp"
 #include "RNG.hpp"
@@ -65,6 +66,7 @@ private:
     Weapon m_weapon;
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
+    ClayWrapper m_clayWrapper;
 
     // globals
     RNG m_rng;
@@ -97,8 +99,8 @@ private:
     ChallengeState m_challengeState;
 
     // game state
-    State m_state = State::Running;
-    State m_prevState = State::Running;
+    State m_state = State::Menu;
+    State m_prevState = State::Menu;
 };
 
 void GLAPIENTRY messageCallback(GLenum source, GLenum type, GLuint id,

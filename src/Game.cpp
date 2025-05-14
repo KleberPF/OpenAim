@@ -37,6 +37,7 @@ Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
+    , m_clayWrapper(m_window.width, m_window.height)
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -272,6 +273,9 @@ void Game::render()
     scene.sprites = m_sprites;
 
     m_renderer.renderScene(scene);
+
+    Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
+    m_renderer.renderClayUi(testUi);
 }
 
 void Game::mainLoopEnd()

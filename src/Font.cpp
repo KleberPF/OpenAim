@@ -6,11 +6,14 @@
 // freetype.h has to be included after
 #include <freetype/freetype.h>
 
+// #define STB_IMAGE_WRITE_IMPLEMENTATION
+// #include <stb_image_write.h>
+
 #include <array>
 #include <memory>
 
 constexpr size_t ATLAS_SIZE = 512; // pixels
-constexpr int GLYPHS_PER_LINE = 20;
+constexpr int GLYPHS_PER_LINE = 15;
 
 Font::Font(const char* path)
 {
@@ -28,7 +31,7 @@ Font::Font(const char* path)
 
     int xoffset = 0;
     int yoffset = 0;
-    std::array<unsigned char, ATLAS_SIZE * ATLAS_SIZE> atlas;
+    std::array<unsigned char, ATLAS_SIZE * ATLAS_SIZE> atlas = {};
 
     for (int i = 0; i < 95; i++) {
         unsigned char c = ' ' + i;
@@ -64,6 +67,8 @@ Font::Font(const char* path)
     }
 
     m_texture = std::make_unique<Texture>(GL_RED, ATLAS_SIZE, ATLAS_SIZE, atlas.data(), Texture::Type::Diffuse);
+
+    // stbi_write_png("output.png", ATLAS_SIZE, ATLAS_SIZE, 1, atlas.data(), ATLAS_SIZE);
 }
 
 glm::vec2 Font::toAtlasCoords(const glm::ivec2& coord)

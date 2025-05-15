@@ -5,6 +5,7 @@
 #include "Shader.hpp"
 #include "Sprite.hpp"
 #include "ClayWrapper.hpp"
+#include "Text.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -17,6 +18,7 @@ public:
 
     void renderScene(const Scene& scene);
     void renderClayUi(Clay_RenderCommandArray& renderCommands);
+    void renderText(const Text& text, float x, float y, float scale) const;
 
 private:
     // Should probably change this later, having to always pass the scene
@@ -27,14 +29,13 @@ private:
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
 
     // primitives clay uses to render UI
-    
-
     ClayWrapper m_clayWrapper;
     glm::mat4 m_orthoProjection
         = glm::ortho(0.0f, 800.0f, 0.0f, 600.0f); // TODO: temp
 
     void renderRectangle(
         float x, float y, float width, float height, glm::vec3 color);
+    
 
     // clang-format off
     std::array<float, 24> m_rectangleVertices = {

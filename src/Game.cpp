@@ -11,6 +11,7 @@
 #include "Scene.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
+#include "Text.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 #include "utils.hpp"
@@ -54,19 +55,15 @@ Game::Game()
     InputManager::setupInputCallbacks(m_window.ptr());
 
     // load shaders and models
-    m_resourceManager.addShader("color", "./resources/shaders/sprite.vert",
-        "./resources/shaders/color.frag");
-    m_resourceManager.addShader("sprite", "./resources/shaders/sprite.vert",
-        "./resources/shaders/sprite.frag");
-    m_resourceManager.addShader("textured", "./resources/shaders/model.vert",
-        "./resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("targets", "./resources/shaders/model.vert",
-        "./resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("skybox", "./resources/shaders/skybox.vert",
-        "./resources/shaders/skybox.frag");
-    m_resourceManager.addShader("healthbar",
-        "./resources/shaders/healthbar.vert",
-        "./resources/shaders/healthbar.frag");
+    m_resourceManager.addShader("color", "./resources/shaders/sprite.vert", "./resources/shaders/color.frag");
+    m_resourceManager.addShader("sprite", "./resources/shaders/sprite.vert", "./resources/shaders/sprite.frag");
+    m_resourceManager.addShader("textured", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
+    m_resourceManager.addShader("targets", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
+    m_resourceManager.addShader("skybox", "./resources/shaders/skybox.vert", "./resources/shaders/skybox.frag");
+    m_resourceManager.addShader("healthbar", "./resources/shaders/healthbar.vert", "./resources/shaders/healthbar.frag");
+    m_resourceManager.addShader("text", "./resources/shaders/text.vert", "./resources/shaders/text.frag");
+
+    m_resourceManager.addFont("liberation", "./resources/fonts/LiberationSans-Regular.ttf");
 
     m_resourceManager.addCubemap("skybox",
         { "./resources/textures/skybox/right.bmp",
@@ -263,9 +260,6 @@ void Game::updateShotEntities()
 
 void Game::render()
 {
-    glClearColor(0.3, 0.3, 0.3, 1.0);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
     Scene scene(m_camera, m_window.width, m_window.height);
     scene.globalLightSource = m_globalLightSource;
     scene.skybox = *m_skybox;
@@ -274,8 +268,11 @@ void Game::render()
 
     m_renderer.renderScene(scene);
 
-    Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
-    m_renderer.renderClayUi(testUi);
+    Text t(g_resourceManager->getFont("liberation"), "Hello World");
+    m_renderer.renderText(t, 0, 0, 1.5);
+
+    // Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
+    // m_renderer.renderClayUi(testUi);
 }
 
 void Game::mainLoopEnd()

@@ -3,6 +3,7 @@
 // Heavily inspired by the LearnOpenGL version, except not a singleton.
 // Meant to be instantiated in Game and passed around as reference if needed
 
+#include "Font.hpp"
 #include "Material.hpp"
 #include "Model.hpp"
 #include "Shader.hpp"
@@ -36,6 +37,9 @@ public:
     void addSound(const std::string& name, const std::string& path);
     const std::vector<Sound>& getAllSounds() const;
 
+    void addFont(const std::string& name, const char* path);
+    const Font& getFont(const std::string& name);
+
 private:
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
@@ -45,4 +49,5 @@ private:
     std::map<std::string, Model> m_models;
     std::map<std::string, Material> m_materials;
     std::vector<Sound> m_sounds;
+    std::map<std::string, Font> m_fonts;
 };

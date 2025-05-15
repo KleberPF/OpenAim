@@ -12,6 +12,7 @@ public:
     enum class Type { Diffuse, Specular, Normal, Height, Last };
 
     Texture(const std::string& path, Texture::Type type);
+    Texture(GLenum format, int width, int height, void* data, Texture::Type type);
     virtual ~Texture() = default;
 
     Texture::Type type() const;
@@ -20,6 +21,8 @@ public:
 
 protected:
     Texture() = default;
+
+    void generateTexture(GLenum format, int width, int height, void* data);
 
     GLuint m_id;
     Texture::Type m_type;

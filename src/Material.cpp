@@ -5,8 +5,6 @@
 Texture::Texture(const std::string& path, Texture::Type type)
     : m_type(type)
 {
-    glGenTextures(1, &m_id);
-
     int width = 0;
     int height = 0;
     int nrComponents = 0;
@@ -21,6 +19,19 @@ Texture::Texture(const std::string& path, Texture::Type type)
     } else if (nrComponents == 4) {
         format = GL_RGBA;
     }
+
+    generateTexture(format, width, height, data);
+}
+
+Texture::Texture(GLenum format, int width, int height, void* data, Texture::Type type)
+    : m_type(type)
+{
+    generateTexture(format, width, height, data);
+}
+
+void Texture::generateTexture(GLenum format, int width, int height, void* data)
+{
+    glGenTextures(1, &m_id);
 
     glBindTexture(GL_TEXTURE_2D, m_id);
     glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, format,

@@ -196,6 +196,25 @@ void Renderer::renderRectangle(
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
+void Renderer::renderText(const Text& text, float x, float y, float scale) const
+{
+    RenderData data = text.getRenderData();
+    const Shader& shader = g_resourceManager->getShader("text");
+    shader.use();
+    shader.setVec3("textColor", text.color.toOpenGLFormat());
+
+    glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
+    model = glm::scale(model, glm::vec3(scale, scale, 0));
+
+    shader.setMat4("mvp", m_orthoProjection * model);
+
+    glBindVertexArray(data.vao);
+    glActiveTexture(GL_TEXTURE0);
+    data.texture->bind();
+
+    glDrawArrays(GL_TRIANGLES, 0, data.vertexCount);
+}
+
 void Renderer::renderScene(const Scene& scene)
 {
     glEnable(GL_BLEND);

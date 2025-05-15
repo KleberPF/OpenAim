@@ -31,6 +31,8 @@ set(SOURCES
     src/Sound.cpp
     src/EntityManager.cpp
     src/ClayWrapper.cpp
+    src/Font.cpp
+    src/Text.cpp
     # Add more source files here as needed
 )
 

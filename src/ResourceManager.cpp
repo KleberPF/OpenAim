@@ -67,3 +67,13 @@ const std::vector<Sound>& ResourceManager::getAllSounds() const
 {
     return m_sounds;
 }
+
+void ResourceManager::addFont(const std::string& name, const char* path)
+{
+    m_fonts.insert({ name, Font(path) });
+}
+
+const Font& ResourceManager::getFont(const std::string& name)
+{
+    return m_fonts.at(name);
+}

@@ -35,14 +35,9 @@ Clay_RenderCommandArray ClayWrapper::buildTestUi()
     // clang-format off
     CLAY({
         .id = CLAY_ID("OuterContainer"),
-        .layout = { .sizing = {CLAY_SIZING_GROW(0), CLAY_SIZING_GROW(0)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
-        .backgroundColor = {250, 250, 255, 255} })
+        .layout = { .sizing = {.width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_FIXED(48)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
+        .backgroundColor = {255, 0, 0, 255} })
     {
-        CLAY({
-            .id = CLAY_ID("SideBar"),
-            .layout = { .sizing = { .width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_GROW(0) }, .padding = CLAY_PADDING_ALL(16), .childGap = 16, .layoutDirection = CLAY_TOP_TO_BOTTOM },
-            .backgroundColor = COLOR_LIGHT
-        }) { }
     }
     // clang-format on
     return Clay_EndLayout();

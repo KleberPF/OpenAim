@@ -198,6 +198,8 @@ void Renderer::renderRectangle(
 
 void Renderer::renderText(const Text& text, float x, float y, float scale) const
 {
+    glDepthFunc(GL_ALWAYS);
+
     RenderData data = text.getRenderData();
     const Shader& shader = g_resourceManager->getShader("text");
     shader.use();
@@ -213,6 +215,8 @@ void Renderer::renderText(const Text& text, float x, float y, float scale) const
     data.texture->bind();
 
     glDrawArrays(GL_TRIANGLES, 0, data.vertexCount);
+
+    glDepthFunc(GL_LESS);
 }
 
 void Renderer::renderScene(const Scene& scene)

@@ -268,11 +268,10 @@ void Game::render()
 
     m_renderer.renderScene(scene);
 
+    Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
+    m_renderer.renderClayUi(testUi);
     Text t(g_resourceManager->getFont("liberation"), "Hello World");
-    m_renderer.renderText(t, 0, 0, 1.5);
-
-    // Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
-    // m_renderer.renderClayUi(testUi);
+    m_renderer.renderText(t, 0, 0, 1);
 }
 
 void Game::mainLoopEnd()

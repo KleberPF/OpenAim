@@ -51,7 +51,8 @@ Font::Font(const char* path)
             for (unsigned int col = 0; col < bmp->width; col++) {
                 int x = xoffset + col;
                 int y = yoffset + row;
-                // fill atlas backwards because OpenGL textures are inverted in memory
+                // fill atlas backwards because OpenGL textures are inverted vertically in memory
+                // basically the (x, y) = y * Width + x formula but backwards
                 atlas[ATLAS_SIZE * (ATLAS_SIZE - 1 - y) + x] = bmp->buffer[row * bmp->pitch + col];
             }
         }

@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "ClayWrapper.hpp"
 #include "EntityManager.hpp"
+#include "EventManager.hpp"
 #include "InputManager.hpp"
 #include "Renderer.hpp"
 #include "Scenario.hpp"
@@ -53,6 +54,7 @@ private:
     void parseScenariosFromFile(const std::string& scenarioFolder);
     void createScenario(size_t index);
 
+    EventManager m_eventManager;
     Window m_window;
     Camera m_camera;
     EntityManager m_entityManager;

@@ -33,6 +33,7 @@ set(SOURCES
     src/ClayWrapper.cpp
     src/Font.cpp
     src/Text.cpp
+    src/EventManager.cpp
     # Add more source files here as needed
 )
 

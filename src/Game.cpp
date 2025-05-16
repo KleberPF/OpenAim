@@ -27,7 +27,7 @@
 using json = nlohmann::json;
 
 Game::Game()
-    : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
+    : m_window(&m_eventManager, SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_inputManager(m_window)
     , m_clayWrapper(m_window.width, m_window.height)
@@ -44,7 +44,8 @@ Game::Game()
     glEnable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(messageCallback, nullptr);
 
-    InputManager::setupInputCallbacks(m_window.ptr());
+    InputManager::setupInputCallbacks(m_window.ptr()); // TODO: refactor this class to use EventManager
+    m_window.subscribe(m_eventManager);
 
     // set/create globals
     RNG::init();

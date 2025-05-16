@@ -1,19 +1,12 @@
 #include "Window.hpp"
 
-#include <GLFW/glfw3.h>
+#include "EventManager.hpp"
+
 #include <glad/glad.h>
 
 #include <iostream>
 
-static void framebufferSizeCallback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-    auto* windowObj = static_cast<Window*>(glfwGetWindowUserPointer(window));
-    windowObj->width = width;
-    windowObj->height = height;
-}
-
-Window::Window(int width, int height, std::string title, bool fullscreen)
+Window::Window(EventManager* eventManager, int width, int height, std::string title, bool fullscreen)
     : width(width)
     , height(height)
     , m_title(std::move(title))
@@ -39,8 +32,8 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
 
     glfwMakeContextCurrent(m_ptr);
     glfwSwapInterval(0); // turn off vsync
-    glfwSetWindowUserPointer(m_ptr, this);
-    glfwSetFramebufferSizeCallback(m_ptr, framebufferSizeCallback);
+    glfwSetWindowUserPointer(m_ptr, eventManager);
+    glfwSetFramebufferSizeCallback(m_ptr, EventManager::framebufferSizeCallback);
 
     glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
@@ -67,4 +60,18 @@ void Window::swapBuffers()
 GLFWwindow* Window::ptr() const
 {
     return m_ptr;
+}
+
+void Window::subscribe(EventManager& eventManager)
+{
+    eventManager.addResizeListener([this](int width, int height) {
+        handleResize(width, height);
+    });
+}
+
+void Window::handleResize(int width, int height)
+{
+    glViewport(0, 0, width, height);
+    this->width = width;
+    this->height = height;
 }

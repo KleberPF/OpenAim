@@ -40,7 +40,8 @@ Checks: "-*,
   -cert-err58-cpp,
   -modernize-avoid-c-arrays,
   -bugprone-narrowing-conversions,
-  -readability-math-missing-parentheses
+  -readability-math-missing-parentheses,
+  -cppcoreguidelines-special-member-functions
   "
 CheckOptions:
   - key: readability-identifier-naming.ClassCase

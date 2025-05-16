@@ -1,8 +1,5 @@
 #pragma once
 
-#include "RNG.hpp"
-#include "ResourceManager.hpp"
-
 #include <AL/al.h>
 #include <AL/alc.h>
 

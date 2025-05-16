@@ -4,11 +4,8 @@
 #include "ClayWrapper.hpp"
 #include "EntityManager.hpp"
 #include "InputManager.hpp"
-#include "RNG.hpp"
 #include "Renderer.hpp"
-#include "ResourceManager.hpp"
 #include "Scenario.hpp"
-#include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -27,7 +24,7 @@ struct ChallengeState {
 
 class Game {
 public:
-    enum class State {
+    enum class State : uint8_t {
         Menu,
         Paused,
         ChallengeEnded,

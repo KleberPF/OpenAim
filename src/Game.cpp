@@ -411,6 +411,7 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
         } catch (...) {
             // probably some JSON format error
             // just skips the file
+            std::cout << "Error parsing file " << entry << '\n';
         }
     }
 }
@@ -477,6 +478,6 @@ void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,
         std::cerr << "GL CALLBACK: "
                   << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
                   << " type = 0x" << std::hex << type << ", severity = 0x"
-                  << severity << ", message = " << message << std::endl;
+                  << severity << ", message = " << message << '\n';
     }
 }

@@ -1,11 +1,15 @@
 #include "SoundPlayer.hpp"
 
+#include "RNG.hpp"
+#include "ResourceManager.hpp"
+
 #include <AL/al.h>
 #include <stb_vorbis.h>
 
+#include <cassert>
 #include <cstdlib>
 #include <iostream>
-#include <vector>
+#include <memory>
 
 namespace {
 
@@ -52,11 +56,9 @@ SoundPlayer::SoundPlayer()
         ALuint buffer = 0;
         alGenBuffers(1, &buffer);
 
-        ALenum format
-            = sound.numChannels() == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
+        ALenum format = sound.numChannels() == 2 ? AL_FORMAT_STEREO16 : AL_FORMAT_MONO16;
 
-        alBufferData(buffer, format, sound.buffer().data(),
-            sound.buffer().size() * sizeof(short), sound.sampleRate());
+        alBufferData(buffer, format, sound.buffer().data(), sound.buffer().size() * sizeof(short), sound.sampleRate());
 
         ALuint source = 0;
         alGenSources(1, &source);

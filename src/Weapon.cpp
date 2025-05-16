@@ -1,6 +1,6 @@
 #include "Weapon.hpp"
 
-#include "Globals.hpp"
+#include "SoundPlayer.hpp"
 
 bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 {
@@ -10,9 +10,9 @@ bool Weapon::tryShoot(float currentTimeMs, bool holdingMouseLeft)
 
     if (currentTimeMs - m_lastTimeFiredMs >= m_shootDelaysMs[(int)type]) {
         if (type == Type::Pistol) {
-            g_soundPlayer->playWithRandomPitch("pistol");
+            SoundPlayer::instance().playWithRandomPitch("pistol");
         } else if (type == Type::Machine_Gun) {
-            g_soundPlayer->playIfNotAlreadyPlaying("machine_gun");
+            SoundPlayer::instance().playIfNotAlreadyPlaying("machine_gun");
         }
         m_lastTimeFiredMs = currentTimeMs;
         return true;

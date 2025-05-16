@@ -1,7 +1,7 @@
 #include "Entity.hpp"
 
-#include "Globals.hpp"
 #include "Model.hpp"
+#include "ResourceManager.hpp"
 #include "Shader.hpp"
 #include "glm/fwd.hpp"
 #include "utils.hpp"

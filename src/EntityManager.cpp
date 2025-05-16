@@ -1,7 +1,7 @@
 #include "EntityManager.hpp"
 
 #include "Entity.hpp"
-#include "Globals.hpp"
+#include "RNG.hpp"
 
 void EntityManager::addEntity(Entity entity)
 {

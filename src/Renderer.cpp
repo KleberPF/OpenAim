@@ -1,8 +1,8 @@
 #include "Renderer.hpp"
 
 #include "Entity.hpp"
-#include "Globals.hpp"
 #include "Material.hpp"
+#include "ResourceManager.hpp"
 #include "Shader.hpp"
 #include "clay.h"
 #include "glad/glad.h"

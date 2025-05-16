@@ -69,9 +69,6 @@ private:
     Scenario* m_currentScenario = nullptr;
     ClayWrapper m_clayWrapper;
 
-    // globals
-    std::unique_ptr<SoundPlayer> m_soundPlayer;
-
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to
     // one locked in the middle of the screen.

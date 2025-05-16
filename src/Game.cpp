@@ -2,9 +2,7 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
-#include "Globals.hpp"
 #include "InputManager.hpp"
-#include "Material.hpp"
 #include "RNG.hpp"
 #include "ResourceManager.hpp"
 #include "Scenario.hpp"
@@ -21,16 +19,12 @@
 #include <stb_image.h>
 
 #include <cmath>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
 
 using json = nlohmann::json;
-
-// globals
-SoundPlayer* g_soundPlayer;
 
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
@@ -55,8 +49,7 @@ Game::Game()
     // set/create globals
     RNG::init();
     ResourceManager::init();
-    m_soundPlayer = std::make_unique<SoundPlayer>();
-    g_soundPlayer = m_soundPlayer.get();
+    SoundPlayer::init();
 
     Sprite crosshair(ResourceManager::instance().getShader("sprite"),
         ResourceManager::instance().getMaterial("crosshair"),

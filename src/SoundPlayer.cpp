@@ -1,15 +1,37 @@
 #include "SoundPlayer.hpp"
 
-#include "Globals.hpp"
-
 #include <AL/al.h>
 #include <stb_vorbis.h>
 
 #include <cstdlib>
-#include <ios>
 #include <iostream>
-#include <memory>
 #include <vector>
+
+namespace {
+
+std::unique_ptr<SoundPlayer> s_Instance = nullptr;
+
+} // end namespace
+
+void SoundPlayer::init()
+{
+    if (s_Instance != nullptr) {
+        return;
+    }
+
+    s_Instance = std::unique_ptr<SoundPlayer>(new SoundPlayer);
+}
+
+void SoundPlayer::shutdown()
+{
+    s_Instance.reset();
+}
+
+SoundPlayer& SoundPlayer::instance()
+{
+    assert(s_Instance);
+    return *s_Instance;
+}
 
 SoundPlayer::SoundPlayer()
     : m_device(alcOpenDevice(nullptr))

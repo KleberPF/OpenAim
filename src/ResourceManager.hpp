@@ -1,7 +1,6 @@
 #pragma once
 
-// Heavily inspired by the LearnOpenGL version, except not a singleton.
-// Meant to be instantiated in Game and passed around as reference if needed
+// Heavily inspired by the LearnOpenGL version
 
 #include "Font.hpp"
 #include "Material.hpp"
@@ -16,31 +15,30 @@
 
 class ResourceManager {
 public:
-    void addShader(const std::string& name, const std::string& vertexPath,
-        const std::string& fragmentPath);
+    static void init();
+    static void shutdown();
+
+    static ResourceManager& instance(); // maybe const this?
+
     const Shader& getShader(const std::string& name);
-
-    void addCubemap(
-        const std::string& name, const std::array<std::string, 6>& paths);
     const Cubemap& getCubemap(const std::string& name);
-
-    void addTexture(
-        const std::string& name, const std::string& path, Texture::Type type);
     const Texture& getTexture(const std::string& name);
-
-    void addModel(const std::string& name, const std::string& path);
     const Model& getModel(const std::string& name);
-
-    void addMaterial(const std::string& name);
     Material& getMaterial(const std::string& name);
-
-    void addSound(const std::string& name, const std::string& path);
     const std::vector<Sound>& getAllSounds() const;
-
-    void addFont(const std::string& name, const char* path);
     const Font& getFont(const std::string& name);
 
 private:
+    ResourceManager() = default;
+
+    void addShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
+    void addCubemap(const std::string& name, const std::array<std::string, 6>& paths);
+    void addTexture(const std::string& name, const std::string& path, Texture::Type type);
+    void addModel(const std::string& name, const std::string& path);
+    void addMaterial(const std::string& name);
+    void addSound(const std::string& name, const std::string& path);
+    void addFont(const std::string& name, const char* path);
+
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
     // This is weird because Cubemap is a Texture, but it's

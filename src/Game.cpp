@@ -31,7 +31,6 @@ using json = nlohmann::json;
 
 // globals
 RNG* g_rng;
-ResourceManager* g_resourceManager;
 SoundPlayer* g_soundPlayer;
 
 Game::Game()
@@ -54,67 +53,14 @@ Game::Game()
 
     InputManager::setupInputCallbacks(m_window.ptr());
 
-    // load shaders and models
-    m_resourceManager.addShader("color", "./resources/shaders/sprite.vert", "./resources/shaders/color.frag");
-    m_resourceManager.addShader("sprite", "./resources/shaders/sprite.vert", "./resources/shaders/sprite.frag");
-    m_resourceManager.addShader("textured", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("targets", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
-    m_resourceManager.addShader("skybox", "./resources/shaders/skybox.vert", "./resources/shaders/skybox.frag");
-    m_resourceManager.addShader("healthbar", "./resources/shaders/healthbar.vert", "./resources/shaders/healthbar.frag");
-    m_resourceManager.addShader("text", "./resources/shaders/text.vert", "./resources/shaders/text.frag");
-
-    m_resourceManager.addFont("liberation", "./resources/fonts/LiberationSans-Regular.ttf");
-
-    m_resourceManager.addCubemap("skybox",
-        { "./resources/textures/skybox/right.bmp",
-            "./resources/textures/skybox/left.bmp",
-            "./resources/textures/skybox/top.bmp",
-            "./resources/textures/skybox/bottom.bmp",
-            "./resources/textures/skybox/front.bmp",
-            "./resources/textures/skybox/back.bmp" });
-
-    m_resourceManager.addTexture(
-        "bricks", "./resources/textures/bricks.png", Texture::Type::Diffuse);
-    m_resourceManager.addTexture("crosshair",
-        "./resources/textures/crosshair.png", Texture::Type::Diffuse);
-    m_resourceManager.addTexture("white_pixel",
-        "./resources/textures/white_pixel.png", Texture::Type::Diffuse);
-
-    m_resourceManager.addMaterial("targets");
-    m_resourceManager.getMaterial("targets")
-        .addTexture(m_resourceManager.getTexture("white_pixel"))
-        .setColor(glm::vec3(0.125f, 0.55f, 0.9f));
-
-    m_resourceManager.addMaterial("bricks");
-    m_resourceManager.getMaterial("bricks")
-        .addTexture(m_resourceManager.getTexture("bricks"))
-        .setTextureScale(16);
-
-    m_resourceManager.addMaterial("crosshair");
-    m_resourceManager.getMaterial("crosshair")
-        .addTexture(m_resourceManager.getTexture("crosshair"))
-        .setColor(glm::vec3(0.0f, 1.0f, 0.0f));
-
-    m_resourceManager.addMaterial("healthbar");
-    m_resourceManager.getMaterial("healthbar")
-        .addTexture(m_resourceManager.getTexture("white_pixel"));
-
-    m_resourceManager.addModel("cube", "./resources/objects/cube/cube.obj");
-    m_resourceManager.addModel("ball", "./resources/objects/ball/ball.obj");
-    m_resourceManager.addModel("plane", "./resources/objects/plane/plane.obj");
-
-    m_resourceManager.addSound("pistol", "./resources/sounds/pistol.ogg");
-    m_resourceManager.addSound(
-        "machine_gun", "./resources/sounds/machine_gun.ogg");
-
     // set/create globals
     g_rng = &m_rng;
-    g_resourceManager = &m_resourceManager;
+    ResourceManager::init();
     m_soundPlayer = std::make_unique<SoundPlayer>();
     g_soundPlayer = m_soundPlayer.get();
 
-    Sprite crosshair(g_resourceManager->getShader("sprite"),
-        g_resourceManager->getMaterial("crosshair"),
+    Sprite crosshair(ResourceManager::instance().getShader("sprite"),
+        ResourceManager::instance().getMaterial("crosshair"),
         glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
         glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f);
     m_sprites.push_back(crosshair);
@@ -124,12 +70,17 @@ Game::Game()
     m_globalLightSource.diffuse = glm::vec3(0.8f, 0.8f, 0.8f);
     m_globalLightSource.specular = glm::vec3(1.0f, 1.0f, 1.0f);
 
-    m_skybox = std::make_unique<Skybox>(g_resourceManager->getCubemap("skybox"),
-        g_resourceManager->getShader("skybox"));
+    m_skybox = std::make_unique<Skybox>(ResourceManager::instance().getCubemap("skybox"),
+        ResourceManager::instance().getShader("skybox"));
 
     buildPlayArea();
     parseScenariosFromFile("./resources/scenarios");
     createScenario(0);
+}
+
+Game::~Game()
+{
+    ResourceManager::shutdown();
 }
 
 void Game::mainLoop()
@@ -270,7 +221,7 @@ void Game::render()
 
     Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
     m_renderer.renderClayUi(testUi);
-    Text t(g_resourceManager->getFont("liberation"), "Hello World");
+    Text t(ResourceManager::instance().getFont("liberation"), "Hello World");
     m_renderer.renderText(t, 0, 0, 1);
 }
 
@@ -314,17 +265,17 @@ void Game::changeState(State newState)
 
 void Game::buildPlayArea()
 {
-    Entity floor(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"), glm::vec3(0));
+    Entity floor(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"), glm::vec3(0));
     floor.addCollisionObject(CollisionObject::Type::AABB);
     floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     floor.setName("Floor");
     m_entityManager.addEntity(std::move(floor));
 
-    Entity frontWall(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"),
+    Entity frontWall(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"),
         glm::vec3(0.0f, 10.0f, -10.0f));
     frontWall.addCollisionObject(CollisionObject::Type::AABB);
     frontWall.setRotation(90, 0, 0);
@@ -332,9 +283,9 @@ void Game::buildPlayArea()
     frontWall.setName("Front Wall");
     m_entityManager.addEntity(std::move(frontWall));
 
-    Entity leftWall(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"),
+    Entity leftWall(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"),
         glm::vec3(-10.0f, 10.0f, 0.0f));
     leftWall.addCollisionObject(CollisionObject::Type::AABB);
     leftWall.setRotation(90, 90, 0);
@@ -342,27 +293,27 @@ void Game::buildPlayArea()
     leftWall.setName("Left Wall");
     m_entityManager.addEntity(std::move(leftWall));
 
-    Entity rightWall(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"), glm::vec3(10.0f, 10.0f, 0.0f));
+    Entity rightWall(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"), glm::vec3(10.0f, 10.0f, 0.0f));
     rightWall.addCollisionObject(CollisionObject::Type::AABB);
     rightWall.setRotation(90, -90, 0);
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     rightWall.setName("Right Wall");
     m_entityManager.addEntity(std::move(rightWall));
 
-    Entity ceiling(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"), glm::vec3(0.0f, 20.0f, 0.0f));
+    Entity ceiling(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"), glm::vec3(0.0f, 20.0f, 0.0f));
     ceiling.addCollisionObject(CollisionObject::Type::AABB);
     ceiling.setRotation(180, 0, 0);
     ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
     ceiling.setName("Ceiling");
     m_entityManager.addEntity(std::move(ceiling));
 
-    Entity backWall(g_resourceManager->getModel("plane"),
-        m_resourceManager.getMaterial("bricks"),
-        m_resourceManager.getShader("textured"), glm::vec3(0.0f, 10.0f, 10.0f));
+    Entity backWall(ResourceManager::instance().getModel("plane"),
+        ResourceManager::instance().getMaterial("bricks"),
+        ResourceManager::instance().getShader("textured"), glm::vec3(0.0f, 10.0f, 10.0f));
     backWall.addCollisionObject(CollisionObject::Type::AABB);
     backWall.setRotation(90, 180, 0);
     backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
@@ -496,15 +447,15 @@ void Game::createScenario(size_t index)
         const Model* model;
         CollisionObject::Type collisionObjType;
         if (target.shape == Target::Shape::Box) {
-            model = &g_resourceManager->getModel("cube");
+            model = &ResourceManager::instance().getModel("cube");
             collisionObjType = CollisionObject::Type::AABB;
         } else {
-            model = &g_resourceManager->getModel("ball");
+            model = &ResourceManager::instance().getModel("ball");
             collisionObjType = CollisionObject::Type::SPHERE;
         }
 
-        Entity entity(*model, m_resourceManager.getMaterial("targets"),
-            m_resourceManager.getShader("targets"), spawnPoint);
+        Entity entity(*model, ResourceManager::instance().getMaterial("targets"),
+            ResourceManager::instance().getShader("targets"), spawnPoint);
         entity.addCollisionObject(collisionObjType);
         entity.setSize(target.scale);
         entity.destroyable = true;

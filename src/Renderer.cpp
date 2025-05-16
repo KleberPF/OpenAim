@@ -183,7 +183,7 @@ void Renderer::renderClayUi(Clay_RenderCommandArray& renderCommands)
 void Renderer::renderRectangle(
     float x, float y, float width, float height, glm::vec3 color)
 {
-    const Shader& shader = g_resourceManager->getShader("color");
+    const Shader& shader = ResourceManager::instance().getShader("color");
     shader.use();
     shader.setVec3("color", color);
 
@@ -201,7 +201,7 @@ void Renderer::renderText(const Text& text, float x, float y, float scale) const
     glDepthFunc(GL_ALWAYS);
 
     RenderData data = text.getRenderData();
-    const Shader& shader = g_resourceManager->getShader("text");
+    const Shader& shader = ResourceManager::instance().getShader("text");
     shader.use();
     shader.setVec3("textColor", text.color.toOpenGLFormat());
 

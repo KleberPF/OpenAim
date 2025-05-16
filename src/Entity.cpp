@@ -150,11 +150,11 @@ Entity::Entity(Model model, const Material& material, const Shader& shader,
     : referentialPos(pos)
     , material(material)
     , shader(shader)
-    , healthbarMaterial(g_resourceManager->getMaterial("healthbar"))
-    , healthbarShader(g_resourceManager->getShader("healthbar"))
+    , healthbarMaterial(ResourceManager::instance().getMaterial("healthbar"))
+    , healthbarShader(ResourceManager::instance().getShader("healthbar"))
     , m_currentPos(pos)
     , m_model(std::move(model))
-    , m_healthbarQuad(g_resourceManager->getModel("plane"))
+    , m_healthbarQuad(ResourceManager::instance().getModel("plane"))
 {
 }
 

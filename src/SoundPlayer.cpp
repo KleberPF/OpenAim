@@ -25,7 +25,7 @@ SoundPlayer::SoundPlayer()
     m_eax = alIsExtensionPresent("EAX2.0");
     alGetError(); // clear error code
 
-    auto sounds = g_resourceManager->getAllSounds();
+    auto sounds = ResourceManager::instance().getAllSounds();
     for (auto& sound : sounds) {
         ALuint buffer = 0;
         alGenBuffers(1, &buffer);

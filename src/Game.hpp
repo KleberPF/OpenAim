@@ -35,6 +35,7 @@ public:
     };
 
     Game();
+    ~Game();
 
     void mainLoop();
 
@@ -70,7 +71,6 @@ private:
 
     // globals
     RNG m_rng;
-    ResourceManager m_resourceManager;
     std::unique_ptr<SoundPlayer> m_soundPlayer;
 
     // mouse input

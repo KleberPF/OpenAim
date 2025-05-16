@@ -103,8 +103,8 @@ CollisionResult EntityManager::areEntitiesColliding(
 void EntityManager::moveEntityToFreePosition(Entity& entityToMove)
 {
     while (true) {
-        float newX = g_rng->getFloatInRange(-8.0f, 8.0f);
-        float newY = g_rng->getFloatInRange(2.0f, 18.0f);
+        float newX = RNG::instance().getFloatInRange(-8.0f, 8.0f);
+        float newY = RNG::instance().getFloatInRange(2.0f, 18.0f);
         float newZ = -8.0f;
         entityToMove.referentialPos = glm::vec3(newX, newY, newZ);
         entityToMove.moveRelative(glm::vec3(0.0f, 0.0f,

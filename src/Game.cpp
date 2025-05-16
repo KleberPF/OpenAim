@@ -30,7 +30,6 @@
 using json = nlohmann::json;
 
 // globals
-RNG* g_rng;
 SoundPlayer* g_soundPlayer;
 
 Game::Game()
@@ -54,7 +53,7 @@ Game::Game()
     InputManager::setupInputCallbacks(m_window.ptr());
 
     // set/create globals
-    g_rng = &m_rng;
+    RNG::init();
     ResourceManager::init();
     m_soundPlayer = std::make_unique<SoundPlayer>();
     g_soundPlayer = m_soundPlayer.get();
@@ -437,9 +436,9 @@ void Game::createScenario(size_t index)
         glm::vec3 spawnPoint;
         if (target.randomSpawn) {
             spawnPoint = glm::vec3(
-                g_rng->getFloatInRange(target.minCoords.x, target.maxCoords.x),
-                g_rng->getFloatInRange(target.minCoords.y, target.maxCoords.y),
-                g_rng->getFloatInRange(target.minCoords.z, target.maxCoords.z));
+                RNG::instance().getFloatInRange(target.minCoords.x, target.maxCoords.x),
+                RNG::instance().getFloatInRange(target.minCoords.y, target.maxCoords.y),
+                RNG::instance().getFloatInRange(target.minCoords.z, target.maxCoords.z));
         } else {
             spawnPoint = target.spawnCoords;
         }

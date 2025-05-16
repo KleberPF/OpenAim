@@ -70,7 +70,6 @@ private:
     ClayWrapper m_clayWrapper;
 
     // globals
-    RNG m_rng;
     std::unique_ptr<SoundPlayer> m_soundPlayer;
 
     // mouse input

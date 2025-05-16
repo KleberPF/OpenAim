@@ -69,7 +69,7 @@ void SoundPlayer::play(const std::string& soundName)
 void SoundPlayer::playWithRandomPitch(const std::string& soundName)
 {
     ALuint source = m_sources.at(soundName);
-    alSourcef(source, AL_PITCH, g_rng->getFloatInRange(0.9f, 1.1f));
+    alSourcef(source, AL_PITCH, RNG::instance().getFloatInRange(0.9f, 1.1f));
     alSourcePlay(source);
 }
 

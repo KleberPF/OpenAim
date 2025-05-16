@@ -34,6 +34,9 @@ Window::Window(EventManager* eventManager, int width, int height, std::string ti
     glfwSwapInterval(0); // turn off vsync
     glfwSetWindowUserPointer(m_ptr, eventManager);
     glfwSetFramebufferSizeCallback(m_ptr, EventManager::framebufferSizeCallback);
+    glfwSetKeyCallback(m_ptr, EventManager::keyCallback);
+    glfwSetMouseButtonCallback(m_ptr, EventManager::mouseButtonCallback);
+    glfwSetCursorPosCallback(m_ptr, EventManager::cursorPosCallback);
 
     glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

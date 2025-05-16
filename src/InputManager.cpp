@@ -2,14 +2,6 @@
 
 #include <GLFW/glfw3.h>
 
-std::vector<InputManager*> InputManager::s_instances;
-
-InputManager::InputManager(Window& window)
-    : m_window(window)
-{
-    InputManager::s_instances.push_back(this);
-}
-
 bool InputManager::isKeyPressed(const int key)
 {
     return m_keys.at(key).current;
@@ -56,52 +48,32 @@ void InputManager::consolidateKeyStates()
     m_cursorMoved = false;
 }
 
-void InputManager::setupInputCallbacks(GLFWwindow* window)
+void InputManager::subscribe(EventManager& eventManager)
 {
-    glfwSetKeyCallback(window, InputManager::keyCallback);
-    glfwSetMouseButtonCallback(window, InputManager::mouseButtonCallback);
-    glfwSetCursorPosCallback(window, InputManager::cursorPosCallback);
-    glfwSetScrollCallback(window, nullptr);
-    glfwSetCharCallback(window, nullptr);
+    eventManager.addKeyListener([this](int key, bool pressed) {
+        handleKey(key, pressed);
+    });
+    eventManager.addMouseButtonListener([this](int key, bool pressed) {
+        handleMouseButton(key, pressed);
+    });
+    eventManager.addCursorPosListener([this](double xpos, double ypos) {
+        handleCursorPos(xpos, ypos);
+    });
 }
 
-void InputManager::setKeyPressed(int key, bool pressed)
+void InputManager::handleKey(int key, bool pressed)
 {
     m_keys.at(key).current = pressed;
 }
 
-void InputManager::setMouseButtonPressed(int key, bool pressed)
+void InputManager::handleMouseButton(int key, bool pressed)
 {
     m_mouseBtns.at(key).current = pressed;
 }
 
-void InputManager::setCursorPos(double xpos, double ypos)
+void InputManager::handleCursorPos(double xpos, double ypos)
 {
     m_cursorMoved = true;
     m_cursorPos.first = xpos;
     m_cursorPos.second = ypos;
-}
-
-void InputManager::keyCallback(
-    GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
-{
-    for (auto* instance : InputManager::s_instances) {
-        instance->setKeyPressed(key, action != GLFW_RELEASE);
-    }
-}
-
-void InputManager::mouseButtonCallback(
-    GLFWwindow* /*window*/, int button, int action, int /*mods*/)
-{
-    for (auto* instance : InputManager::s_instances) {
-        instance->setMouseButtonPressed(button, action != GLFW_RELEASE);
-    }
-}
-
-void InputManager::cursorPosCallback(
-    GLFWwindow* /*window*/, double xpos, double ypos)
-{
-    for (auto* instance : InputManager::s_instances) {
-        instance->setCursorPos(xpos, ypos);
-    }
 }

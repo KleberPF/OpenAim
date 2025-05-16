@@ -2,8 +2,7 @@
 // based on
 // https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
 
-#include "Window.hpp"
-
+#include "EventManager.hpp"
 #include <GLFW/glfw3.h>
 
 #include <array>
@@ -21,8 +20,6 @@ struct InputState {
 
 class InputManager {
 public:
-    InputManager(Window& window);
-
     bool isKeyPressed(int key);
 
     bool didCursorMove() const;
@@ -42,25 +39,16 @@ public:
     // the keys that were pressed this frame
     void consolidateKeyStates();
 
-    // MUST be called after all instances are created,
-    // otherwise the callback won't be set
-    static void setupInputCallbacks(GLFWwindow* window);
+    void subscribe(EventManager& eventManager);
 
 private:
-    Window& m_window;
     std::array<InputState, GLFW_KEY_LAST + 1> m_keys;
     std::array<InputState, GLFW_MOUSE_BUTTON_LAST + 1> m_mouseBtns;
     std::pair<double, double> m_cursorPos = { -1, -1 };
     static std::vector<InputManager*> s_instances;
     bool m_cursorMoved = false;
 
-    void setKeyPressed(int key, bool pressed);
-    void setMouseButtonPressed(int key, bool pressed);
-    void setCursorPos(double xpos, double ypos);
-
-    static void keyCallback(
-        GLFWwindow* window, int key, int scancode, int action, int mods);
-    static void mouseButtonCallback(
-        GLFWwindow* window, int button, int action, int mods);
-    static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+    void handleKey(int key, bool pressed);
+    void handleMouseButton(int key, bool pressed);
+    void handleCursorPos(double xpos, double ypos);
 };

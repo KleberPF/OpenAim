@@ -29,7 +29,7 @@ public:
     const Font& getFont(const std::string& name);
 
 private:
-    ResourceManager() = default;
+    ResourceManager();
 
     void addShader(const std::string& name, const std::string& vertexPath, const std::string& fragmentPath);
     void addCubemap(const std::string& name, const std::array<std::string, 6>& paths);

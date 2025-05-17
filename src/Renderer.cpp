@@ -12,9 +12,36 @@
 
 #include <iostream>
 
+namespace {
+
+void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,
+    GLenum severity, GLsizei /*unused*/, const GLchar* message,
+    const void* /*unused*/)
+{
+    if (severity == GL_DEBUG_SEVERITY_MEDIUM
+        || severity == GL_DEBUG_SEVERITY_HIGH) {
+        std::cerr << "GL CALLBACK: "
+                  << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
+                  << " type = 0x" << std::hex << type << ", severity = 0x"
+                  << severity << ", message = " << message << '\n';
+    }
+}
+
+} // namespace
+
 Renderer::Renderer()
     : m_clayWrapper(800, 600) // TODO: temp
 {
+    // opengl initialization
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_MULTISAMPLE);
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(messageCallback, nullptr);
+
     // sprite
     glGenVertexArrays(1, &m_rectangleVao);
     glGenBuffers(1, &m_rectangleVbo);

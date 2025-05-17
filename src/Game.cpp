@@ -33,16 +33,6 @@ Game::Game()
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
-    // opengl initialization
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
-    glEnable(GL_MULTISAMPLE);
-    glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(messageCallback, nullptr);
-
     // set up subscribers to events (resize, mouse move, etc)
     m_inputManager.subscribe(m_eventManager);
     m_window.subscribe(m_eventManager);
@@ -73,7 +63,9 @@ Game::Game()
 
 Game::~Game()
 {
+    RNG::shutdown();
     ResourceManager::shutdown();
+    SoundPlayer::shutdown();
 }
 
 void Game::mainLoop()
@@ -467,18 +459,5 @@ void Game::createScenario(size_t index)
                 });
         }
         m_entityManager.addEntity(std::move(entity));
-    }
-}
-
-void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,
-    GLenum severity, GLsizei /*unused*/, const GLchar* message,
-    const void* /*unused*/)
-{
-    if (severity == GL_DEBUG_SEVERITY_MEDIUM
-        || severity == GL_DEBUG_SEVERITY_HIGH) {
-        std::cerr << "GL CALLBACK: "
-                  << (type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "")
-                  << " type = 0x" << std::hex << type << ", severity = 0x"
-                  << severity << ", message = " << message << '\n';
     }
 }

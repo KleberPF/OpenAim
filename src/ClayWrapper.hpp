@@ -23,7 +23,6 @@ public:
 
 private:
     void handleResize(int width, int height);
-    void handleKey(int key, bool pressed);
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
 
@@ -31,4 +30,10 @@ private:
 
     float m_viewWidth;
     float m_viewHeight;
+
+    struct {
+        float x;
+        float y;
+    } m_cursorPos;
+    bool m_mouseDown; // TODO: check how clay handles different mouse buttons
 };

@@ -30,10 +30,8 @@ ClayWrapper::ClayWrapper(float screenWidth, float screenHeight)
 
 ClayRenderData ClayWrapper::buildTestUi()
 {
-    const Clay_Color COLOR_RED = (Clay_Color) { 168, 66, 28, 255 };
-    const Clay_Color COLOR_LIGHT = (Clay_Color) { 224, 215, 210, 255 };
-
     Clay_SetLayoutDimensions((Clay_Dimensions) { m_viewWidth, m_viewHeight });
+    Clay_SetPointerState((Clay_Vector2) { m_cursorPos.x, m_cursorPos.y }, m_mouseDown);
 
     Clay_BeginLayout();
     // clang-format off
@@ -58,9 +56,6 @@ void ClayWrapper::subscribe(EventManager& eventManager)
     eventManager.addResizeListener([this](int width, int height) {
         handleResize(width, height);
     });
-    eventManager.addKeyListener([this](int key, bool pressed) {
-        handleKey(key, pressed);
-    });
     eventManager.addMouseButtonListener([this](int key, bool pressed) {
         handleMouseButton(key, pressed);
     });
@@ -75,14 +70,13 @@ void ClayWrapper::handleResize(int width, int height)
     m_viewHeight = height;
 }
 
-void ClayWrapper::handleKey(int key, bool pressed)
+void ClayWrapper::handleMouseButton(int /*key*/, bool pressed)
 {
-}
-
-void ClayWrapper::handleMouseButton(int key, bool pressed)
-{
+    m_mouseDown = pressed;
 }
 
 void ClayWrapper::handleCursorPos(double xpos, double ypos)
 {
+    m_cursorPos.x = xpos;
+    m_cursorPos.y = ypos;
 }

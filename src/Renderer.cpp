@@ -30,7 +30,6 @@ void messageCallback(GLenum /*unused*/, GLenum type, GLuint /*unused*/,
 } // namespace
 
 Renderer::Renderer()
-    : m_clayWrapper(800, 600) // TODO: temp
 {
     // opengl initialization
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
@@ -185,9 +184,12 @@ void Renderer::renderSkybox(
     glDepthFunc(GL_LESS);
 }
 
-void Renderer::renderClayUi(Clay_RenderCommandArray& renderCommands)
+void Renderer::renderClayUi(ClayRenderData& renderData)
 {
     glDepthFunc(GL_ALWAYS);
+
+    auto& [renderCommands, viewWidth, viewHeight] = renderData;
+    m_orthoProjection = glm::ortho(0.0f, viewWidth, 0.0f, viewHeight);
 
     for (int i = 0; i < renderCommands.length; i++) {
         Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);
@@ -207,8 +209,7 @@ void Renderer::renderClayUi(Clay_RenderCommandArray& renderCommands)
     glDepthFunc(GL_LESS);
 }
 
-void Renderer::renderRectangle(
-    float x, float y, float width, float height, glm::vec3 color)
+void Renderer::renderRectangle(float x, float y, float width, float height, glm::vec3 color)
 {
     const Shader& shader = ResourceManager::instance().getShader("color");
     shader.use();

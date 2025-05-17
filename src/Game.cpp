@@ -1,6 +1,7 @@
 #include "Game.hpp"
 
 #include "Camera.hpp"
+#include "ClayWrapper.hpp"
 #include "Entity.hpp"
 #include "InputManager.hpp"
 #include "RNG.hpp"
@@ -36,6 +37,7 @@ Game::Game()
     // set up subscribers to events (resize, mouse move, etc)
     m_inputManager.subscribe(m_eventManager);
     m_window.subscribe(m_eventManager);
+    m_clayWrapper.subscribe(m_eventManager);
 
     // set/create globals
     RNG::init();
@@ -204,7 +206,7 @@ void Game::render()
 
     m_renderer.renderScene(scene);
 
-    Clay_RenderCommandArray testUi = m_clayWrapper.buildTestUi();
+    ClayRenderData testUi = m_clayWrapper.buildTestUi();
     m_renderer.renderClayUi(testUi);
     Text t(ResourceManager::instance().getFont("liberation"), "Hello World");
     m_renderer.renderText(t, 0, 0, 1);

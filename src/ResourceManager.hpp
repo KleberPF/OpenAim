@@ -13,6 +13,14 @@
 #include <string>
 #include <vector>
 
+using FontId = unsigned int;
+
+// fonts
+enum Fonts : uint8_t {
+    LIBERATION = 0,
+    FONT_COUNT
+};
+
 class ResourceManager {
 public:
     static void init();
@@ -26,7 +34,7 @@ public:
     const Model& getModel(const std::string& name);
     Material& getMaterial(const std::string& name);
     const std::vector<Sound>& getAllSounds() const;
-    const Font& getFont(const std::string& name);
+    const Font& getFont(FontId id);
 
 private:
     ResourceManager();
@@ -37,7 +45,7 @@ private:
     void addModel(const std::string& name, const std::string& path);
     void addMaterial(const std::string& name);
     void addSound(const std::string& name, const std::string& path);
-    void addFont(const std::string& name, const char* path);
+    void addFont(FontId id, Font font);
 
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
@@ -47,5 +55,6 @@ private:
     std::map<std::string, Model> m_models;
     std::map<std::string, Material> m_materials;
     std::vector<Sound> m_sounds;
-    std::map<std::string, Font> m_fonts;
+
+    std::map<FontId, Font> m_fonts;
 };

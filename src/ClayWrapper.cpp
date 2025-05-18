@@ -21,7 +21,7 @@ void handleClayErrors(Clay_ErrorData errorData)
 Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* /* config */, void* /* userData */)
 {
     // TODO: kinda ignore config for now, use hardcoded font
-    Text t(&ResourceManager::instance().getFont("liberation"), std::string(text.chars, text.length).c_str());
+    Text t(&ResourceManager::instance().getFont(LIBERATION), std::string(text.chars, text.length).c_str());
     return (Clay_Dimensions) {
         .width = static_cast<float>(t.width()),
         .height = static_cast<float>(t.height())

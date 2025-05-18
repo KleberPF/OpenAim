@@ -9,7 +9,13 @@
 
 class Texture {
 public:
-    enum class Type { Diffuse, Specular, Normal, Height, Last };
+    enum class Type : uint8_t {
+        Diffuse,
+        Specular,
+        Normal,
+        Height,
+        Last
+    };
 
     Texture(const std::string& path, Texture::Type type);
     Texture(GLenum format, int width, int height, void* data, Texture::Type type);

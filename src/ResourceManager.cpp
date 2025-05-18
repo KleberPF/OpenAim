@@ -40,7 +40,7 @@ ResourceManager::ResourceManager()
     addShader("text", "./resources/shaders/text.vert", "./resources/shaders/text.frag");
 
     // fonts
-    addFont("liberation", "./resources/fonts/LiberationSans-Regular.ttf");
+    addFont(LIBERATION, Font("./resources/fonts/LiberationSans-Regular.ttf"));
 
     // cubemaps
     addCubemap("skybox", { "./resources/textures/skybox/right.bmp", "./resources/textures/skybox/left.bmp", "./resources/textures/skybox/top.bmp", "./resources/textures/skybox/bottom.bmp", "./resources/textures/skybox/front.bmp", "./resources/textures/skybox/back.bmp" });
@@ -142,12 +142,12 @@ const std::vector<Sound>& ResourceManager::getAllSounds() const
     return m_sounds;
 }
 
-void ResourceManager::addFont(const std::string& name, const char* path)
+void ResourceManager::addFont(FontId id, Font font)
 {
-    m_fonts.insert({ name, Font(path) });
+    m_fonts.insert({ id, std::move(font) });
 }
 
-const Font& ResourceManager::getFont(const std::string& name)
+const Font& ResourceManager::getFont(FontId id)
 {
-    return m_fonts.at(name);
+    return m_fonts.at(id);
 }

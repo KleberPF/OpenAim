@@ -52,10 +52,31 @@ ClayRenderData ClayWrapper::buildTestUi()
     // clang-format off
     CLAY({
         .id = CLAY_ID("OuterContainer"),
-        .layout = { .sizing = {.width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_FIXED(48)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
-        .backgroundColor = { 255, 0, 0, 255 } })
+        .layout = {
+            .sizing = {.width = CLAY_SIZING_GROW(800), .height = CLAY_SIZING_GROW(600)},
+            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+            .childAlignment = {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_TOP
+            }
+        },
+    })
     {
-        CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 24 }));
+        CLAY({
+            .id = CLAY_ID("InnerContainer"),
+            .layout = {
+                .sizing = {.width = CLAY_SIZING_PERCENT(0.3), .height = CLAY_SIZING_PERCENT(0.4)},
+                .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                .childAlignment = {
+                    .x = CLAY_ALIGN_X_CENTER,
+                    .y = CLAY_ALIGN_Y_TOP
+                }
+            },
+            .backgroundColor = {255.0f, 0.0f, 0.0f, 255.0f}
+        })
+        {
+            CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 24 }));
+        }
     }
     // clang-format on
 

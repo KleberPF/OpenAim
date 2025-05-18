@@ -189,7 +189,7 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
     glDepthFunc(GL_ALWAYS);
 
     auto& [renderCommands, viewWidth, viewHeight] = renderData;
-    m_orthoProjection = glm::ortho(0.0f, viewWidth, 0.0f, viewHeight);
+    m_orthoProjection = glm::ortho(0.0f, viewWidth, viewHeight, 0.0f);
 
     for (int i = 0; i < renderCommands.length; i++) {
         Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);

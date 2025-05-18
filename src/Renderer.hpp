@@ -35,14 +35,15 @@ private:
         float x, float y, float width, float height, glm::vec3 color);
 
     // clang-format off
-    std::array<float, 24> m_rectangleVertices = {
-        // pos      tex
-        0.0f, 0.0f, 0.0f, 0.0f,
-        1.0f, 0.0f, 1.0f, 0.0f,
+    std::array<float, 24> m_rectangleVertices = { 
+        // pos      // tex
         0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 0.0f, 1.0f, 0.0f,
+        0.0f, 0.0f, 0.0f, 0.0f, 
+    
+        0.0f, 1.0f, 0.0f, 1.0f,
         1.0f, 1.0f, 1.0f, 1.0f,
-        0.0f, 1.0f, 0.0f, 1.0f,
+        1.0f, 0.0f, 1.0f, 0.0f
     };
 
     std::array<float, 108> m_skyboxVertices = {      

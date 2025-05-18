@@ -46,7 +46,7 @@ void TextRenderable::createRenderData()
         const Glyph& g = m_text.m_font->getGlyph(c, m_text.m_fontSize);
 
         float xpos = width + g.bearing.x;
-        float ypos = m_text.m_height + g.bearing.y - g.size.y;
+        float ypos = m_text.m_height - g.bearing.y;
 
         float w = g.size.x;
         float h = g.size.y;
@@ -56,12 +56,12 @@ void TextRenderable::createRenderData()
 
         // clang-format off
         m_vertices.insert(m_vertices.end(), {
-            {.position = {xpos    , ypos    }, .texCoords = {texBottomLeft.x, texBottomLeft.y}},
-            {.position = {xpos + w, ypos    }, .texCoords = {texTopRight.x  , texBottomLeft.y}},
-            {.position = {xpos    , ypos - h}, .texCoords = {texBottomLeft.x, texTopRight.y  }},
-            {.position = {xpos + w, ypos    }, .texCoords = {texTopRight.x  , texBottomLeft.y}},
-            {.position = {xpos + w, ypos - h}, .texCoords = {texTopRight.x  , texTopRight.y  }},
-            {.position = {xpos    , ypos - h}, .texCoords = {texBottomLeft.x, texTopRight.y  }},
+            {.position = {xpos    , ypos + h}, .texCoords = {texBottomLeft.x, texBottomLeft.y}},
+            {.position = {xpos + w, ypos    }, .texCoords = {texTopRight.x  , texTopRight.y  }},
+            {.position = {xpos    , ypos    }, .texCoords = {texBottomLeft.x, texTopRight.y  }},
+            {.position = {xpos    , ypos + h}, .texCoords = {texBottomLeft.x, texBottomLeft.y}},
+            {.position = {xpos + w, ypos + h}, .texCoords = {texTopRight.x  , texBottomLeft.y}},
+            {.position = {xpos + w, ypos    }, .texCoords = {texTopRight.x  , texTopRight.y  }},
         });
         // clang-format on
 

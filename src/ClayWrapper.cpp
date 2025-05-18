@@ -57,7 +57,7 @@ ClayRenderData ClayWrapper::buildTestUi()
             .padding = CLAY_PADDING_ALL(16), .childGap = 16,
             .childAlignment = {
                 .x = CLAY_ALIGN_X_CENTER,
-                .y = CLAY_ALIGN_Y_TOP
+                .y = CLAY_ALIGN_Y_CENTER
             }
         },
     })

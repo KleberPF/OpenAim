@@ -224,14 +224,14 @@ void Renderer::renderRectangle(float x, float y, float width, float height, glm:
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Renderer::renderText(const Text& text, float x, float y, float scale) const
+void Renderer::renderText(const TextRenderable& renderable, float x, float y, float scale) const
 {
     glDepthFunc(GL_ALWAYS);
 
-    RenderData data = text.getRenderData();
+    RenderData data = renderable.getRenderData();
     const Shader& shader = ResourceManager::instance().getShader("text");
     shader.use();
-    shader.setVec3("textColor", text.color.toOpenGLFormat());
+    shader.setVec3("textColor", renderable.text().color.toOpenGLFormat());
 
     glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
     model = glm::scale(model, glm::vec3(scale, scale, 0));

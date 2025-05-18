@@ -41,7 +41,8 @@ Checks: "-*,
   -modernize-avoid-c-arrays,
   -bugprone-narrowing-conversions,
   -readability-math-missing-parentheses,
-  -cppcoreguidelines-special-member-functions
+  -cppcoreguidelines-special-member-functions,
+  -performance-no-int-to-ptr
   "
 CheckOptions:
   - key: readability-identifier-naming.ClassCase

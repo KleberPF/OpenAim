@@ -11,6 +11,7 @@
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "Text.hpp"
+#include "TextRenderable.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 #include "utils.hpp"
@@ -208,8 +209,9 @@ void Game::render()
 
     ClayRenderData testUi = m_clayWrapper.buildTestUi();
     m_renderer.renderClayUi(testUi);
-    Text t(ResourceManager::instance().getFont("liberation"), "Hello World");
-    m_renderer.renderText(t, 0, 0, 1);
+    Text t(&ResourceManager::instance().getFont("liberation"), "Hello World");
+    TextRenderable tr(t);
+    m_renderer.renderText(tr, 0, 0, 1);
 }
 
 void Game::mainLoopEnd()

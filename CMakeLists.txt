@@ -34,6 +34,7 @@ set(SOURCES
     src/Font.cpp
     src/Text.cpp
     src/EventManager.cpp
+    src/TextRenderable.cpp
     # Add more source files here as needed
 )
 
@@ -115,7 +116,7 @@ target_link_libraries(${PROJECT_NAME}
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra)
+    target_compile_options(${PROJECT_NAME} PRIVATE)
 endif()
 
 # Optionally, set C++ standard

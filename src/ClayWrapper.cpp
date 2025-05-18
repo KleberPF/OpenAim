@@ -1,4 +1,7 @@
 #include "ClayWrapper.hpp"
+#include "ResourceManager.hpp"
+#include "Text.hpp"
+#include <string>
 
 #define CLAY_IMPLEMENTATION
 #include "clay.h"
@@ -11,6 +14,15 @@ void handleClayErrors(Clay_ErrorData errorData)
 {
     // See the Clay_ErrorData struct for more information
     std::cout << errorData.errorText.chars << '\n';
+}
+
+Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* /* config */, void* /* userData */) {
+    // TODO: kinda ignore config for now, use hardcoded font
+    Text t(&ResourceManager::instance().getFont("liberation"), std::string(text.chars, text.length).c_str());
+    return (Clay_Dimensions) {
+            .width = static_cast<float>(t.width()),
+            .height = static_cast<float>(t.height())
+    };
 }
 
 } // namespace
@@ -26,6 +38,7 @@ ClayWrapper::ClayWrapper(float screenWidth, float screenHeight)
 
     Clay_Initialize(arena, (Clay_Dimensions) { screenWidth, screenHeight },
         (Clay_ErrorHandler) { handleClayErrors, nullptr });
+    Clay_SetMeasureTextFunction(measureText, nullptr);
 }
 
 ClayRenderData ClayWrapper::buildTestUi()

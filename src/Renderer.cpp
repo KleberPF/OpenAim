@@ -201,6 +201,11 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
             Clay_Color color = config.backgroundColor;
             renderRectangle(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, normalizeRGBColor({ color.r, color.g, color.b }));
         } break;
+        case CLAY_RENDER_COMMAND_TYPE_TEXT: {
+            Clay_TextRenderData *textData = &renderCommand->renderData.text;
+            Text t(&ResourceManager::instance().getFont("liberation"), std::string(textData->stringContents.chars, textData->stringContents.length).c_str());
+            renderText(t, boundingBox.x, boundingBox.y, 1.0);
+        } break;
         default:
             std::cout << "Render command type not supported: " << renderCommand->commandType;
         }

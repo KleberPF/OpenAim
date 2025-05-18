@@ -1,6 +1,8 @@
 #include "ClayWrapper.hpp"
+
 #include "ResourceManager.hpp"
 #include "Text.hpp"
+
 #include <string>
 
 #define CLAY_IMPLEMENTATION
@@ -16,12 +18,13 @@ void handleClayErrors(Clay_ErrorData errorData)
     std::cout << errorData.errorText.chars << '\n';
 }
 
-Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* /* config */, void* /* userData */) {
+Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* /* config */, void* /* userData */)
+{
     // TODO: kinda ignore config for now, use hardcoded font
     Text t(&ResourceManager::instance().getFont("liberation"), std::string(text.chars, text.length).c_str());
     return (Clay_Dimensions) {
-            .width = static_cast<float>(t.width()),
-            .height = static_cast<float>(t.height())
+        .width = static_cast<float>(t.width()),
+        .height = static_cast<float>(t.height())
     };
 }
 
@@ -51,8 +54,9 @@ ClayRenderData ClayWrapper::buildTestUi()
     CLAY({
         .id = CLAY_ID("OuterContainer"),
         .layout = { .sizing = {.width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_FIXED(48)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
-        .backgroundColor = {255, 0, 0, 255} })
+        .backgroundColor = { 255, 0, 0, 255 } })
     {
+        CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontSize = 24 }));
     }
     // clang-format on
 

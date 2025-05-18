@@ -7,7 +7,7 @@
 
 class Text {
 public:
-    Text(const Font* font, const char* text);
+    Text(const Font* font, const char* text, int fontSize);
 
     void setFont(const Font* font);
     void setText(const std::string& text);
@@ -24,6 +24,7 @@ private:
     int m_width = 0;
     // this is the height of the tallest letter
     int m_height = 0;
+    int m_fontSize;
     std::string m_contents;
     const Font* m_font;
 

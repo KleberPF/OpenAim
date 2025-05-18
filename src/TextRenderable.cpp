@@ -33,7 +33,7 @@ RenderData TextRenderable::getRenderData() const
     return {
         .vao = m_vao,
         .vertexCount = m_vertices.size(),
-        .texture = m_text.m_font->texture()
+        .texture = m_text.m_font->texture(m_text.m_fontSize)
     };
 }
 
@@ -43,7 +43,7 @@ void TextRenderable::createRenderData()
     int width = 0;
 
     for (auto c : m_text.contents()) {
-        const Glyph& g = m_text.m_font->getGlyph(c);
+        const Glyph& g = m_text.m_font->getGlyph(c, m_text.m_fontSize);
 
         float xpos = width + g.bearing.x;
         float ypos = g.bearing.y - g.size.y;

@@ -202,9 +202,9 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
             renderRectangle(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, normalizeRGBColor({ color.r, color.g, color.b }));
         } break;
         case CLAY_RENDER_COMMAND_TYPE_TEXT: {
-            Clay_TextRenderData *textData = &renderCommand->renderData.text;
-            Text t(&ResourceManager::instance().getFont(LIBERATION), std::string(textData->stringContents.chars, textData->stringContents.length).c_str());
-            renderText(t, boundingBox.x, boundingBox.y, 1.0);
+            Clay_TextRenderData* textData = &renderCommand->renderData.text;
+            Text t(&ResourceManager::instance().getFont(textData->fontId), std::string(textData->stringContents.chars, textData->stringContents.length).c_str(), textData->fontSize);
+            renderText(t, boundingBox.x, boundingBox.y);
         } break;
         default:
             std::cout << "Render command type not supported: " << renderCommand->commandType;
@@ -229,7 +229,7 @@ void Renderer::renderRectangle(float x, float y, float width, float height, glm:
     glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void Renderer::renderText(const TextRenderable& renderable, float x, float y, float scale) const
+void Renderer::renderText(const TextRenderable& renderable, float x, float y) const
 {
     glDepthFunc(GL_ALWAYS);
 
@@ -239,7 +239,6 @@ void Renderer::renderText(const TextRenderable& renderable, float x, float y, fl
     shader.setVec3("textColor", renderable.text().color.toOpenGLFormat());
 
     glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
-    model = glm::scale(model, glm::vec3(scale, scale, 0));
 
     shader.setMat4("mvp", m_orthoProjection * model);
 

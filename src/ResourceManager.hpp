@@ -34,7 +34,7 @@ public:
     const Model& getModel(const std::string& name);
     Material& getMaterial(const std::string& name);
     const std::vector<Sound>& getAllSounds() const;
-    const Font& getFont(FontId id);
+    Font& getFont(FontId id);
 
 private:
     ResourceManager();

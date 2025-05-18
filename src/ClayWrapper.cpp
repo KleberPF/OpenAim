@@ -18,10 +18,9 @@ void handleClayErrors(Clay_ErrorData errorData)
     std::cout << errorData.errorText.chars << '\n';
 }
 
-Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* /* config */, void* /* userData */)
+Clay_Dimensions measureText(Clay_StringSlice text, Clay_TextElementConfig* config, void* /* userData */)
 {
-    // TODO: kinda ignore config for now, use hardcoded font
-    Text t(&ResourceManager::instance().getFont(LIBERATION), std::string(text.chars, text.length).c_str());
+    Text t(&ResourceManager::instance().getFont(config->fontId), std::string(text.chars, text.length).c_str(), config->fontSize);
     return (Clay_Dimensions) {
         .width = static_cast<float>(t.width()),
         .height = static_cast<float>(t.height())
@@ -56,7 +55,7 @@ ClayRenderData ClayWrapper::buildTestUi()
         .layout = { .sizing = {.width = CLAY_SIZING_FIXED(300), .height = CLAY_SIZING_FIXED(48)}, .padding = CLAY_PADDING_ALL(16), .childGap = 16 },
         .backgroundColor = { 255, 0, 0, 255 } })
     {
-        CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontSize = 24 }));
+        CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 24 }));
     }
     // clang-format on
 

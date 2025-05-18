@@ -4,8 +4,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Text::Text(const Font* font, const char* text = "")
-    : m_contents(text)
+Text::Text(const Font* font, const char* text, int fontSize)
+    : m_fontSize(fontSize)
+    , m_contents(text)
     , m_font(font)
 {
     setText(text);
@@ -21,7 +22,7 @@ void Text::setText(const std::string& text)
     m_width = 0;
 
     for (auto c : text) {
-        const Glyph& g = m_font->getGlyph(c);
+        const Glyph& g = m_font->getGlyph(c, m_fontSize);
         m_height = std::max<float>(g.size.y, m_height);
         m_width += g.advance;
     }

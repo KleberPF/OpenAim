@@ -2,32 +2,51 @@
 
 #include "Material.hpp"
 
-#include <ft2build.h>
-// freetype.h has to be included after
-#include <freetype/freetype.h>
-
 // #define STB_IMAGE_WRITE_IMPLEMENTATION
 // #include <stb_image_write.h>
 
 #include <array>
-#include <memory>
 
 constexpr size_t ATLAS_SIZE = 512; // pixels
 constexpr int GLYPHS_PER_LINE = 15;
 
 Font::Font(const char* path)
 {
-    FT_Library ft;
-    if (FT_Init_FreeType(&ft)) {
+    if (FT_Init_FreeType(&m_ft)) {
         exit(-1);
     }
 
-    FT_Face face;
-    if (FT_New_Face(ft, path, 0, &face)) {
+    if (FT_New_Face(m_ft, path, 0, &m_face)) {
         exit(-1);
     }
 
-    FT_Set_Pixel_Sizes(face, 0, 48);
+    generateGlyphsForFontSize(MAX_FONT_SIZE);
+}
+
+glm::vec2 Font::toAtlasCoords(const glm::ivec2& coord)
+{
+    return { (float)coord.x / ATLAS_SIZE, 1 - (float)coord.y / ATLAS_SIZE };
+}
+
+const Glyph& Font::getGlyph(char c, int fontSize) const
+{
+    return m_glyphMap.at(fontSize).glyphs[c];
+}
+
+const Texture* Font::texture(int fontSize) const
+{
+    return m_glyphMap.at(fontSize).texture.get();
+}
+
+Font& Font::generateGlyphsForFontSize(int fontSize)
+{
+    if (m_glyphMap.contains(fontSize)) {
+        return *this;
+    }
+
+    FontSizeData& data = m_glyphMap[fontSize];
+
+    FT_Set_Pixel_Sizes(m_face, 0, fontSize);
 
     int xoffset = 0;
     int yoffset = 0;
@@ -36,16 +55,16 @@ Font::Font(const char* path)
     for (int i = 0; i < 95; i++) {
         unsigned char c = ' ' + i;
 
-        if (FT_Load_Char(face, c, FT_LOAD_RENDER)) {
+        if (FT_Load_Char(m_face, c, FT_LOAD_RENDER)) {
             continue;
         }
 
         if (i != 0 && i % GLYPHS_PER_LINE == 0) {
-            yoffset += ((face->size->metrics.height >> 6) + 1);
+            yoffset += ((m_face->size->metrics.height >> 6) + 1);
             xoffset = 0;
         }
 
-        FT_Bitmap* bmp = &face->glyph->bitmap;
+        FT_Bitmap* bmp = &m_face->glyph->bitmap;
 
         for (unsigned int row = 0; row < bmp->rows; row++) {
             for (unsigned int col = 0; col < bmp->width; col++) {
@@ -57,37 +76,18 @@ Font::Font(const char* path)
             }
         }
 
-        m_glyphs[c] = {
+        data.glyphs[c] = {
             .topLeft = { xoffset, yoffset },
             .size = { bmp->width, bmp->rows },
-            .bearing = { face->glyph->bitmap_left, face->glyph->bitmap_top },
-            .advance = face->glyph->advance.x >> 6
+            .bearing = { m_face->glyph->bitmap_left, m_face->glyph->bitmap_top },
+            .advance = m_face->glyph->advance.x >> 6
         };
 
         xoffset += bmp->width + 1;
     }
 
-    m_texture = std::make_unique<Texture>(GL_RED, ATLAS_SIZE, ATLAS_SIZE, atlas.data(), Texture::Type::Diffuse);
-
+    data.texture = std::make_unique<Texture>(GL_RED, ATLAS_SIZE, ATLAS_SIZE, atlas.data(), Texture::Type::Diffuse);
     // stbi_write_png("output.png", ATLAS_SIZE, ATLAS_SIZE, 1, atlas.data(), ATLAS_SIZE);
-}
 
-glm::vec2 Font::toAtlasCoords(const glm::ivec2& coord)
-{
-    return { (float)coord.x / ATLAS_SIZE, 1 - (float)coord.y / ATLAS_SIZE };
-}
-
-const Glyph& Font::getGlyph(char c) const
-{
-    return m_glyphs[c];
-}
-
-void Font::use() const
-{
-    m_texture->bind();
-}
-
-const Texture* Font::texture() const
-{
-    return m_texture.get();
+    return *this;
 }

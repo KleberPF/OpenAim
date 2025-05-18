@@ -18,7 +18,7 @@ public:
 
     void renderScene(const Scene& scene);
     void renderClayUi(ClayRenderData& renderData);
-    void renderText(const TextRenderable& renderable, float x, float y, float scale) const;
+    void renderText(const TextRenderable& renderable, float x, float y) const;
 
 private:
     // Should probably change this later, having to always pass the scene

@@ -42,6 +42,11 @@ ResourceManager::ResourceManager()
     // fonts
     addFont(LIBERATION, Font("./resources/fonts/LiberationSans-Regular.ttf"));
 
+    getFont(LIBERATION)
+        .generateGlyphsForFontSize(12)
+        .generateGlyphsForFontSize(24)
+        .generateGlyphsForFontSize(36);
+
     // cubemaps
     addCubemap("skybox", { "./resources/textures/skybox/right.bmp", "./resources/textures/skybox/left.bmp", "./resources/textures/skybox/top.bmp", "./resources/textures/skybox/bottom.bmp", "./resources/textures/skybox/front.bmp", "./resources/textures/skybox/back.bmp" });
 
@@ -147,7 +152,7 @@ void ResourceManager::addFont(FontId id, Font font)
     m_fonts.insert({ id, std::move(font) });
 }
 
-const Font& ResourceManager::getFont(FontId id)
+Font& ResourceManager::getFont(FontId id)
 {
     return m_fonts.at(id);
 }

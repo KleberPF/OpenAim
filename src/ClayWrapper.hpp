@@ -5,6 +5,7 @@
 #include <clay.h>
 
 #include <cstdint>
+#include <map>
 #include <vector>
 
 struct ClayRenderData {
@@ -13,11 +14,15 @@ struct ClayRenderData {
     float viewHeight;
 };
 
+struct ClayElementState {
+    bool clicked = false;
+    bool wasPressedLastFrame = false;
+};
+
 class ClayWrapper {
 public:
     ClayWrapper(float screenWidth, float screenHeight);
 
-    ClayRenderData buildTestUi();
     ClayRenderData buildMainMenu();
 
     void subscribe(EventManager& eventManager);
@@ -27,9 +32,10 @@ private:
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
 
-    // Components
+    void scenarioButton(Clay_String id, Clay_String label);
 
     std::vector<uint8_t> m_clayBuffer;
+    std::map<uint32_t, ClayElementState> m_uiState;
 
     float m_viewWidth;
     float m_viewHeight;

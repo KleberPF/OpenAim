@@ -44,58 +44,17 @@ ClayWrapper::ClayWrapper(float screenWidth, float screenHeight)
     Clay_SetMeasureTextFunction(measureText, nullptr);
 }
 
-ClayRenderData ClayWrapper::buildTestUi()
-{
-    Clay_SetLayoutDimensions((Clay_Dimensions) { m_viewWidth, m_viewHeight });
-    Clay_SetPointerState((Clay_Vector2) { m_cursorPos.x, m_cursorPos.y }, m_mouseDown);
-
-    Clay_BeginLayout();
-    // clang-format off
-    CLAY({
-        .id = CLAY_ID("OuterContainer"),
-        .layout = {
-            .sizing = {.width = CLAY_SIZING_GROW(800), .height = CLAY_SIZING_GROW(600)},
-            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
-            .childAlignment = {
-                .x = CLAY_ALIGN_X_CENTER,
-                .y = CLAY_ALIGN_Y_CENTER
-            }
-        },
-    })
-    {
-        CLAY({
-            .id = CLAY_ID("InnerContainer"),
-            .layout = {
-                .sizing = {.width = CLAY_SIZING_PERCENT(0.3), .height = CLAY_SIZING_PERCENT(0.4)},
-                .padding = CLAY_PADDING_ALL(16), .childGap = 16,
-                .childAlignment = {
-                    .x = CLAY_ALIGN_X_CENTER,
-                    .y = CLAY_ALIGN_Y_TOP
-                }
-            },
-            .backgroundColor = {255.0f, 0.0f, 0.0f, 255.0f}
-        })
-        {
-            CLAY_TEXT(CLAY_STRING("Hello World"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 24 }));
-        }
-    }
-    // clang-format on
-
-    Clay_RenderCommandArray renderCommands = Clay_EndLayout();
-    return {
-        .renderCommands = renderCommands,
-        .viewWidth = m_viewWidth,
-        .viewHeight = m_viewHeight
-    };
-}
-
 ClayRenderData ClayWrapper::buildMainMenu()
 {
     Clay_SetLayoutDimensions((Clay_Dimensions) { m_viewWidth, m_viewHeight });
     Clay_SetPointerState((Clay_Vector2) { m_cursorPos.x, m_cursorPos.y }, m_mouseDown);
 
-    Clay_BeginLayout();
+    if (m_uiState[CLAY_ID("SwitchingButton").id].clicked || m_uiState[CLAY_ID("TrackingButton").id].clicked || m_uiState[CLAY_ID("ClickingButton").id].clicked) {
+        std::cout << "Clicked\n";
+    }
+
     // clang-format off
+    Clay_BeginLayout();
     CLAY({
         .id = CLAY_ID("ScreenContainer"),
         .layout = {
@@ -166,36 +125,9 @@ ClayRenderData ClayWrapper::buildMainMenu()
                     .backgroundColor = {40.0f, 40.0f, 40.0f, 255.0f},
                 })
                 {
-                    CLAY({
-                        .id = CLAY_ID("ClickingButton"),
-                        .layout = {
-                            .sizing = {.width =  CLAY_SIZING_PERCENT(0.4), .height = CLAY_SIZING_FIXED(25)},
-                            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
-                            .childAlignment = {
-                                .x = CLAY_ALIGN_X_CENTER,
-                                .y = CLAY_ALIGN_Y_CENTER
-                            },
-                        },
-                        .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
-                    })
-                    {
-                        CLAY_TEXT(CLAY_STRING("Clicking"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
-                    }
-                    CLAY({
-                        .id = CLAY_ID("TrackingButton"),
-                        .layout = {
-                            .sizing = {.width =  CLAY_SIZING_PERCENT(0.4), .height = CLAY_SIZING_FIXED(25)},
-                            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
-                            .childAlignment = {
-                                .x = CLAY_ALIGN_X_CENTER,
-                                .y = CLAY_ALIGN_Y_CENTER
-                            },
-                        },
-                        .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
-                    })
-                    {
-                        CLAY_TEXT(CLAY_STRING("Tracking"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
-                    }
+                    scenarioButton(CLAY_STRING("ClickingButton"), CLAY_STRING("Clicking"));
+                    scenarioButton(CLAY_STRING("TrackingButton"), CLAY_STRING("Tracking"));
+                    scenarioButton(CLAY_STRING("SwitchingButton"), CLAY_STRING("Switching"));
                 }
             }
         }
@@ -238,4 +170,39 @@ void ClayWrapper::handleCursorPos(double xpos, double ypos)
 {
     m_cursorPos.x = xpos;
     m_cursorPos.y = ypos;
+}
+
+void ClayWrapper::scenarioButton(Clay_String id, Clay_String label)
+{
+    // clang-format off
+    auto onHover = [](Clay_ElementId elemId, Clay_PointerData data, intptr_t userData) {
+        auto* self = (ClayWrapper*)(userData);
+        uint32_t id = elemId.id;
+
+        self->m_uiState[id].clicked = false;
+
+        if (self->m_uiState[id].wasPressedLastFrame && data.state == CLAY_POINTER_DATA_RELEASED_THIS_FRAME) {
+            self->m_uiState[id].clicked = true;
+        }
+
+        self->m_uiState[id].wasPressedLastFrame = data.state == CLAY_POINTER_DATA_PRESSED_THIS_FRAME || data.state == CLAY_POINTER_DATA_PRESSED;
+    };
+
+    CLAY({
+        .id = CLAY_SID(id),
+        .layout = {
+            .sizing = {.width =  CLAY_SIZING_PERCENT(0.4), .height = CLAY_SIZING_FIXED(25)},
+            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+            .childAlignment = {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_CENTER
+            },
+        },
+        .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
+    })
+    {
+        Clay_OnHover(onHover, (intptr_t)this);
+        CLAY_TEXT(label, CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
+    }
+    // clang-format on
 }

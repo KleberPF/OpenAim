@@ -27,6 +27,8 @@ private:
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
 
+    // Components
+
     std::vector<uint8_t> m_clayBuffer;
 
     float m_viewWidth;

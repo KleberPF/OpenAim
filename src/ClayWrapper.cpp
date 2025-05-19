@@ -3,6 +3,7 @@
 #include "ResourceManager.hpp"
 #include "Text.hpp"
 
+#include <cstdint>
 #include <string>
 
 #define CLAY_IMPLEMENTATION
@@ -140,16 +141,62 @@ ClayRenderData ClayWrapper::buildMainMenu()
                 .id = CLAY_ID("BodyContainer"),
                 .layout = {
                     .sizing = {.width =  CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
-                    .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                    .padding = CLAY_PADDING_ALL(16), .childGap = 4,
                     .childAlignment = {
                         .x = CLAY_ALIGN_X_CENTER,
                         .y = CLAY_ALIGN_Y_TOP
-                    }
+                    },
+                    .layoutDirection = CLAY_TOP_TO_BOTTOM
                 },
-                .backgroundColor = {40.0f, 40.0f, 40.0f, 255.0f}
+                .backgroundColor = {40.0f, 40.0f, 40.0f, 255.0f},
             })
             {
                 CLAY_TEXT(CLAY_STRING("Select the scenario:"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
+                CLAY({
+                    .id = CLAY_ID("ButtonContainer"),
+                    .layout = {
+                        .sizing = {.width =  CLAY_SIZING_GROW(0), .height = CLAY_SIZING_GROW(0)},
+                        .padding = CLAY_PADDING_ALL(16), .childGap = 4,
+                        .childAlignment = {
+                            .x = CLAY_ALIGN_X_CENTER,
+                            .y = CLAY_ALIGN_Y_TOP
+                        },
+                        .layoutDirection = CLAY_TOP_TO_BOTTOM
+                    },
+                    .backgroundColor = {40.0f, 40.0f, 40.0f, 255.0f},
+                })
+                {
+                    CLAY({
+                        .id = CLAY_ID("ClickingButton"),
+                        .layout = {
+                            .sizing = {.width =  CLAY_SIZING_PERCENT(0.4), .height = CLAY_SIZING_FIXED(25)},
+                            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                            .childAlignment = {
+                                .x = CLAY_ALIGN_X_CENTER,
+                                .y = CLAY_ALIGN_Y_CENTER
+                            },
+                        },
+                        .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
+                    })
+                    {
+                        CLAY_TEXT(CLAY_STRING("Clicking"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
+                    }
+                    CLAY({
+                        .id = CLAY_ID("TrackingButton"),
+                        .layout = {
+                            .sizing = {.width =  CLAY_SIZING_PERCENT(0.4), .height = CLAY_SIZING_FIXED(25)},
+                            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                            .childAlignment = {
+                                .x = CLAY_ALIGN_X_CENTER,
+                                .y = CLAY_ALIGN_Y_CENTER
+                            },
+                        },
+                        .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
+                    })
+                    {
+                        CLAY_TEXT(CLAY_STRING("Tracking"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 12 }));
+                    }
+                }
             }
         }
     }

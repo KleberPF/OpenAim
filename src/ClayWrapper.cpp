@@ -88,6 +88,80 @@ ClayRenderData ClayWrapper::buildTestUi()
     };
 }
 
+ClayRenderData ClayWrapper::buildMainMenu()
+{
+    Clay_SetLayoutDimensions((Clay_Dimensions) { m_viewWidth, m_viewHeight });
+    Clay_SetPointerState((Clay_Vector2) { m_cursorPos.x, m_cursorPos.y }, m_mouseDown);
+
+    Clay_BeginLayout();
+    // clang-format off
+    CLAY({
+        .id = CLAY_ID("ScreenContainer"),
+        .layout = {
+            .sizing = {.width = CLAY_SIZING_GROW(800), .height = CLAY_SIZING_GROW(600)},
+            .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+            .childAlignment = {
+                .x = CLAY_ALIGN_X_CENTER,
+                .y = CLAY_ALIGN_Y_CENTER
+            }
+        },
+    })
+    {
+        CLAY({
+            .id = CLAY_ID("MainContainer"),
+            .layout = {
+                .sizing = {.width = CLAY_SIZING_PERCENT(0.2), .height = CLAY_SIZING_PERCENT(0.4)},
+                .padding = CLAY_PADDING_ALL(4), .childGap = 16,
+                .childAlignment = {
+                    .x = CLAY_ALIGN_X_CENTER,
+                    .y = CLAY_ALIGN_Y_TOP
+                },
+                .layoutDirection = CLAY_TOP_TO_BOTTOM
+            },
+            .backgroundColor = {45.0f, 45.0f, 45.0f, 255.0f}
+        })
+        {
+            CLAY({
+                .id = CLAY_ID("TitleContainer"),
+                .layout = {
+                    .sizing = {.width = CLAY_SIZING_GROW(0), .height = CLAY_SIZING_FIXED(30)},
+                    .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                    .childAlignment = {
+                        .x = CLAY_ALIGN_X_CENTER,
+                        .y = CLAY_ALIGN_Y_CENTER
+                    }
+                },
+                .backgroundColor = {40.0f, 40.0f, 40.0f, 255.0f}
+            })
+            {
+                CLAY_TEXT(CLAY_STRING("OpenAim"), CLAY_TEXT_CONFIG({ .textColor = {255, 255, 255, 255}, .fontId = LIBERATION, .fontSize = 18 }));
+            }
+            CLAY({
+                .id = CLAY_ID("BodyContainer"),
+                .layout = {
+                    .sizing = {.width = CLAY_SIZING_FIXED(50), .height = CLAY_SIZING_FIXED(50)},
+                    .padding = CLAY_PADDING_ALL(16), .childGap = 16,
+                    .childAlignment = {
+                        .x = CLAY_ALIGN_X_CENTER,
+                        .y = CLAY_ALIGN_Y_TOP
+                    }
+                },
+                .backgroundColor = {255.0f, 0.0f, 0.0f, 255.0f}
+            })
+            {
+            }
+        }
+    }
+    // clang-format on
+
+    Clay_RenderCommandArray renderCommands = Clay_EndLayout();
+    return {
+        .renderCommands = renderCommands,
+        .viewWidth = m_viewWidth,
+        .viewHeight = m_viewHeight
+    };
+}
+
 void ClayWrapper::subscribe(EventManager& eventManager)
 {
     eventManager.addResizeListener([this](int width, int height) {

@@ -44,6 +44,7 @@ ResourceManager::ResourceManager()
 
     getFont(LIBERATION)
         .generateGlyphsForFontSize(12)
+        .generateGlyphsForFontSize(18)
         .generateGlyphsForFontSize(24)
         .generateGlyphsForFontSize(36);
 

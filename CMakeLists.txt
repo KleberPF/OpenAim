@@ -115,6 +115,8 @@ target_link_libraries(${PROJECT_NAME}
 
 if (MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_options(${PROJECT_NAME} PRIVATE -g)
 else()
     target_compile_options(${PROJECT_NAME} PRIVATE)
 endif()

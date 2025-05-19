@@ -197,15 +197,15 @@ void Game::updateShotEntities()
 
 void Game::render()
 {
-    Scene scene(m_camera, m_window.width, m_window.height);
-    scene.globalLightSource = m_globalLightSource;
-    scene.skybox = *m_skybox;
-    scene.entities = m_entityManager.entities();
-    scene.sprites = m_sprites;
+    // Scene scene(m_camera, m_window.width, m_window.height);
+    // scene.globalLightSource = m_globalLightSource;
+    // scene.skybox = *m_skybox;
+    // scene.entities = m_entityManager.entities();
+    // scene.sprites = m_sprites;
 
-    m_renderer.renderScene(scene);
+    // m_renderer.renderScene(scene);
 
-    ClayRenderData testUi = m_clayWrapper.buildTestUi();
+    ClayRenderData testUi = m_clayWrapper.buildMainMenu();
     m_renderer.renderClayUi(testUi);
     // Text t(&ResourceManager::instance().getFont(LIBERATION), "Hello World", 24);
     // TextRenderable tr(t);

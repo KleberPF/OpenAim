@@ -18,6 +18,7 @@ public:
     ClayWrapper(float screenWidth, float screenHeight);
 
     ClayRenderData buildTestUi();
+    ClayRenderData buildMainMenu();
 
     void subscribe(EventManager& eventManager);
 

@@ -4,6 +4,7 @@
 #include "Text.hpp"
 
 #include <cstdint>
+#include <optional>
 #include <string>
 
 #define CLAY_IMPLEMENTATION
@@ -44,13 +45,24 @@ ClayWrapper::ClayWrapper(float screenWidth, float screenHeight)
     Clay_SetMeasureTextFunction(measureText, nullptr);
 }
 
-ClayRenderData ClayWrapper::buildMainMenu()
+MenuData ClayWrapper::buildMainMenu()
 {
     Clay_SetLayoutDimensions((Clay_Dimensions) { m_viewWidth, m_viewHeight });
     Clay_SetPointerState((Clay_Vector2) { m_cursorPos.x, m_cursorPos.y }, m_mouseDown);
 
-    if (m_uiState[CLAY_ID("SwitchingButton").id].clicked || m_uiState[CLAY_ID("TrackingButton").id].clicked || m_uiState[CLAY_ID("ClickingButton").id].clicked) {
-        std::cout << "Clicked\n";
+    MenuData menuData = {
+        .renderData = {
+            .viewWidth = m_viewWidth,
+            .viewHeight = m_viewHeight },
+        .scenarioId = std::nullopt
+    };
+
+    if (m_uiState[CLAY_ID("ClickingButton").id].clicked) {
+        menuData.scenarioId = 0;
+    } else if (m_uiState[CLAY_ID("TrackingButton").id].clicked) {
+        menuData.scenarioId = 1;
+    } else if (m_uiState[CLAY_ID("SwitchingButton").id].clicked) {
+        menuData.scenarioId = 2;
     }
 
     // clang-format off
@@ -126,20 +138,17 @@ ClayRenderData ClayWrapper::buildMainMenu()
                 })
                 {
                     scenarioButton(CLAY_STRING("ClickingButton"), CLAY_STRING("Clicking"));
-                    scenarioButton(CLAY_STRING("TrackingButton"), CLAY_STRING("Tracking"));
                     scenarioButton(CLAY_STRING("SwitchingButton"), CLAY_STRING("Switching"));
+                    scenarioButton(CLAY_STRING("TrackingButton"), CLAY_STRING("Tracking"));
                 }
             }
         }
     }
     // clang-format on
 
-    Clay_RenderCommandArray renderCommands = Clay_EndLayout();
-    return {
-        .renderCommands = renderCommands,
-        .viewWidth = m_viewWidth,
-        .viewHeight = m_viewHeight
-    };
+    menuData.renderData.renderCommands = Clay_EndLayout();
+
+    return menuData;
 }
 
 void ClayWrapper::subscribe(EventManager& eventManager)

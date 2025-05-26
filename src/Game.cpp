@@ -59,7 +59,6 @@ Game::Game()
 
     buildPlayArea();
     parseScenariosFromFile("./resources/scenarios");
-    createScenario(0);
 }
 
 Game::~Game()
@@ -205,11 +204,15 @@ void Game::render()
 
     m_renderer.renderScene(scene);
 
-    ClayRenderData testUi = m_clayWrapper.buildMainMenu();
-    m_renderer.renderClayUi(testUi);
-    // Text t(&ResourceManager::instance().getFont(LIBERATION), "Hello World", 24);
-    // TextRenderable tr(t);
-    // m_renderer.renderText(tr, 0, 0);
+    if (m_state == State::Menu) {
+        auto [menuRenderData, scenarioId] = m_clayWrapper.buildMainMenu();
+        m_renderer.renderClayUi(menuRenderData);
+    
+        if (scenarioId.has_value()) {
+            createScenario(scenarioId.value());
+            changeState(Game::State::Running);
+        }
+    }
 }
 
 void Game::mainLoopEnd()

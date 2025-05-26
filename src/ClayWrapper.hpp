@@ -6,12 +6,18 @@
 
 #include <cstdint>
 #include <map>
+#include <optional>
 #include <vector>
 
 struct ClayRenderData {
     Clay_RenderCommandArray renderCommands;
     float viewWidth;
     float viewHeight;
+};
+
+struct MenuData {
+    ClayRenderData renderData;
+    std::optional<int> scenarioId;   
 };
 
 struct ClayElementState {
@@ -23,7 +29,7 @@ class ClayWrapper {
 public:
     ClayWrapper(float screenWidth, float screenHeight);
 
-    ClayRenderData buildMainMenu();
+    MenuData buildMainMenu();
 
     void subscribe(EventManager& eventManager);
 

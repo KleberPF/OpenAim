@@ -14,7 +14,6 @@
 #include "Window.hpp"
 #include "utils.hpp"
 
-#include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
@@ -33,15 +32,16 @@ Game::Game()
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
-    // set up subscribers to events (resize, mouse move, etc)
-    m_inputManager.subscribe(m_eventManager);
-    m_window.subscribe(m_eventManager);
-    m_clayWrapper.subscribe(m_eventManager);
-
     // set/create globals
     RNG::init();
     ResourceManager::init();
     SoundPlayer::init();
+    InputManager::init();
+
+    // set up subscribers to events (resize, mouse move, etc)
+    InputManager::instance().subscribe(m_eventManager);
+    m_window.subscribe(m_eventManager);
+    m_clayWrapper.subscribe(m_eventManager);
 
     Sprite crosshair(ResourceManager::instance().getShader("sprite"),
         ResourceManager::instance().getMaterial("crosshair"),
@@ -108,16 +108,16 @@ void Game::mainLoopBegin()
 void Game::processInput()
 {
     // high priority keys
-    if (m_inputManager.isKeyToggled(GLFW_KEY_F1)) {
+    if (InputManager::instance().isKeyJustPressed(Key::KEY_F1)) {
         glfwSetWindowShouldClose(m_window.ptr(), true);
         return;
     }
 
-    if (m_inputManager.isKeyToggled(GLFW_KEY_Y)) {
+    if (InputManager::instance().isKeyJustPressed(Key::KEY_Y)) {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     }
 
-    if (m_inputManager.isKeyToggled(GLFW_KEY_ESCAPE)) {
+    if (InputManager::instance().isKeyJustPressed(Key::KEY_ESCAPE)) {
         togglePaused();
     }
 
@@ -127,8 +127,8 @@ void Game::processInput()
     }
 
     // mouse input
-    if (m_inputManager.didCursorMove()) {
-        auto [xpos, ypos] = m_inputManager.getCursorPos();
+    if (InputManager::instance().didCursorMove()) {
+        auto [xpos, ypos] = InputManager::instance().getCursorPos();
 
         if (m_ignoreCursorMovement) {
             m_lastX = xpos;
@@ -137,8 +137,7 @@ void Game::processInput()
         }
 
         float xoffset = xpos - m_lastX;
-        float yoffset = m_lastY
-            - ypos; // reversed since y-coordinates go from bottom to top
+        float yoffset = m_lastY - ypos; // reversed since y-coordinates go from bottom to top
 
         m_lastX = xpos;
         m_lastY = ypos;
@@ -150,16 +149,16 @@ void Game::processInput()
 
     // camera keyboard processing
     // uncomment this to allow flying around
-    if (m_inputManager.isKeyPressed(GLFW_KEY_W)) {
+    if (InputManager::instance().isKeyPressed(Key::KEY_W)) {
         m_camera.processKeyboard(CameraMovement::FORWARD, m_deltaTime);
     }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_S)) {
+    if (InputManager::instance().isKeyPressed(Key::KEY_S)) {
         m_camera.processKeyboard(CameraMovement::BACKWARD, m_deltaTime);
     }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_A)) {
+    if (InputManager::instance().isKeyPressed(Key::KEY_A)) {
         m_camera.processKeyboard(CameraMovement::LEFT, m_deltaTime);
     }
-    if (m_inputManager.isKeyPressed(GLFW_KEY_D)) {
+    if (InputManager::instance().isKeyPressed(Key::KEY_D)) {
         m_camera.processKeyboard(CameraMovement::RIGHT, m_deltaTime);
     }
 }
@@ -176,12 +175,11 @@ void Game::updateEntities()
 
 void Game::updateShotEntities()
 {
-    if (!m_inputManager.isMouseButtonPressed(GLFW_MOUSE_BUTTON_LEFT)) {
+    if (!InputManager::instance().isMouseButtonPressed(MouseButton::BUTTON_LEFT)) {
         return;
     }
 
-    bool isHoldingMouseButton
-        = !m_inputManager.isMouseButtonToggled(GLFW_MOUSE_BUTTON_LEFT);
+    bool isHoldingMouseButton = !InputManager::instance().isMouseButtonJustPressed(MouseButton::BUTTON_LEFT);
     if (!m_weapon.tryShoot(glfwGetTime() * 1000, isHoldingMouseButton)) {
         return;
     }
@@ -207,7 +205,7 @@ void Game::render()
     if (m_state == State::Menu) {
         auto [menuRenderData, scenarioId] = m_clayWrapper.buildMainMenu();
         m_renderer.renderClayUi(menuRenderData);
-    
+
         if (scenarioId.has_value()) {
             createScenario(scenarioId.value());
             changeState(Game::State::Running);
@@ -217,7 +215,7 @@ void Game::render()
 
 void Game::mainLoopEnd()
 {
-    m_inputManager.consolidateKeyStates();
+    InputManager::instance().consolidateKeyStates();
     glfwPollEvents();
 
     if (!m_fpsCapped || m_timeNow - m_lastFrame >= 1 / m_fpsLimit) {

@@ -2,9 +2,53 @@
 
 #include <GLFW/glfw3.h>
 
-bool InputManager::isKeyPressed(const int key)
+#include <cassert>
+#include <memory>
+
+namespace {
+
+std::unique_ptr<InputManager> s_Instance = nullptr;
+
+} // end namespace
+
+void InputManager::init()
+{
+    if (s_Instance != nullptr) {
+        return;
+    }
+
+    s_Instance = std::unique_ptr<InputManager>(new InputManager);
+}
+
+void InputManager::shutdown()
+{
+    s_Instance.reset();
+}
+
+InputManager& InputManager::instance()
+{
+    assert(s_Instance);
+    return *s_Instance;
+}
+
+bool InputManager::isKeyPressed(Key::Value key)
 {
     return m_keys.at(key).current;
+}
+
+bool InputManager::isKeyJustPressed(Key::Value key)
+{
+    return m_keys.at(key).current && !m_keys.at(key).prev;
+}
+
+bool InputManager::isMouseButtonPressed(MouseButton::Value button)
+{
+    return m_mouseBtns.at(button).current;
+}
+
+bool InputManager::isMouseButtonJustPressed(MouseButton::Value button)
+{
+    return m_mouseBtns.at(button).current && !m_mouseBtns.at(button).prev;
 }
 
 bool InputManager::didCursorMove() const
@@ -12,22 +56,7 @@ bool InputManager::didCursorMove() const
     return m_cursorMoved;
 }
 
-bool InputManager::isKeyToggled(int key)
-{
-    return m_keys.at(key).current && !m_keys.at(key).prev;
-}
-
-bool InputManager::isMouseButtonPressed(int button)
-{
-    return m_mouseBtns.at(button).current;
-}
-
-bool InputManager::isMouseButtonToggled(int button)
-{
-    return m_mouseBtns.at(button).current && !m_mouseBtns.at(button).prev;
-}
-
-std::pair<float, float> InputManager::getCursorPos()
+CursorPos InputManager::getCursorPos()
 {
     // double xpos = 0;
     // double ypos = 0;
@@ -74,6 +103,6 @@ void InputManager::handleMouseButton(int key, bool pressed)
 void InputManager::handleCursorPos(double xpos, double ypos)
 {
     m_cursorMoved = true;
-    m_cursorPos.first = xpos;
-    m_cursorPos.second = ypos;
+    m_cursorPos.x = xpos;
+    m_cursorPos.y = ypos;
 }

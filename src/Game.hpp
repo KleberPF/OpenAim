@@ -4,7 +4,6 @@
 #include "ClayWrapper.hpp"
 #include "EntityManager.hpp"
 #include "EventManager.hpp"
-#include "InputManager.hpp"
 #include "Renderer.hpp"
 #include "Scenario.hpp"
 #include "Sprite.hpp"
@@ -60,7 +59,6 @@ private:
     EntityManager m_entityManager;
     std::vector<Sprite> m_sprites;
     Renderer m_renderer;
-    InputManager m_inputManager;
     LightSource m_globalLightSource;
     std::unique_ptr<Skybox> m_skybox;
     Weapon m_weapon;

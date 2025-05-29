@@ -2,8 +2,10 @@
 
 #include "Color.hpp"
 #include "Renderer.hpp"
+#include "TextRenderable.hpp"
 
 #include <functional>
+#include <memory>
 
 namespace UI {
 
@@ -21,6 +23,8 @@ public:
     void updateRect(float screenWidth, float screenHeight);
     void render(const Renderer& renderer) const;
 
+    void setText(const char* text);
+
     std::function<void(void)> onClick;
     std::function<void(void)> onMouseEnter;
     std::function<void(void)> onMouseLeave;
@@ -35,6 +39,9 @@ private:
     // We then use this rect to calculate the actual pixel rect and update it whenever the screen size changes
     Rect m_relativeRect;
     Rect m_rect;
+
+    // Ugly, but it's here so we don't have to recreate the text render data every frame
+    std::unique_ptr<TextRenderable> m_textRenderable = nullptr;
 
     friend class Screen;
 };

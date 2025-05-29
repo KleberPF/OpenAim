@@ -11,6 +11,7 @@
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "UI/Screen.hpp"
+#include "UI/ScreenBuilders.hpp"
 #include "UI/UIManager.hpp"
 #include "UI/Widget.hpp"
 #include "Weapon.hpp"
@@ -66,21 +67,7 @@ Game::Game()
     parseScenariosFromFile("./resources/scenarios");
 
     // Build UI (TODO: temp, move this)
-    UI::Screen* screen = m_uiManager.addScreen();
-    screen->active = true;
-
-    UI::Widget* widget = screen->addWidget({ .x = 0.333, .y = 0.1, .w = 0.333, .h = 0.5 });
-    widget->onClick = []() {
-        std::cout << "Clicked\n";
-    };
-
-    widget->onMouseEnter = []() {
-        std::cout << "Entered\n";
-    };
-
-    widget->onMouseLeave = []() {
-        std::cout << "Left\n";
-    };
+    buildMenuScreen(m_uiManager);
 }
 
 Game::~Game()

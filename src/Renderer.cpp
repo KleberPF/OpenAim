@@ -216,6 +216,8 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
 
 void Renderer::renderRectangle(float x, float y, float width, float height, glm::vec3 color) const
 {
+    glDepthFunc(GL_ALWAYS);
+
     const Shader& shader = ResourceManager::instance().getShader("color");
     shader.use();
     shader.setVec3("color", color);
@@ -227,10 +229,14 @@ void Renderer::renderRectangle(float x, float y, float width, float height, glm:
 
     glBindVertexArray(m_rectangleVao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
+
+    glDepthFunc(GL_LESS);
 }
 
 void Renderer::renderText(const TextRenderable& renderable, float x, float y) const
 {
+    glDepthFunc(GL_ALWAYS);
+
     RenderData data = renderable.getRenderData();
     const Shader& shader = ResourceManager::instance().getShader("text");
     shader.use();
@@ -245,6 +251,8 @@ void Renderer::renderText(const TextRenderable& renderable, float x, float y) co
     data.texture->bind();
 
     glDrawArrays(GL_TRIANGLES, 0, data.vertexCount);
+
+    glDepthFunc(GL_LESS);
 }
 
 void Renderer::renderScene(const Scene& scene)

@@ -38,6 +38,7 @@ set(SOURCES
     src/UI/UIManager.cpp
     src/UI/Screen.cpp
     src/UI/Widget.cpp
+    src/UI/ScreenBuilders.cpp
     # Add more source files here as needed
 )
 

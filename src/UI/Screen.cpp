@@ -26,7 +26,9 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
         if (m_clickedWidget == widget.get() && widget->onClick) {
             widget->onClick();
         }
+    }
 
+    if (!pressed) {
         m_clickedWidget = nullptr;
     }
 }

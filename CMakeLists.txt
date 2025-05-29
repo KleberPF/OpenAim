@@ -30,7 +30,6 @@ set(SOURCES
     src/SoundPlayer.cpp
     src/Sound.cpp
     src/EntityManager.cpp
-    src/ClayWrapper.cpp
     src/Font.cpp
     src/Text.cpp
     src/EventManager.cpp

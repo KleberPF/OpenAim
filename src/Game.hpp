@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Camera.hpp"
-#include "ClayWrapper.hpp"
 #include "EntityManager.hpp"
 #include "EventManager.hpp"
 #include "Renderer.hpp"
@@ -65,7 +64,6 @@ private:
     Weapon m_weapon;
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
-    ClayWrapper m_clayWrapper;
     UI::UIManager m_uiManager;
 
     // mouse input

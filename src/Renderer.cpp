@@ -4,7 +4,6 @@
 #include "Material.hpp"
 #include "ResourceManager.hpp"
 #include "Shader.hpp"
-#include "clay.h"
 #include "glad/glad.h"
 #include "utils.hpp"
 
@@ -181,36 +180,6 @@ void Renderer::renderSkybox(
     glActiveTexture(GL_TEXTURE0); // temp
     cubemap.bind();
     glDrawArrays(GL_TRIANGLES, 0, m_skyboxVertices.size() / 3);
-    glDepthFunc(GL_LESS);
-}
-
-void Renderer::renderClayUi(ClayRenderData& renderData)
-{
-    glDepthFunc(GL_ALWAYS);
-
-    auto& [renderCommands, viewWidth, viewHeight] = renderData;
-    orthoProjection = glm::ortho(0.0f, viewWidth, viewHeight, 0.0f);
-
-    for (int i = 0; i < renderCommands.length; i++) {
-        Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);
-        Clay_BoundingBox boundingBox = renderCommand->boundingBox;
-
-        switch (renderCommand->commandType) {
-        case CLAY_RENDER_COMMAND_TYPE_RECTANGLE: {
-            const Clay_RectangleRenderData& config = renderCommand->renderData.rectangle;
-            Clay_Color color = config.backgroundColor;
-            renderRectangle(boundingBox.x, boundingBox.y, boundingBox.width, boundingBox.height, normalizeRGBColor({ color.r, color.g, color.b }));
-        } break;
-        case CLAY_RENDER_COMMAND_TYPE_TEXT: {
-            Clay_TextRenderData* textData = &renderCommand->renderData.text;
-            Text t(&ResourceManager::instance().getFont(textData->fontId), std::string(textData->stringContents.chars, textData->stringContents.length).c_str(), textData->fontSize);
-            renderText(t, boundingBox.x, boundingBox.y);
-        } break;
-        default:
-            std::cout << "Render command type not supported: " << renderCommand->commandType;
-        }
-    }
-
     glDepthFunc(GL_LESS);
 }
 

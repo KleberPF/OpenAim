@@ -1,6 +1,5 @@
 #pragma once
 
-#include "ClayWrapper.hpp"
 #include "Material.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
@@ -17,7 +16,6 @@ public:
     ~Renderer();
 
     void renderScene(const Scene& scene);
-    void renderClayUi(ClayRenderData& renderData);
     void renderText(const TextRenderable& renderable, float x, float y) const;
 
     void renderRectangle(float x, float y, float width, float height, glm::vec3 color) const;
@@ -32,8 +30,6 @@ private:
     void renderSprite(const Scene& scene, const Sprite& sprite) const;
     void renderSkybox(
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
-
-    // primitives clay uses to render UI
 
     // clang-format off
     std::array<float, 24> m_rectangleVertices = { 

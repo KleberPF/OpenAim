@@ -1,6 +1,6 @@
 # OpenAim
 
-OpenAim is a small aim trainer made from scratch in C++, using OpenGL as the rendering backend.
+OpenAim is a small aim trainer made from scratch in C++, using OpenGL as the rendering backend. This branch is very much still WIP.
 
 ## Building on Linux
 

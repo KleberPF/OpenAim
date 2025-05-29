@@ -66,25 +66,21 @@ Game::Game()
     parseScenariosFromFile("./resources/scenarios");
 
     // Build UI (TODO: temp, move this)
-    UI::Screen screen;
-    screen.active = true;
+    UI::Screen* screen = m_uiManager.addScreen();
+    screen->active = true;
 
-    UI::Widget widget;
-    widget.rect = { .x = 100, .y = 100, .w = 200, .h = 200 };
-    widget.onClick = []() {
+    UI::Widget* widget = screen->addWidget({ .x = 0.333, .y = 0.1, .w = 0.333, .h = 0.5 });
+    widget->onClick = []() {
         std::cout << "Clicked\n";
     };
 
-    widget.onMouseEnter = []() {
+    widget->onMouseEnter = []() {
         std::cout << "Entered\n";
     };
 
-    widget.onMouseLeave = []() {
+    widget->onMouseLeave = []() {
         std::cout << "Left\n";
     };
-
-    screen.addWidget(widget);
-    m_uiManager.addScreen(screen);
 }
 
 Game::~Game()

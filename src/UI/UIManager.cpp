@@ -25,17 +25,21 @@ void UIManager::subscribe(EventManager& eventManager)
     });
 }
 
-void UIManager::addScreen(Screen screen)
+Screen* UIManager::addScreen()
 {
-    m_screens.push_back(std::move(screen));
+    auto* screen = new Screen(this);
+    auto ptr = std::unique_ptr<Screen>(screen);
+    m_screens.push_back(std::move(ptr));
+
+    return screen;
 }
 
 void UIManager::render(Renderer& renderer)
 {
     renderer.orthoProjection = glm::ortho(0.0f, m_viewWidth, m_viewHeight, 0.0f);
     for (auto& screen : m_screens) {
-        if (screen.active) {
-            screen.render(renderer);
+        if (screen->active) {
+            screen->render(renderer);
         }
     }
 }
@@ -44,13 +48,18 @@ void UIManager::handleResize(int width, int height)
 {
     m_viewWidth = width;
     m_viewHeight = height;
+
+    for (auto& screen : m_screens) {
+        screen->processResize(width, height);
+    }
 }
 
 void UIManager::handleMouseButton(int /*key*/, bool pressed)
 {
     for (auto& screen : m_screens) {
-        if (screen.active) {
-            screen.processClick(MouseButton::BUTTON_LEFT, pressed, m_cursorPos.x, m_cursorPos.y);
+        if (screen->active) {
+            // TODO: hardcoded LMB
+            screen->processClick(MouseButton::BUTTON_LEFT, pressed, m_cursorPos.x, m_cursorPos.y);
         }
     }
 }
@@ -61,20 +70,9 @@ void UIManager::handleCursorPos(double xpos, double ypos)
     m_cursorPos.y = ypos;
 
     for (auto& screen : m_screens) {
-        if (screen.active) {
-            screen.processMouseMove(xpos, ypos);
+        if (screen->active) {
+            screen->processMouseMove(xpos, ypos);
         }
     }
 }
 
-void UIManager::onFrame()
-{
-    bool clicked = InputManager::instance().isMouseButtonJustPressed(MouseButton::BUTTON_LEFT);
-
-    for (auto& screen : m_screens) {
-        if (screen.active) {
-            // pass down update
-            screen.onFrame(InputManager::instance().getCursorPos(), clicked);
-        }
-    }
-}

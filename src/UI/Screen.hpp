@@ -6,27 +6,34 @@
 #include "Renderer.hpp"
 #include "UI/Widget.hpp"
 
+#include <memory>
 #include <vector>
 
 namespace UI {
 
+class UIManager;
+
 class Screen {
 public:
-    void onFrame(const CursorPos& cursorPos, bool clicked);
     void processClick(MouseButton::Value button, bool pressed, double xpos, double ypos);
     void processMouseMove(double xpos, double ypos);
+    void processResize(float screenWidth, float screenHeight);
 
-    void addWidget(Widget widget);
+    Widget* addWidget(Rect relativeRect);
 
     void render(const Renderer& renderer);
 
     bool active;
 
 private:
+    Screen(UIManager* parent);
+
     Widget* m_clickedWidget = nullptr;
     Widget* m_hoveredWidget = nullptr;
 
-    std::vector<Widget> m_widgets;
+    std::vector<std::unique_ptr<Widget>> m_widgets;
+    UIManager* m_parent;
+    friend class UIManager;
 };
 
 } // namespace UI

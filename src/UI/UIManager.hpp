@@ -4,6 +4,7 @@
 #include "Renderer.hpp"
 #include "UI/Screen.hpp"
 
+#include <memory>
 #include <vector>
 
 namespace UI {
@@ -14,8 +15,7 @@ public:
 
     void subscribe(EventManager& eventManager);
 
-    void onFrame();
-    void addScreen(Screen screen);
+    Screen* addScreen();
 
     void render(Renderer& renderer);
 
@@ -32,7 +32,8 @@ private:
         float y;
     } m_cursorPos;
 
-    std::vector<Screen> m_screens;
+    std::vector<std::unique_ptr<Screen>> m_screens;
+    friend class Screen;
 };
 
 } // namespace UI

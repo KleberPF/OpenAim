@@ -20,8 +20,9 @@ public:
 
     void render(const Renderer& renderer) const;
 
-    std::function<void(void)> onHover;
     std::function<void(void)> onClick;
+    std::function<void(void)> onMouseEnter;
+    std::function<void(void)> onMouseLeave;
 
     Rect rect;
     Color backgroundColor = { .r = 255, .g = 0, .b = 0 }; // TODO: temp

@@ -75,6 +75,14 @@ Game::Game()
         std::cout << "Clicked\n";
     };
 
+    widget.onMouseEnter = []() {
+        std::cout << "Entered\n";
+    };
+
+    widget.onMouseLeave = []() {
+        std::cout << "Left\n";
+    };
+
     screen.addWidget(widget);
     m_uiManager.addScreen(screen);
 }

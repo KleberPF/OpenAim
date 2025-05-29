@@ -24,6 +24,7 @@ public:
 
 private:
     Widget* m_clickedWidget = nullptr;
+    Widget* m_hoveredWidget = nullptr;
 
     std::vector<Widget> m_widgets;
 };

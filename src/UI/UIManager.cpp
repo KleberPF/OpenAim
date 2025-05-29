@@ -50,7 +50,6 @@ void UIManager::handleMouseButton(int /*key*/, bool pressed)
 {
     for (auto& screen : m_screens) {
         if (screen.active) {
-            // pass down update
             screen.processClick(MouseButton::BUTTON_LEFT, pressed, m_cursorPos.x, m_cursorPos.y);
         }
     }
@@ -60,6 +59,12 @@ void UIManager::handleCursorPos(double xpos, double ypos)
 {
     m_cursorPos.x = xpos;
     m_cursorPos.y = ypos;
+
+    for (auto& screen : m_screens) {
+        if (screen.active) {
+            screen.processMouseMove(xpos, ypos);
+        }
+    }
 }
 
 void UIManager::onFrame()

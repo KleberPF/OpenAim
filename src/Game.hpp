@@ -7,6 +7,7 @@
 #include "Renderer.hpp"
 #include "Scenario.hpp"
 #include "Sprite.hpp"
+#include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 
@@ -65,6 +66,7 @@ private:
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
     ClayWrapper m_clayWrapper;
+    UI::UIManager m_uiManager;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

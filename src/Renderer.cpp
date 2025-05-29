@@ -189,7 +189,7 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
     glDepthFunc(GL_ALWAYS);
 
     auto& [renderCommands, viewWidth, viewHeight] = renderData;
-    m_orthoProjection = glm::ortho(0.0f, viewWidth, viewHeight, 0.0f);
+    orthoProjection = glm::ortho(0.0f, viewWidth, viewHeight, 0.0f);
 
     for (int i = 0; i < renderCommands.length; i++) {
         Clay_RenderCommand* renderCommand = Clay_RenderCommandArray_Get(&renderCommands, i);
@@ -214,7 +214,7 @@ void Renderer::renderClayUi(ClayRenderData& renderData)
     glDepthFunc(GL_LESS);
 }
 
-void Renderer::renderRectangle(float x, float y, float width, float height, glm::vec3 color)
+void Renderer::renderRectangle(float x, float y, float width, float height, glm::vec3 color) const
 {
     const Shader& shader = ResourceManager::instance().getShader("color");
     shader.use();
@@ -223,7 +223,7 @@ void Renderer::renderRectangle(float x, float y, float width, float height, glm:
     glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
     model = glm::scale(model, glm::vec3(width, height, 0));
 
-    shader.setMat4("mvp", m_orthoProjection * model);
+    shader.setMat4("mvp", orthoProjection * model);
 
     glBindVertexArray(m_rectangleVao);
     glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -238,7 +238,7 @@ void Renderer::renderText(const TextRenderable& renderable, float x, float y) co
 
     glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
 
-    shader.setMat4("mvp", m_orthoProjection * model);
+    shader.setMat4("mvp", orthoProjection * model);
 
     glBindVertexArray(data.vao);
     glActiveTexture(GL_TEXTURE0);

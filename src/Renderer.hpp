@@ -20,6 +20,11 @@ public:
     void renderClayUi(ClayRenderData& renderData);
     void renderText(const TextRenderable& renderable, float x, float y) const;
 
+    void renderRectangle(float x, float y, float width, float height, glm::vec3 color) const;
+
+    // TODO: temporary approach
+    glm::mat4 orthoProjection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f);
+
 private:
     // Should probably change this later, having to always pass the scene
     // is kinda ugly
@@ -29,10 +34,6 @@ private:
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
 
     // primitives clay uses to render UI
-    glm::mat4 m_orthoProjection; // set in renderClayUi, for now at least
-
-    void renderRectangle(
-        float x, float y, float width, float height, glm::vec3 color);
 
     // clang-format off
     std::array<float, 24> m_rectangleVertices = { 

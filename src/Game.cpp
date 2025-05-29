@@ -10,6 +10,9 @@
 #include "Scene.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
+#include "UI/Screen.hpp"
+#include "UI/UIManager.hpp"
+#include "UI/Widget.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 #include "utils.hpp"
@@ -29,6 +32,7 @@ Game::Game()
     : m_window(&m_eventManager, SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
     , m_clayWrapper(m_window.width, m_window.height)
+    , m_uiManager(m_window.width, m_window.height)
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -42,6 +46,7 @@ Game::Game()
     InputManager::instance().subscribe(m_eventManager);
     m_window.subscribe(m_eventManager);
     m_clayWrapper.subscribe(m_eventManager);
+    m_uiManager.subscribe(m_eventManager);
 
     Sprite crosshair(ResourceManager::instance().getShader("sprite"),
         ResourceManager::instance().getMaterial("crosshair"),
@@ -59,6 +64,19 @@ Game::Game()
 
     buildPlayArea();
     parseScenariosFromFile("./resources/scenarios");
+
+    // Build UI (TODO: temp, move this)
+    UI::Screen screen;
+    screen.active = true;
+
+    UI::Widget widget;
+    widget.rect = { .x = 100, .y = 100, .w = 200, .h = 200 };
+    widget.onClick = []() {
+        std::cout << "Clicked\n";
+    };
+
+    screen.addWidget(widget);
+    m_uiManager.addScreen(screen);
 }
 
 Game::~Game()
@@ -203,13 +221,14 @@ void Game::render()
     m_renderer.renderScene(scene);
 
     if (m_state == State::Menu) {
-        auto [menuRenderData, scenarioId] = m_clayWrapper.buildMainMenu();
-        m_renderer.renderClayUi(menuRenderData);
+        // auto [menuRenderData, scenarioId] = m_clayWrapper.buildMainMenu();
+        // m_renderer.renderClayUi(menuRenderData);
 
-        if (scenarioId.has_value()) {
-            createScenario(scenarioId.value());
-            changeState(Game::State::Running);
-        }
+        // if (scenarioId.has_value()) {
+        //     createScenario(scenarioId.value());
+        //     changeState(Game::State::Running);
+        // }
+        m_uiManager.render(m_renderer);
     }
 }
 

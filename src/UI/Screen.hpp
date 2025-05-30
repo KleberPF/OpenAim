@@ -19,20 +19,28 @@ public:
     void processMouseMove(double xpos, double ypos);
     void processResize(float screenWidth, float screenHeight);
 
-    Widget* addWidget(Rect relativeRect);
+    template <typename T>
+    T* add(T* widget)
+    {
+        m_widgets.push_back(std::unique_ptr<T>(widget));
+        widget->updateRect(m_viewWidth, m_viewHeight);
+        return widget;
+    }
 
     void render(const Renderer& renderer);
 
     bool active;
 
 private:
-    Screen(UIManager* parent);
+    Screen(float screenWidth, float screenHeight);
+
+    float m_viewWidth;
+    float m_viewHeight;
 
     Widget* m_clickedWidget = nullptr;
     Widget* m_hoveredWidget = nullptr;
 
     std::vector<std::unique_ptr<Widget>> m_widgets;
-    UIManager* m_parent;
     friend class UIManager;
 };
 

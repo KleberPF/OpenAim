@@ -27,7 +27,7 @@ void UIManager::subscribe(EventManager& eventManager)
 
 Screen* UIManager::addScreen()
 {
-    auto* screen = new Screen(this);
+    auto* screen = new Screen(m_viewWidth, m_viewHeight);
     auto ptr = std::unique_ptr<Screen>(screen);
     m_screens.push_back(std::move(ptr));
 
@@ -75,4 +75,3 @@ void UIManager::handleCursorPos(double xpos, double ypos)
         }
     }
 }
-

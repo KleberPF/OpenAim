@@ -1,7 +1,6 @@
 #include "UI/Screen.hpp"
 
 #include "InputManager.hpp"
-#include "UIManager.hpp"
 
 #include <memory>
 
@@ -10,7 +9,7 @@ using namespace UI;
 void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, double ypos)
 {
     for (auto& widget : m_widgets) {
-        if (!widget->isInsideRect(xpos, ypos)) {
+        if (!widget->m_rect.isInside(xpos, ypos)) {
             continue;
         }
 
@@ -38,7 +37,7 @@ void Screen::processMouseMove(double xpos, double ypos)
     bool insideAnyWidget = false;
 
     for (auto& widget : m_widgets) {
-        if (!widget->isInsideRect(xpos, ypos)) {
+        if (!widget->m_rect.isInside(xpos, ypos)) {
             continue;
         }
 
@@ -64,18 +63,12 @@ void Screen::processMouseMove(double xpos, double ypos)
 
 void Screen::processResize(float screenWidth, float screenHeight)
 {
+    m_viewWidth = screenWidth;
+    m_viewHeight = screenHeight;
+
     for (auto& widget : m_widgets) {
         widget->updateRect(screenWidth, screenHeight);
     }
-}
-
-Widget* Screen::addWidget(Rect relativeRect)
-{
-    auto* widget = new Widget(relativeRect, m_parent->m_viewWidth, m_parent->m_viewHeight);
-    auto ptr = std::unique_ptr<Widget>(widget);
-    m_widgets.push_back(std::move(ptr));
-
-    return widget;
 }
 
 void Screen::render(const Renderer& renderer)
@@ -85,7 +78,8 @@ void Screen::render(const Renderer& renderer)
     }
 }
 
-Screen::Screen(UIManager* parent)
-    : m_parent(parent)
+Screen::Screen(float screenWidth, float screenHeight)
+    : m_viewWidth(screenWidth)
+    , m_viewHeight(screenHeight)
 {
 }

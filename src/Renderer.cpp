@@ -132,6 +132,8 @@ void Renderer::renderEntity(const Scene& scene, const Entity& entity)
     }
 }
 
+// TODO: This is broken because of face culling
+// Should change the ortho matrix to (0, w, h, 0) and fix positioning
 void Renderer::renderSprite(const Scene& scene, const Sprite& sprite) const
 {
     sprite.shader.get().use();

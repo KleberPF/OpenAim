@@ -2,9 +2,7 @@
 
 #include "ResourceManager.hpp"
 
-#include <algorithm>
 #include <cstddef>
-#include <iostream>
 
 using namespace UI;
 
@@ -47,6 +45,8 @@ void Dropdown::updateRect(float screenWidth, float screenHeight)
     m_rect.y = m_relativeRect.y * screenHeight;
     m_rect.w = m_relativeRect.w * screenWidth;
     m_rect.h = m_relativeRect.h * screenHeight;
+
+    recreateDropdownRect();
 }
 
 bool Dropdown::isInsideRect(float x, float y)

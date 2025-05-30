@@ -24,33 +24,27 @@ Screen* buildMenuScreen(UIManager& uiManager)
     titleCard->setText("OpenAim");
     titleCard->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 
-    // Buttons
-    // auto* clickingBtn = screen->add<Button>(new Button({ .x = 0.3995, .y = 0.2, .w = 0.2, .h = 0.05 }));
-    // clickingBtn->setText("Clicking");
-    // clickingBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    // clickingBtn->onClick = []() {
-    //     std::cout << "Clicking selected\n";
-    // };
-
-    // auto* trackingBtn = screen->add<Button>(new Button({ .x = 0.3995, .y = 0.26, .w = 0.2, .h = 0.05 }));
-    // trackingBtn->setText("Tracking");
-    // trackingBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    // trackingBtn->onClick = []() {
-    //     std::cout << "Tracking selected\n";
-    // };
-
-    // auto* switchingBtn = screen->add<Button>(new Button({ .x = 0.3995, .y = 0.32, .w = 0.2, .h = 0.05 }));
-    // switchingBtn->setText("Switching");
-    // switchingBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    // switchingBtn->onClick = []() {
-    //     std::cout << "Switching selected\n";
-    // };
-
+    // Dropdown
     auto* dropdown = screen->add(new Dropdown({ .x = 0.3995, .y = 0.2, .w = 0.2, .h = 0.05 }));
     dropdown->backgroundColor = { .r = 50, .g = 50, .b = 50 };
     dropdown->addOption("Clicking");
     dropdown->addOption("Tracking");
     dropdown->addOption("Switching");
+
+    // Buttons
+    auto* challengeBtn = screen->add<Button>(new Button({ .x = 0.3995, .y = 0.45, .w = 0.2, .h = 0.05 }));
+    challengeBtn->setText("Challenge");
+    challengeBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
+    challengeBtn->onClick = []() {
+        std::cout << "Challenge selected\n";
+    };
+
+    auto* freePlayBtn = screen->add<Button>(new Button({ .x = 0.3995, .y = 0.51, .w = 0.2, .h = 0.05 }));
+    freePlayBtn->setText("Free Play");
+    freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
+    freePlayBtn->onClick = []() {
+        std::cout << "Free Play selected\n";
+    };
 
     return screen;
 }

@@ -12,9 +12,10 @@ public:
     }
 
     void setText(const char* text);
-    void render(const Renderer& renderer) const override;
 
 private:
+    void render(const Renderer& renderer) const override;
+
     // Ugly, but it's here so we don't have to recreate the text render data every frame
     std::unique_ptr<TextRenderable> m_textRenderable = nullptr;
 

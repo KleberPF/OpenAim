@@ -9,7 +9,7 @@ using namespace UI;
 void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, double ypos)
 {
     for (auto& widget : m_widgets) {
-        if (!widget->m_rect.isInside(xpos, ypos)) {
+        if (!widget->isInsideRect(xpos, ypos)) {
             continue;
         }
 
@@ -22,8 +22,8 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
             continue;
         }
 
-        if (m_clickedWidget == widget.get() && widget->onClick) {
-            widget->onClick();
+        if (m_clickedWidget == widget.get()) {
+            widget->processClick(xpos, ypos);
         }
     }
 

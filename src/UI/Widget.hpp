@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Color.hpp"
+#include "InputManager.hpp"
 #include "Renderer.hpp"
 
 #include <functional>
@@ -26,8 +27,6 @@ public:
     Widget(Rect relative);
     virtual ~Widget() = default;
 
-    virtual void render(const Renderer& renderer) const;
-
     std::function<void(void)> onClick;
     std::function<void(void)> onMouseEnter;
     std::function<void(void)> onMouseLeave;
@@ -36,7 +35,10 @@ public:
     bool focusable = false;
 
 protected:
+    virtual void render(const Renderer& renderer) const;
     virtual void updateRect(float screenWidth, float screenHeight);
+    virtual bool isInsideRect(float x, float y);
+    virtual void processClick(float x, float y);
 
     // This rect defines the rect of the widget based on a percentage of the total screen size (0, 1)
     // We then use this rect to calculate the actual pixel rect and update it whenever the screen size changes

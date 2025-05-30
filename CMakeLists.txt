@@ -40,6 +40,7 @@ set(SOURCES
     src/UI/ScreenBuilders.cpp
     src/UI/Label.cpp
     src/UI/Button.cpp
+    src/UI/Dropdown.cpp
     # Add more source files here as needed
 )
 

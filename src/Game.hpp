@@ -6,6 +6,7 @@
 #include "Renderer.hpp"
 #include "Scenario.hpp"
 #include "Sprite.hpp"
+#include "UI/MainMenu.hpp"
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -65,6 +66,8 @@ private:
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
     UI::UIManager m_uiManager;
+
+    std::unique_ptr<UI::MainMenu> m_mainMenu;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

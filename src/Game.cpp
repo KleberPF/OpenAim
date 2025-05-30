@@ -9,8 +9,8 @@
 #include "Scene.hpp"
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
+#include "UI/MainMenu.hpp"
 #include "UI/Screen.hpp"
-#include "UI/ScreenBuilders.hpp"
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -62,8 +62,8 @@ Game::Game()
     buildPlayArea();
     parseScenariosFromFile("./resources/scenarios");
 
-    // Build UI (TODO: temp, move this)
-    buildMenuScreen(m_uiManager);
+    // Build UI (TODO: temp, move this, create a menu manager or something)
+    m_mainMenu = std::make_unique<UI::MainMenu>(m_uiManager);
 }
 
 Game::~Game()

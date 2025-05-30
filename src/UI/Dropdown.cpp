@@ -12,6 +12,11 @@ void Dropdown::addOption(const char* option)
     recreateDropdownRect();
 }
 
+std::string Dropdown::selectedOption()
+{
+    return m_options[m_selectedIndex].text().contents();
+}
+
 void Dropdown::render(const Renderer& renderer) const
 {
     // Main box

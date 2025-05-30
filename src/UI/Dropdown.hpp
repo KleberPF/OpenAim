@@ -14,6 +14,7 @@ public:
     }
 
     void addOption(const char* option);
+    std::string selectedOption();
 
 private:
     void render(const Renderer& renderer) const override;

@@ -47,6 +47,7 @@ Screen* buildMenuScreen(UIManager& uiManager)
     // };
 
     auto* dropdown = screen->add(new Dropdown({ .x = 0.3995, .y = 0.2, .w = 0.2, .h = 0.05 }));
+    dropdown->backgroundColor = { .r = 50, .g = 50, .b = 50 };
     dropdown->addOption("Clicking");
     dropdown->addOption("Tracking");
     dropdown->addOption("Switching");

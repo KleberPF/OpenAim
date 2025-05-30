@@ -2,7 +2,9 @@
 
 #include "ResourceManager.hpp"
 
+#include <algorithm>
 #include <cstddef>
+#include <iostream>
 
 using namespace UI;
 
@@ -25,16 +27,11 @@ void Dropdown::render(const Renderer& renderer) const
 
     // Dropdown options
     if (m_expanded) {
-        size_t renderedItemCount = 0;
+        Color dropdownBackground = backgroundColor + Color { .r = 5, .g = 5, .b = 5 };
 
         for (size_t i = 0; i < m_options.size(); i++) {
-            if (i == m_selectedIndex) {
-                continue;
-            }
-
-            renderedItemCount++;
-            float yOffset = m_rect.y + renderedItemCount * m_rect.h;
-            renderer.renderRectangle(m_rect.x, yOffset, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+            float yOffset = m_rect.y + (i + 1) * m_rect.h;
+            renderer.renderRectangle(m_rect.x, yOffset, m_rect.w, m_rect.h, dropdownBackground.toOpenGLFormat());
 
             auto text = m_options[i].text();
             float textX = m_rect.x + m_rect.w / 2 - (float)text.width() / 2;
@@ -64,21 +61,29 @@ void Dropdown::processClick(float x, float y)
         return;
     }
 
-    
+    if (!m_expanded) {
+        return;
+    }
+
+    if (m_dropdownRect.isInside(x, y)) {
+        // Click inside the dropdown
+        // Figure out which option was clicked
+        float yOffset = y - m_dropdownRect.y;
+        m_selectedIndex = (size_t)(yOffset / m_rect.h);
+        m_expanded = false;
+    }
 }
 
 void Dropdown::recreateDropdownRect()
 {
-    // TODO
-    if (m_options.size() <= 1) {
+    if (m_options.size() == 0) {
         return;
     }
 
-    size_t numItemsInDropdown = m_options.size() - 1;
     m_dropdownRect = {
         .x = m_rect.x,
         .y = m_rect.y + m_rect.h,
         .w = m_rect.w,
-        .h = m_rect.h * numItemsInDropdown,
+        .h = m_rect.h * m_options.size(),
     };
 }

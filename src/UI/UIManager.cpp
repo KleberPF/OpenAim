@@ -1,6 +1,7 @@
 #include "UIManager.hpp"
 
 #include "EventManager.hpp"
+#include "Events.hpp"
 #include "InputManager.hpp"
 
 #include <cassert>
@@ -15,14 +16,14 @@ UIManager::UIManager(float viewWidth, float viewHeight)
 
 void UIManager::subscribe()
 {
-    EventManager::instance().addResizeListener([this](int width, int height) {
-        handleResize(width, height);
+    EventManager::instance().addListener(EventType::Resize, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
-    EventManager::instance().addMouseButtonListener([this](int key, bool pressed) {
-        handleMouseButton(key, pressed);
+    EventManager::instance().addListener(EventType::MouseButton, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
-    EventManager::instance().addCursorPosListener([this](double xpos, double ypos) {
-        handleCursorPos(xpos, ypos);
+    EventManager::instance().addListener(EventType::CursorPos, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
 }
 
@@ -74,5 +75,25 @@ void UIManager::handleCursorPos(double xpos, double ypos)
         if (screen->active) {
             screen->processMouseMove(xpos, ypos);
         }
+    }
+}
+
+void UIManager::onEvent(EventType type, void* data)
+{
+    switch (type) {
+    case EventType::Resize: {
+        auto* event = (ResizeEvent*)data;
+        handleResize(event->width, event->height);
+    } break;
+    case EventType::MouseButton: {
+        auto* event = (MouseButtonEvent*)data;
+        handleMouseButton(event->button, event->pressed);
+    } break;
+    case EventType::CursorPos: {
+        auto* event = (CursorPosEvent*)data;
+        handleCursorPos(event->xpos, event->ypos);
+    } break;
+    default:
+        break;
     }
 }

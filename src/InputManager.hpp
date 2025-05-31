@@ -1,6 +1,6 @@
 #pragma once
-// based on
-// https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
+
+#include "EventManager.hpp"
 
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
@@ -204,4 +204,6 @@ private:
     void handleKey(int key, bool pressed);
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
+
+    void onEvent(EventType type, void* data);
 };

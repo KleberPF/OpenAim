@@ -23,6 +23,8 @@ private:
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
 
+    void onEvent(EventType type, void* data);
+
     float m_viewWidth;
     float m_viewHeight;
 

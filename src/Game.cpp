@@ -487,7 +487,5 @@ void Game::onEvent(EventType type, void* data)
 
         m_challengeState.happening = event->challenge;
         changeState(Game::State::Running);
-
-        delete event;
     }
 }

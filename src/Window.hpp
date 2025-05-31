@@ -1,5 +1,7 @@
 #pragma once
 
+#include "EventManager.hpp"
+
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -21,6 +23,8 @@ public:
 
 private:
     void handleResize(int width, int height);
+
+    void onEvent(EventType type, void* data);
 
     GLFWwindow* m_ptr;
     std::string m_title;

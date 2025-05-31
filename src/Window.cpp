@@ -1,6 +1,7 @@
 #include "Window.hpp"
 
 #include "EventManager.hpp"
+#include "Events.hpp"
 
 #include <glad/glad.h>
 
@@ -66,8 +67,8 @@ GLFWwindow* Window::ptr() const
 
 void Window::subscribe()
 {
-    EventManager::instance().addResizeListener([this](int width, int height) {
-        handleResize(width, height);
+    EventManager::instance().addListener(EventType::Resize, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
 }
 
@@ -76,4 +77,18 @@ void Window::handleResize(int width, int height)
     glViewport(0, 0, width, height);
     this->width = width;
     this->height = height;
+}
+
+void Window::onEvent(EventType type, void* data)
+{
+    switch (type) {
+    case EventType::Resize: {
+        auto* event = (ResizeEvent*)data;
+        glViewport(0, 0, width, height);
+        this->width = event->width;
+        this->height = event->height;
+    } break;
+    default:
+        break;
+    }
 }

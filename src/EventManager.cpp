@@ -1,5 +1,7 @@
 #include "EventManager.hpp"
 
+#include "Events.hpp"
+
 #include <glad/glad.h>
 
 #include <cassert>
@@ -32,26 +34,6 @@ EventManager& EventManager::instance()
     return *s_Instance;
 }
 
-void EventManager::addResizeListener(const ResizeCallback& cb)
-{
-    m_resizeListeners.push_back(cb);
-}
-
-void EventManager::addKeyListener(const KeyCallback& cb)
-{
-    m_keyListeners.push_back(cb);
-}
-
-void EventManager::addMouseButtonListener(const MouseButtonCallback& cb)
-{
-    m_mouseButtonListeners.push_back(cb);
-}
-
-void EventManager::addCursorPosListener(const CursorPosCallback& cb)
-{
-    m_cursorPosListeners.push_back(cb);
-}
-
 void EventManager::addListener(EventType type, const EventHandler& handler)
 {
     m_listeners[std::to_underlying(type)].push_back(handler);
@@ -59,6 +41,7 @@ void EventManager::addListener(EventType type, const EventHandler& handler)
 
 void EventManager::triggerEvent(EventType type, void* data)
 {
+    // TODO: this is leaking
     for (auto& handler : m_listeners[std::to_underlying(type)]) {
         handler(type, data);
     }
@@ -67,20 +50,36 @@ void EventManager::triggerEvent(EventType type, void* data)
 void EventManager::framebufferSizeCallback(GLFWwindow* /*window*/, int width, int height)
 {
     glViewport(0, 0, width, height);
-    EventManager::instance().notify(EventManager::instance().m_resizeListeners, width, height);
+    auto* event = new ResizeEvent {
+        .width = width,
+        .height = height
+    };
+    EventManager::instance().triggerEvent(EventType::Resize, event);
 }
 
 void EventManager::keyCallback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
 {
-    EventManager::instance().notify(EventManager::instance().m_keyListeners, key, action != GLFW_RELEASE);
+    auto* event = new KeyPressEvent {
+        .key = key,
+        .pressed = static_cast<bool>(action)
+    };
+    EventManager::instance().triggerEvent(EventType::KeyPress, event);
 }
 
 void EventManager::mouseButtonCallback(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
 {
-    EventManager::instance().notify(EventManager::instance().m_mouseButtonListeners, button, action != GLFW_RELEASE);
+    auto* event = new MouseButtonEvent {
+        .button = button,
+        .pressed = action != GLFW_RELEASE
+    };
+    EventManager::instance().triggerEvent(EventType::MouseButton, event);
 }
 
 void EventManager::cursorPosCallback(GLFWwindow* /*window*/, double xpos, double ypos)
 {
-    EventManager::instance().notify(EventManager::instance().m_cursorPosListeners, xpos, ypos);
+    auto* event = new CursorPosEvent {
+        .xpos = xpos,
+        .ypos = ypos
+    };
+    EventManager::instance().triggerEvent(EventType::CursorPos, event);
 }

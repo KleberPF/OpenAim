@@ -1,5 +1,7 @@
 #include "InputManager.hpp"
+
 #include "EventManager.hpp"
+#include "Events.hpp"
 
 #include <cassert>
 #include <memory>
@@ -78,14 +80,14 @@ void InputManager::consolidateKeyStates()
 
 void InputManager::subscribe()
 {
-    EventManager::instance().addKeyListener([this](int key, bool pressed) {
-        handleKey(key, pressed);
+    EventManager::instance().addListener(EventType::KeyPress, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
-    EventManager::instance().addMouseButtonListener([this](int key, bool pressed) {
-        handleMouseButton(key, pressed);
+    EventManager::instance().addListener(EventType::MouseButton, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
-    EventManager::instance().addCursorPosListener([this](double xpos, double ypos) {
-        handleCursorPos(xpos, ypos);
+    EventManager::instance().addListener(EventType::CursorPos, [this](EventType type, void* data) {
+        onEvent(type, data);
     });
 }
 
@@ -104,4 +106,26 @@ void InputManager::handleCursorPos(double xpos, double ypos)
     m_cursorMoved = true;
     m_cursorPos.x = xpos;
     m_cursorPos.y = ypos;
+}
+
+void InputManager::onEvent(EventType type, void* data)
+{
+    switch (type) {
+    case EventType::KeyPress: {
+        auto* event = (KeyPressEvent*)data;
+        m_keys.at(event->key).current = event->pressed;
+    } break;
+    case EventType::MouseButton: {
+        auto* event = (MouseButtonEvent*)data;
+        m_mouseBtns.at(event->button).current = event->pressed;
+    } break;
+    case EventType::CursorPos: {
+        auto* event = (CursorPosEvent*)data;
+        m_cursorMoved = true;
+        m_cursorPos.x = event->xpos;
+        m_cursorPos.y = event->ypos;
+    } break;
+    default:
+        break;
+    }
 }

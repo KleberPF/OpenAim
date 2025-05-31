@@ -1,7 +1,5 @@
 #pragma once
 
-#include "EventManager.hpp"
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
@@ -9,7 +7,7 @@
 
 class Window {
 public:
-    Window(EventManager* eventManager, int width, int height, std::string title, bool fullscreen);
+    Window(int width, int height, std::string title, bool fullscreen);
 
     bool shouldClose();
     void swapBuffers();
@@ -19,7 +17,7 @@ public:
     int width;
     int height;
 
-    void subscribe(EventManager& eventManager);
+    void subscribe();
 
 private:
     void handleResize(int width, int height);

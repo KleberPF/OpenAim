@@ -2,7 +2,7 @@
 
 #include <utility>
 #define GLFW_INCLUDE_NONE
-#include "GLFW/glfw3.h"
+#include <GLFW/glfw3.h>
 
 #include <functional>
 #include <vector>
@@ -27,6 +27,11 @@ public:
     using MouseButtonCallback = std::function<void(int, bool)>;
     using CursorPosCallback = std::function<void(double, double)>;
 
+    static void init();
+    static void shutdown();
+
+    static EventManager& instance(); // maybe const this?
+
     void addResizeListener(const ResizeCallback& cb);
     void addKeyListener(const KeyCallback& cb);
     void addMouseButtonListener(const MouseButtonCallback& cb);
@@ -38,6 +43,8 @@ public:
     void triggerEvent(EventType type, void* data);
 
 private:
+    EventManager() = default;
+
     template <typename T, typename... Args>
     void notify(const std::vector<T>& listeners, Args&&... args)
     {

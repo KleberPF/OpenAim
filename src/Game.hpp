@@ -10,6 +10,7 @@
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
+#include <memory>
 
 // settings
 constexpr auto SCR_WIDTH = 800;
@@ -57,7 +58,6 @@ private:
     // TODO: I don't like the Game object itself handling events
     void onEvent(EventType type, void* data);
 
-    EventManager m_eventManager;
     Window m_window;
     Camera m_camera;
     EntityManager m_entityManager;

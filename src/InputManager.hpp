@@ -2,8 +2,7 @@
 // based on
 // https://stackoverflow.com/questions/55573238/how-do-i-do-a-proper-input-class-in-glfw-for-a-game-engine
 
-#include "EventManager.hpp"
-
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
 #include <array>
@@ -191,7 +190,7 @@ public:
     // the keys that were pressed this frame
     void consolidateKeyStates();
 
-    void subscribe(EventManager& eventManager);
+    void subscribe();
 
 private:
     InputManager() = default;

@@ -12,7 +12,7 @@ public:
 private:
     Screen* m_screen;
 
-    void submit(const std::string& scenarioName, bool challenge);
+    static void submit(const std::string& scenarioName, bool challenge);
 };
 
 } // namespace UI

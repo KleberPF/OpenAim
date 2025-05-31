@@ -1,11 +1,11 @@
 #include "MainMenu.hpp"
 
+#include "EventManager.hpp"
+#include "Events.hpp"
 #include "UI/Button.hpp"
 #include "UI/Dropdown.hpp"
 #include "UI/Label.hpp"
 #include "UI/UIManager.hpp"
-
-#include <iostream>
 
 using namespace UI;
 
@@ -34,20 +34,23 @@ MainMenu::MainMenu(UIManager& uiManager)
     auto* challengeBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.45, .w = 0.2, .h = 0.05 }));
     challengeBtn->setText("Challenge");
     challengeBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    challengeBtn->onClick = [this, dropdown]() {
-        this->submit(dropdown->selectedOption(), true);
+    challengeBtn->onClick = [dropdown]() {
+        MainMenu::submit(dropdown->selectedOption(), true);
     };
 
     auto* freePlayBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.51, .w = 0.2, .h = 0.05 }));
     freePlayBtn->setText("Free Play");
     freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    freePlayBtn->onClick = [this, dropdown]() {
-        this->submit(dropdown->selectedOption(), false);
+    freePlayBtn->onClick = [dropdown]() {
+        MainMenu::submit(dropdown->selectedOption(), false);
     };
 }
 
 void MainMenu::submit(const std::string& scenarioName, bool challenge)
 {
-    // TODO: signal game should start
-    std::cout << "Started " << scenarioName << " challenge=" << challenge << '\n';
+    auto* event = new NewScenarioEvent {
+        .scenario = scenarioName,
+        .challenge = challenge
+    };
+    EventManager::instance().triggerEvent(EventType::StartScenario, event);
 }

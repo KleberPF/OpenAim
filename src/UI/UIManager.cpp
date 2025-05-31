@@ -1,5 +1,6 @@
 #include "UIManager.hpp"
 
+#include "EventManager.hpp"
 #include "InputManager.hpp"
 
 #include <cassert>
@@ -12,15 +13,15 @@ UIManager::UIManager(float viewWidth, float viewHeight)
 {
 }
 
-void UIManager::subscribe(EventManager& eventManager)
+void UIManager::subscribe()
 {
-    eventManager.addResizeListener([this](int width, int height) {
+    EventManager::instance().addResizeListener([this](int width, int height) {
         handleResize(width, height);
     });
-    eventManager.addMouseButtonListener([this](int key, bool pressed) {
+    EventManager::instance().addMouseButtonListener([this](int key, bool pressed) {
         handleMouseButton(key, pressed);
     });
-    eventManager.addCursorPosListener([this](double xpos, double ypos) {
+    EventManager::instance().addCursorPosListener([this](double xpos, double ypos) {
         handleCursorPos(xpos, ypos);
     });
 }

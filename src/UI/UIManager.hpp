@@ -1,6 +1,5 @@
 #pragma once
 
-#include "EventManager.hpp"
 #include "Renderer.hpp"
 #include "UI/Screen.hpp"
 
@@ -13,7 +12,7 @@ class UIManager {
 public:
     UIManager(float viewWidth, float viewHeight);
 
-    void subscribe(EventManager& eventManager);
+    void subscribe();
 
     Screen* addScreen();
 

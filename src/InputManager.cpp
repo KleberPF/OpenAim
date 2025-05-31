@@ -1,6 +1,5 @@
 #include "InputManager.hpp"
-
-#include <GLFW/glfw3.h>
+#include "EventManager.hpp"
 
 #include <cassert>
 #include <memory>
@@ -77,15 +76,15 @@ void InputManager::consolidateKeyStates()
     m_cursorMoved = false;
 }
 
-void InputManager::subscribe(EventManager& eventManager)
+void InputManager::subscribe()
 {
-    eventManager.addKeyListener([this](int key, bool pressed) {
+    EventManager::instance().addKeyListener([this](int key, bool pressed) {
         handleKey(key, pressed);
     });
-    eventManager.addMouseButtonListener([this](int key, bool pressed) {
+    EventManager::instance().addMouseButtonListener([this](int key, bool pressed) {
         handleMouseButton(key, pressed);
     });
-    eventManager.addCursorPosListener([this](double xpos, double ypos) {
+    EventManager::instance().addCursorPosListener([this](double xpos, double ypos) {
         handleCursorPos(xpos, ypos);
     });
 }

@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-Window::Window(EventManager* eventManager, int width, int height, std::string title, bool fullscreen)
+Window::Window(int width, int height, std::string title, bool fullscreen)
     : width(width)
     , height(height)
     , m_title(std::move(title))
@@ -32,7 +32,6 @@ Window::Window(EventManager* eventManager, int width, int height, std::string ti
 
     glfwMakeContextCurrent(m_ptr);
     glfwSwapInterval(0); // turn off vsync
-    glfwSetWindowUserPointer(m_ptr, eventManager);
     glfwSetFramebufferSizeCallback(m_ptr, EventManager::framebufferSizeCallback);
     glfwSetKeyCallback(m_ptr, EventManager::keyCallback);
     glfwSetMouseButtonCallback(m_ptr, EventManager::mouseButtonCallback);
@@ -65,9 +64,9 @@ GLFWwindow* Window::ptr() const
     return m_ptr;
 }
 
-void Window::subscribe(EventManager& eventManager)
+void Window::subscribe()
 {
-    eventManager.addResizeListener([this](int width, int height) {
+    EventManager::instance().addResizeListener([this](int width, int height) {
         handleResize(width, height);
     });
 }

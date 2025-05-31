@@ -2,6 +2,8 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "EventManager.hpp"
+#include "Events.hpp"
 #include "InputManager.hpp"
 #include "RNG.hpp"
 #include "ResourceManager.hpp"
@@ -64,6 +66,10 @@ Game::Game()
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
     m_mainMenu = std::make_unique<UI::MainMenu>(m_uiManager);
+
+    m_eventManager.addListener(EventType::StartScenario, [this](EventType type, void* data) {
+        onEvent(type, data);
+    });
 }
 
 Game::~Game()
@@ -461,5 +467,24 @@ void Game::createScenario(size_t index)
                 });
         }
         m_entityManager.addEntity(std::move(entity));
+    }
+}
+
+void Game::onEvent(EventType type, void* data)
+{
+    if (type == EventType::StartScenario) {
+        auto* event = (NewScenarioEvent*)data;
+
+        // TODO: use ids?
+        if (event->scenario == "Clicking") {
+            createScenario(0);
+        } else if (event->scenario == "Tracking") {
+            createScenario(1);
+        } else if (event->scenario == "Switching") {
+            createScenario(2);
+        }
+
+        m_challengeState.happening = event->challenge;
+        changeState(Game::State::Running);
     }
 }

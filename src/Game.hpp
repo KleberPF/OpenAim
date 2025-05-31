@@ -54,6 +54,9 @@ private:
     void parseScenariosFromFile(const std::string& scenarioFolder);
     void createScenario(size_t index);
 
+    // TODO: I don't like the Game object itself handling events
+    void onEvent(EventType type, void* data);
+
     EventManager m_eventManager;
     Window m_window;
     Camera m_camera;

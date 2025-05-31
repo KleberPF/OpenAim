@@ -7,6 +7,19 @@
 #include <functional>
 #include <vector>
 
+enum class EventType : uint8_t {
+    // GLFW
+    Resize,
+    KeyPress,
+    MouseButton,
+    CursorPos,
+
+    // Scenario
+    StartScenario,
+
+    Count
+};
+
 class EventManager {
 public:
     using ResizeCallback = std::function<void(int, int)>;
@@ -18,6 +31,11 @@ public:
     void addKeyListener(const KeyCallback& cb);
     void addMouseButtonListener(const MouseButtonCallback& cb);
     void addCursorPosListener(const CursorPosCallback& cb);
+
+    using EventHandler = std::function<void(EventType,void*)>;
+    void addListener(EventType type, const EventHandler& handler);
+
+    void triggerEvent(EventType type, void* data);
 
 private:
     template <typename T, typename... Args>
@@ -38,6 +56,9 @@ private:
     std::vector<KeyCallback> m_keyListeners;
     std::vector<MouseButtonCallback> m_mouseButtonListeners;
     std::vector<CursorPosCallback> m_cursorPosListeners;
+
+    // Indexed by EventType
+    std::vector<std::vector<EventHandler>> m_listeners = std::vector<std::vector<EventHandler>>(std::to_underlying(EventType::Count));
 
     friend class Window;
 };

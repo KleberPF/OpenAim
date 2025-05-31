@@ -2,6 +2,7 @@
 
 #include "UI/Screen.hpp"
 #include <string>
+
 namespace UI {
 
 class MainMenu {

@@ -113,17 +113,15 @@ void InputManager::onEvent(EventType type, void* data)
     switch (type) {
     case EventType::KeyPress: {
         auto* event = (KeyPressEvent*)data;
-        m_keys.at(event->key).current = event->pressed;
+        handleKey(event->key, event->pressed);
     } break;
     case EventType::MouseButton: {
         auto* event = (MouseButtonEvent*)data;
-        m_mouseBtns.at(event->button).current = event->pressed;
+        handleMouseButton(event->button, event->pressed);
     } break;
     case EventType::CursorPos: {
         auto* event = (CursorPosEvent*)data;
-        m_cursorMoved = true;
-        m_cursorPos.x = event->xpos;
-        m_cursorPos.y = event->ypos;
+        handleCursorPos(event->xpos, event->ypos);
     } break;
     default:
         break;

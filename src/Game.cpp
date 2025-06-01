@@ -75,9 +75,11 @@ Game::Game()
 
 Game::~Game()
 {
+    EventManager::shutdown();
     RNG::shutdown();
     ResourceManager::shutdown();
     SoundPlayer::shutdown();
+    InputManager::shutdown();
 }
 
 void Game::mainLoop()

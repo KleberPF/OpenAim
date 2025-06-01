@@ -84,9 +84,7 @@ void Window::onEvent(EventType type, void* data)
     switch (type) {
     case EventType::Resize: {
         auto* event = (ResizeEvent*)data;
-        glViewport(0, 0, width, height);
-        this->width = event->width;
-        this->height = event->height;
+        handleResize(event->width, event->height);
     } break;
     default:
         break;

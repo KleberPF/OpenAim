@@ -48,9 +48,9 @@ MainMenu::MainMenu(UIManager& uiManager)
 
 void MainMenu::submit(const std::string& scenarioName, bool challenge)
 {
-    auto* event = new NewScenarioEvent {
+    auto event = NewScenarioEvent {
         .scenario = scenarioName,
         .challenge = challenge
     };
-    EventManager::instance().triggerEvent(EventType::StartScenario, event);
+    EventManager::instance().triggerEvent(EventType::StartScenario, &event);
 }

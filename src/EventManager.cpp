@@ -41,7 +41,6 @@ void EventManager::addListener(EventType type, const EventHandler& handler)
 
 void EventManager::triggerEvent(EventType type, void* data)
 {
-    // TODO: this is leaking
     for (auto& handler : m_listeners[std::to_underlying(type)]) {
         handler(type, data);
     }
@@ -50,36 +49,36 @@ void EventManager::triggerEvent(EventType type, void* data)
 void EventManager::framebufferSizeCallback(GLFWwindow* /*window*/, int width, int height)
 {
     glViewport(0, 0, width, height);
-    auto* event = new ResizeEvent {
+    auto event = ResizeEvent {
         .width = width,
         .height = height
     };
-    EventManager::instance().triggerEvent(EventType::Resize, event);
+    EventManager::instance().triggerEvent(EventType::Resize, &event);
 }
 
 void EventManager::keyCallback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/)
 {
-    auto* event = new KeyPressEvent {
+    auto event = KeyPressEvent {
         .key = key,
         .pressed = static_cast<bool>(action)
     };
-    EventManager::instance().triggerEvent(EventType::KeyPress, event);
+    EventManager::instance().triggerEvent(EventType::KeyPress, &event);
 }
 
 void EventManager::mouseButtonCallback(GLFWwindow* /*window*/, int button, int action, int /*mods*/)
 {
-    auto* event = new MouseButtonEvent {
+    auto event = MouseButtonEvent {
         .button = button,
         .pressed = action != GLFW_RELEASE
     };
-    EventManager::instance().triggerEvent(EventType::MouseButton, event);
+    EventManager::instance().triggerEvent(EventType::MouseButton, &event);
 }
 
 void EventManager::cursorPosCallback(GLFWwindow* /*window*/, double xpos, double ypos)
 {
-    auto* event = new CursorPosEvent {
+    auto event = CursorPosEvent {
         .xpos = xpos,
         .ypos = ypos
     };
-    EventManager::instance().triggerEvent(EventType::CursorPos, event);
+    EventManager::instance().triggerEvent(EventType::CursorPos, &event);
 }

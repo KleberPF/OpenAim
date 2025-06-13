@@ -1,6 +1,7 @@
 #include "UI/Screen.hpp"
 
 #include "InputManager.hpp"
+#include "UI/Widget.hpp"
 
 #include <memory>
 
@@ -8,26 +9,31 @@ using namespace UI;
 
 void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, double ypos)
 {
-    for (auto& widget : m_widgets) {
-        if (!widget->isInsideRect(xpos, ypos)) {
-            continue;
-        }
-
-        if (button != MouseButton::BUTTON_LEFT) {
-            continue;
-        }
-
-        if (pressed) {
-            m_clickedWidget = widget.get();
-            continue;
-        }
-
-        if (m_clickedWidget == widget.get()) {
-            widget->processClick(xpos, ypos);
-        }
+    if (button != MouseButton::BUTTON_LEFT) {
+        return;
     }
 
-    if (!pressed) {
+    ClickEvent event = {
+        .pressed = pressed,
+        .clicked = nullptr,
+        .stopped = false,
+        .x = xpos,
+        .y = ypos
+    };
+
+    for (auto& widget : m_widgets) {
+        widget->processClick(event);
+    }
+
+    if (pressed) {
+        // Mouse button was pressed and we determined which widget it hit
+        m_clickedWidget = event.clicked;
+    } else {
+        // Mouse button was released and we need to check if it was a valid click
+        if (m_clickedWidget != nullptr && m_clickedWidget == event.clicked && m_clickedWidget->onClick) {
+            m_clickedWidget->onClick();
+        }
+
         m_clickedWidget = nullptr;
     }
 }

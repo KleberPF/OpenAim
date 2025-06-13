@@ -19,31 +19,31 @@ MainMenu::MainMenu()
     mainContainer->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 
     // Title card
-    auto* titleCard = m_screen->add<Label>(new Label({ .x = 0.3995, .y = 0.13, .w = 0.2, .h = 0.05 }));
+    auto* titleCard = mainContainer->add<Label>(new Label({ .x = 0.1, .y = 0.07, .w = 0.8, .h = 0.1 }));
     titleCard->setText("OpenAim");
     titleCard->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 
     // Dropdown
-    auto* dropdown = m_screen->add(new Dropdown({ .x = 0.3995, .y = 0.2, .w = 0.2, .h = 0.05 }));
+    auto* dropdown = mainContainer->add(new Dropdown({ .x = 0.1, .y = 0.21, .w = 0.8, .h = 0.1 }));
     dropdown->backgroundColor = { .r = 50, .g = 50, .b = 50 };
     dropdown->addOption("Clicking");
     dropdown->addOption("Tracking");
     dropdown->addOption("Switching");
 
     // Buttons
-    auto* challengeBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.45, .w = 0.2, .h = 0.05 }));
+    auto* challengeBtn = mainContainer->add<Button>(new Button({ .x = 0.2, .y = 0.7, .w = 0.6, .h = 0.1 }));
     challengeBtn->setText("Challenge");
     challengeBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
     challengeBtn->onClick = [dropdown]() {
         MainMenu::submit(dropdown->selectedOption(), true);
     };
 
-    auto* freePlayBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.51, .w = 0.2, .h = 0.05 }));
-    freePlayBtn->setText("Free Play");
-    freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    freePlayBtn->onClick = [dropdown]() {
-        MainMenu::submit(dropdown->selectedOption(), false);
-    };
+    // auto* freePlayBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.51, .w = 0.2, .h = 0.05 }));
+    // freePlayBtn->setText("Free Play");
+    // freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
+    // freePlayBtn->onClick = [dropdown]() {
+    //     MainMenu::submit(dropdown->selectedOption(), false);
+    // };
 }
 
 void MainMenu::submit(const std::string& scenarioName, bool challenge)

@@ -20,7 +20,7 @@ private:
     void render(const Renderer& renderer) const override;
     void updateRect() override;
     bool isInsideRect(float x, float y) override;
-    void processClick(float x, float y) override;
+    void processClick(ClickEvent& event) override;
 
     void recreateDropdownRect();
 
@@ -32,6 +32,7 @@ private:
     size_t m_selectedIndex = 0;
 
     friend class Screen;
+    friend class Widget;
 };
 
 } // namespace UI

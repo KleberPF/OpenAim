@@ -2,6 +2,7 @@
 
 #include "ResourceManager.hpp"
 #include "UI/UIManager.hpp"
+#include "UI/Widget.hpp"
 
 #include <cstddef>
 
@@ -47,14 +48,7 @@ void Dropdown::render(const Renderer& renderer) const
 
 void Dropdown::updateRect()
 {
-    float screenWidth = UIManager::instance().viewWidth();
-    float screenHeight = UIManager::instance().viewHeight();
-
-    m_rect.x = m_relativeRect.x * screenWidth;
-    m_rect.y = m_relativeRect.y * screenHeight;
-    m_rect.w = m_relativeRect.w * screenWidth;
-    m_rect.h = m_relativeRect.h * screenHeight;
-
+    Widget::updateRect();
     recreateDropdownRect();
 }
 
@@ -63,9 +57,16 @@ bool Dropdown::isInsideRect(float x, float y)
     return m_rect.isInside(x, y) || (m_expanded && m_dropdownRect.isInside(x, y));
 }
 
-void Dropdown::processClick(float x, float y)
+void Dropdown::processClick(ClickEvent& event)
 {
-    if (m_rect.isInside(x, y)) {
+    // TODO: this is a bit broken because it works outside of the onClick logic
+    // Right now we basically only check for mouse release
+    if (m_rect.isInside(event.x, event.y)) {
+        if (event.pressed) {
+            event.clicked = this;
+            return;
+        }
+
         m_expanded = !m_expanded;
         return;
     }
@@ -74,10 +75,15 @@ void Dropdown::processClick(float x, float y)
         return;
     }
 
-    if (m_dropdownRect.isInside(x, y)) {
+    if (m_dropdownRect.isInside(event.x, event.y)) {
+        if (event.pressed) {
+            event.clicked = this;
+            return;
+        }
+
         // Click inside the dropdown
         // Figure out which option was clicked
-        float yOffset = y - m_dropdownRect.y;
+        float yOffset = event.y - m_dropdownRect.y;
         m_selectedIndex = (size_t)(yOffset / m_rect.h);
         m_expanded = false;
     }

@@ -38,12 +38,12 @@ MainMenu::MainMenu()
         MainMenu::submit(dropdown->selectedOption(), true);
     };
 
-    // auto* freePlayBtn = m_screen->add<Button>(new Button({ .x = 0.3995, .y = 0.51, .w = 0.2, .h = 0.05 }));
-    // freePlayBtn->setText("Free Play");
-    // freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    // freePlayBtn->onClick = [dropdown]() {
-    //     MainMenu::submit(dropdown->selectedOption(), false);
-    // };
+    auto* freePlayBtn = mainContainer->add<Button>(new Button({ .x = 0.2, .y = 0.82, .w = 0.6, .h = 0.1 }));
+    freePlayBtn->setText("Free Play");
+    freePlayBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
+    freePlayBtn->onClick = [dropdown]() {
+        MainMenu::submit(dropdown->selectedOption(), false);
+    };
 }
 
 void MainMenu::submit(const std::string& scenarioName, bool challenge)

@@ -21,10 +21,9 @@ struct Rect {
 
 class Widget;
 
-struct ClickEvent {
-    bool pressed; // Was the mouse button pressed or released?
+struct WalkContext {
     Widget* clicked; // Innermost widget that was clicked
-    bool stopped; // Think JS stopPropagation
+    bool stopped; // Think JS stopPropagation (not used for now)
     double x;
     double y;
 };
@@ -57,7 +56,10 @@ protected:
     virtual void render(const Renderer& renderer) const;
     virtual void updateRect();
     virtual bool isInsideRect(float x, float y);
-    virtual void processClick(ClickEvent& event);
+    virtual void processClick(float x, float y);
+
+    // Walk through the widget tree to determine which topmost widget was clicked
+    void treeWalk(WalkContext& ctx);
 
     // This rect defines the rect of the widget based on a percentage of the total screen size (0, 1)
     // We then use this rect to calculate the actual pixel rect and update it whenever the screen size changes

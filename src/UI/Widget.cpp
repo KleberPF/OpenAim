@@ -40,15 +40,22 @@ bool Widget::isInsideRect(float x, float y)
     return m_rect.isInside(x, y);
 }
 
-void Widget::processClick(ClickEvent& event)
+void Widget::processClick(float /*x*/, float /*y*/)
 {
-    if (!isInsideRect(event.x, event.y)) {
+    if (onClick) {
+        onClick();
+    }
+}
+
+void Widget::treeWalk(WalkContext& ctx)
+{
+    if (ctx.stopped || !isInsideRect(ctx.x, ctx.y)) {
         return;
     }
 
-    event.clicked = this;
+    ctx.clicked = this;
 
     for (auto& widget : m_widgets) {
-        widget->processClick(event);
+        widget->treeWalk(ctx);
     }
 }

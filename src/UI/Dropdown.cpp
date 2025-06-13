@@ -1,7 +1,6 @@
 #include "Dropdown.hpp"
 
 #include "ResourceManager.hpp"
-#include "UI/UIManager.hpp"
 #include "UI/Widget.hpp"
 
 #include <cstddef>
@@ -57,16 +56,9 @@ bool Dropdown::isInsideRect(float x, float y)
     return m_rect.isInside(x, y) || (m_expanded && m_dropdownRect.isInside(x, y));
 }
 
-void Dropdown::processClick(ClickEvent& event)
+void Dropdown::processClick(float x, float y)
 {
-    // TODO: this is a bit broken because it works outside of the onClick logic
-    // Right now we basically only check for mouse release
-    if (m_rect.isInside(event.x, event.y)) {
-        if (event.pressed) {
-            event.clicked = this;
-            return;
-        }
-
+    if (m_rect.isInside(x, y)) {
         m_expanded = !m_expanded;
         return;
     }
@@ -75,15 +67,10 @@ void Dropdown::processClick(ClickEvent& event)
         return;
     }
 
-    if (m_dropdownRect.isInside(event.x, event.y)) {
-        if (event.pressed) {
-            event.clicked = this;
-            return;
-        }
-
+    if (m_dropdownRect.isInside(x, y)) {
         // Click inside the dropdown
         // Figure out which option was clicked
-        float yOffset = event.y - m_dropdownRect.y;
+        float yOffset = y - m_dropdownRect.y;
         m_selectedIndex = (size_t)(yOffset / m_rect.h);
         m_expanded = false;
     }

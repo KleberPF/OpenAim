@@ -20,7 +20,7 @@ private:
     void render(const Renderer& renderer) const override;
     void updateRect() override;
     bool isInsideRect(float x, float y) override;
-    void processClick(ClickEvent& event) override;
+    void processClick(float x, float y) override;
 
     void recreateDropdownRect();
 

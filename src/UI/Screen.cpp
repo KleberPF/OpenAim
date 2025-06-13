@@ -13,25 +13,25 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
         return;
     }
 
-    ClickEvent event = {
-        .pressed = pressed,
+    WalkContext ctx = {
         .clicked = nullptr,
         .stopped = false,
         .x = xpos,
         .y = ypos
     };
 
+    // Walk through the widget tree to know which widget the cursor was on
     for (auto& widget : m_widgets) {
-        widget->processClick(event);
+        widget->treeWalk(ctx);
     }
 
     if (pressed) {
         // Mouse button was pressed and we determined which widget it hit
-        m_clickedWidget = event.clicked;
+        m_clickedWidget = ctx.clicked;
     } else {
         // Mouse button was released and we need to check if it was a valid click
-        if (m_clickedWidget != nullptr && m_clickedWidget == event.clicked && m_clickedWidget->onClick) {
-            m_clickedWidget->onClick();
+        if (m_clickedWidget != nullptr && m_clickedWidget == ctx.clicked) {
+            m_clickedWidget->processClick(ctx.x, ctx.y);
         }
 
         m_clickedWidget = nullptr;

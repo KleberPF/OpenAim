@@ -1,6 +1,6 @@
 #include "UI/Widget.hpp"
 
-#include "InputManager.hpp"
+#include "UI/UIManager.hpp"
 
 using namespace UI;
 
@@ -9,8 +9,11 @@ Widget::Widget(Rect relative)
 {
 }
 
-void Widget::updateRect(float screenWidth, float screenHeight)
+void Widget::updateRect()
 {
+    float screenWidth = UIManager::instance().viewWidth();
+    float screenHeight = UIManager::instance().viewHeight();
+
     m_rect.x = m_relativeRect.x * screenWidth;
     m_rect.y = m_relativeRect.y * screenHeight;
     m_rect.w = m_relativeRect.w * screenWidth;

@@ -10,7 +10,10 @@ namespace UI {
 
 class UIManager {
 public:
-    UIManager(float viewWidth, float viewHeight);
+    static void init(float viewWidth, float viewHeight);
+    static void shutdown();
+
+    static UIManager& instance(); // maybe const this?
 
     void subscribe();
 
@@ -18,7 +21,12 @@ public:
 
     void render(Renderer& renderer);
 
+    float viewWidth() const;
+    float viewHeight() const;
+
 private:
+    UIManager() = default;
+
     void handleResize(int width, int height);
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);

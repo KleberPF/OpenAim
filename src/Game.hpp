@@ -7,7 +7,6 @@
 #include "Scenario.hpp"
 #include "Sprite.hpp"
 #include "UI/MainMenu.hpp"
-#include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 #include <memory>
@@ -68,7 +67,6 @@ private:
     Weapon m_weapon;
     std::vector<Scenario> m_scenarios;
     Scenario* m_currentScenario = nullptr;
-    UI::UIManager m_uiManager;
 
     std::unique_ptr<UI::MainMenu> m_mainMenu;
 

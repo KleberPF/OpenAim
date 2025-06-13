@@ -9,8 +9,8 @@
 
 using namespace UI;
 
-MainMenu::MainMenu(UIManager& uiManager)
-    : m_screen(uiManager.addScreen())
+MainMenu::MainMenu()
+    : m_screen(UIManager::instance().addScreen())
 {
     m_screen->active = true;
 

@@ -17,13 +17,13 @@ class Screen {
 public:
     void processClick(MouseButton::Value button, bool pressed, double xpos, double ypos);
     void processMouseMove(double xpos, double ypos);
-    void processResize(float screenWidth, float screenHeight);
+    void processResize();
 
     template <typename T>
     T* add(T* widget)
     {
         m_widgets.push_back(std::unique_ptr<T>(widget));
-        widget->updateRect(m_viewWidth, m_viewHeight);
+        widget->updateRect();
         return widget;
     }
 
@@ -32,10 +32,7 @@ public:
     bool active;
 
 private:
-    Screen(float screenWidth, float screenHeight);
-
-    float m_viewWidth;
-    float m_viewHeight;
+    Screen() = default;
 
     Widget* m_clickedWidget = nullptr;
     Widget* m_hoveredWidget = nullptr;

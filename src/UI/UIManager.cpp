@@ -8,10 +8,33 @@
 
 using namespace UI;
 
-UIManager::UIManager(float viewWidth, float viewHeight)
-    : m_viewWidth(viewWidth)
-    , m_viewHeight(viewHeight)
+namespace {
+
+std::unique_ptr<UIManager> s_Instance = nullptr;
+
+} // end namespace
+
+void UIManager::init(float viewWidth, float viewHeight)
 {
+    if (s_Instance != nullptr) {
+        return;
+    }
+
+    s_Instance = std::unique_ptr<UIManager>(new UIManager);
+
+    s_Instance->m_viewWidth = viewWidth;
+    s_Instance->m_viewHeight = viewHeight;
+}
+
+void UIManager::shutdown()
+{
+    s_Instance.reset();
+}
+
+UIManager& UIManager::instance()
+{
+    assert(s_Instance);
+    return *s_Instance;
 }
 
 void UIManager::subscribe()
@@ -29,7 +52,7 @@ void UIManager::subscribe()
 
 Screen* UIManager::addScreen()
 {
-    auto* screen = new Screen(m_viewWidth, m_viewHeight);
+    auto* screen = new Screen;
     auto ptr = std::unique_ptr<Screen>(screen);
     m_screens.push_back(std::move(ptr));
 
@@ -46,13 +69,23 @@ void UIManager::render(Renderer& renderer)
     }
 }
 
+float UIManager::viewWidth() const
+{
+    return m_viewWidth;
+}
+
+float UIManager::viewHeight() const
+{
+    return m_viewHeight;
+}
+
 void UIManager::handleResize(int width, int height)
 {
     m_viewWidth = width;
     m_viewHeight = height;
 
     for (auto& screen : m_screens) {
-        screen->processResize(width, height);
+        screen->processResize();
     }
 }
 

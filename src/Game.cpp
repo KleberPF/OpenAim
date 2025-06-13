@@ -32,7 +32,6 @@ using json = nlohmann::json;
 Game::Game()
     : m_window(SCR_WIDTH, SCR_HEIGHT, "OpenAim", FULLSCREEN)
     , m_camera({ 0.0f, 1.5f, 8.0f }, { 0.0, 1.0, 0.0 }, -90.0, 0.0)
-    , m_uiManager(m_window.width, m_window.height)
     , m_lastX((float)m_window.width / 2)
     , m_lastY((float)m_window.height / 2)
 {
@@ -42,11 +41,12 @@ Game::Game()
     ResourceManager::init();
     SoundPlayer::init();
     InputManager::init();
+    UI::UIManager::init(m_window.width, m_window.height);
 
     // set up subscribers to events (resize, mouse move, etc)
     InputManager::instance().subscribe();
     m_window.subscribe();
-    m_uiManager.subscribe();
+    UI::UIManager::instance().subscribe();
 
     Sprite crosshair(ResourceManager::instance().getShader("sprite"),
         ResourceManager::instance().getMaterial("crosshair"),
@@ -66,7 +66,7 @@ Game::Game()
     parseScenariosFromFile("./resources/scenarios");
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
-    m_mainMenu = std::make_unique<UI::MainMenu>(m_uiManager);
+    m_mainMenu = std::make_unique<UI::MainMenu>();
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
         onEvent(type, data);
@@ -80,6 +80,7 @@ Game::~Game()
     ResourceManager::shutdown();
     SoundPlayer::shutdown();
     InputManager::shutdown();
+    UI::UIManager::shutdown();
 }
 
 void Game::mainLoop()
@@ -217,7 +218,7 @@ void Game::render()
     m_renderer.renderScene(scene);
 
     if (m_state == State::Menu) {
-        m_uiManager.render(m_renderer);
+        UI::UIManager::instance().render(m_renderer);
     }
 }
 

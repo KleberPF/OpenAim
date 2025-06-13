@@ -7,7 +7,7 @@ namespace UI {
 
 class MainMenu {
 public:
-    MainMenu(UIManager& uiManager);
+    MainMenu();
 
 private:
     Screen* m_screen;

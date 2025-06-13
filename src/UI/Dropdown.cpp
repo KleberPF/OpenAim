@@ -1,6 +1,7 @@
 #include "Dropdown.hpp"
 
 #include "ResourceManager.hpp"
+#include "UI/UIManager.hpp"
 
 #include <cstddef>
 
@@ -44,8 +45,11 @@ void Dropdown::render(const Renderer& renderer) const
     }
 }
 
-void Dropdown::updateRect(float screenWidth, float screenHeight)
+void Dropdown::updateRect()
 {
+    float screenWidth = UIManager::instance().viewWidth();
+    float screenHeight = UIManager::instance().viewHeight();
+
     m_rect.x = m_relativeRect.x * screenWidth;
     m_rect.y = m_relativeRect.y * screenHeight;
     m_rect.w = m_relativeRect.w * screenWidth;

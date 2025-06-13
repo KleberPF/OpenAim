@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Color.hpp"
-#include "InputManager.hpp"
 #include "Renderer.hpp"
 
 #include <functional>
@@ -36,7 +35,7 @@ public:
 
 protected:
     virtual void render(const Renderer& renderer) const;
-    virtual void updateRect(float screenWidth, float screenHeight);
+    virtual void updateRect();
     virtual bool isInsideRect(float x, float y);
     virtual void processClick(float x, float y);
 
@@ -44,6 +43,9 @@ protected:
     // We then use this rect to calculate the actual pixel rect and update it whenever the screen size changes
     Rect m_relativeRect;
     Rect m_rect;
+
+    std::vector<std::unique_ptr<Widget>> m_widgets;
+    Widget* m_parent;
 
     friend class Screen;
 };

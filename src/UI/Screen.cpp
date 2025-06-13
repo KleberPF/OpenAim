@@ -61,13 +61,10 @@ void Screen::processMouseMove(double xpos, double ypos)
     }
 }
 
-void Screen::processResize(float screenWidth, float screenHeight)
+void Screen::processResize()
 {
-    m_viewWidth = screenWidth;
-    m_viewHeight = screenHeight;
-
     for (auto& widget : m_widgets) {
-        widget->updateRect(screenWidth, screenHeight);
+        widget->updateRect();
     }
 }
 
@@ -76,10 +73,4 @@ void Screen::render(const Renderer& renderer)
     for (auto& widget : m_widgets) {
         widget->render(renderer);
     }
-}
-
-Screen::Screen(float screenWidth, float screenHeight)
-    : m_viewWidth(screenWidth)
-    , m_viewHeight(screenHeight)
-{
 }

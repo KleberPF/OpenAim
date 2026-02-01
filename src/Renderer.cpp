@@ -139,24 +139,41 @@ void Renderer::renderSprite(const Scene& scene, const Sprite& sprite) const
     sprite.shader.get().use();
     sprite.material.get().bind(sprite.shader);
 
+    float width = sprite.dimensions.relative ? sprite.dimensions.width * scene.viewportWidth : sprite.dimensions.width;
+    float height = sprite.dimensions.relative ? sprite.dimensions.height * scene.viewportHeight : sprite.dimensions.height;
+
+    float x = sprite.position.relative ? sprite.position.x * scene.viewportWidth : sprite.position.x;
+    float y = sprite.position.relative ? sprite.position.y * scene.viewportHeight : sprite.position.y;
+
+    x -= sprite.pivot.x * width;
+    y -= sprite.pivot.y * height;
+
     auto model = glm::identity<glm::mat4>();
-    model = glm::translate(model, glm::vec3(sprite.position, 1.0f));
+    model = glm::translate(model, glm::vec3(x, y, 1.0f));
 
-    if (sprite.rotationAngle != 0.0f) {
-        model = glm::translate(model,
-            glm::vec3(0.5 * sprite.dimensions.x, 0.5 * sprite.dimensions.y, 0));
-        model = glm::rotate(
-            model, glm::radians(sprite.rotationAngle), glm::vec3(0, 0, 1));
-        model = glm::translate(model,
-            glm::vec3(
-                -0.5 * sprite.dimensions.x, -0.5 * sprite.dimensions.y, 0));
-    }
+    // TODO: support rotations later if needed
 
-    model = glm::scale(model, glm::vec3(sprite.dimensions, 1.0));
+    // if (sprite.rotationAngle != 0.0f) {
+    //     model = glm::translate(model,
+    //         glm::vec3(0.5 * x, 0.5 * sprite.dimensions.y, 0));
+    //     model = glm::rotate(
+    //         model, glm::radians(sprite.rotationAngle), glm::vec3(0, 0, 1));
+    //     model = glm::translate(model,
+    //         glm::vec3(
+    //             -0.5 * sprite.dimensions.x, -0.5 * sprite.dimensions.y, 0));
+    // }
 
-    glm::mat4 projection = glm::ortho(-scene.viewportWidth / 2.0f,
-        scene.viewportWidth / 2.0f, -scene.viewportHeight / 2.0f,
-        scene.viewportHeight / 2.0f, -1.0f, 1.0f);
+    model = glm::scale(model, glm::vec3(width, height, 1.0));
+
+    // Values need to be casted to float here
+    // Don't ask me how I know
+    glm::mat4 projection = glm::ortho(
+        0.0f,
+        static_cast<float>(scene.viewportWidth),
+        static_cast<float>(scene.viewportHeight),
+        0.0f,
+        -1.0f,
+        1.0f);
 
     glm::mat4 mvp = projection * model;
     sprite.shader.get().setMat4("mvp", mvp);

@@ -50,8 +50,9 @@ Game::Game()
 
     Sprite crosshair(ResourceManager::instance().getShader("sprite"),
         ResourceManager::instance().getMaterial("crosshair"),
-        glm::vec2(CROSSHAIR_SIZE_PX, CROSSHAIR_SIZE_PX),
-        glm::vec2(-CROSSHAIR_SIZE_PX / 2, -CROSSHAIR_SIZE_PX / 2), 0.0f);
+        { .width = CROSSHAIR_SIZE_PX, .height = CROSSHAIR_SIZE_PX, .relative = false },
+        { .x = 0.5f, .y = 0.5f, .relative = true },
+        0.0f, glm::vec2(0.5f, 0.5f));
     m_sprites.push_back(crosshair);
 
     m_globalLightSource.direction = glm::vec3(-0.2f, -1.0f, -0.3f);

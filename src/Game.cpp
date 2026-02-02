@@ -77,7 +77,7 @@ Game::Game()
         return scenario.name;
     });
     m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
-    m_scenarioOverlay = std::make_unique<UI::ScenarioOverlay>(UI::ScenarioOverlayData());
+    m_scenarioOverlay = std::make_unique<UI::ScenarioOverlay>();
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
         onEvent(type, data);

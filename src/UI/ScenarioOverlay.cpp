@@ -7,7 +7,7 @@
 
 using namespace UI;
 
-ScenarioOverlay::ScenarioOverlay(const ScenarioOverlayData& data)
+ScenarioOverlay::ScenarioOverlay()
     : m_screen(UIManager::instance().addScreen())
 {
     auto* mainContainer = m_screen->add<Widget>(new Widget({ .x = 0.0, .y = 0.0, .w = 0.2, .h = 0.2 }));

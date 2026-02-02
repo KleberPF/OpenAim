@@ -11,7 +11,7 @@ struct ScenarioOverlayData {
 
 class ScenarioOverlay {
 public:
-    ScenarioOverlay(const ScenarioOverlayData& data);
+    ScenarioOverlay();
 
     void enable()
     {

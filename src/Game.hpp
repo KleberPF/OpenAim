@@ -7,6 +7,7 @@
 #include "Scenario.hpp"
 #include "Sprite.hpp"
 #include "UI/MainMenu.hpp"
+#include "UI/ScenarioOverlay.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 
@@ -70,6 +71,7 @@ private:
     Scenario* m_currentScenario = nullptr;
 
     std::unique_ptr<UI::MainMenu> m_mainMenu;
+    std::unique_ptr<UI::ScenarioOverlay> m_scenarioOverlay;
 
     // mouse input
     // This is meant to be set every time we go from a free moving cursor to

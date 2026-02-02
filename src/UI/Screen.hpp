@@ -29,7 +29,7 @@ public:
 
     void render(const Renderer& renderer);
 
-    bool active;
+    bool active = false;
 
 private:
     Screen() = default;

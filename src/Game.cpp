@@ -12,6 +12,7 @@
 #include "SoundPlayer.hpp"
 #include "Sprite.hpp"
 #include "UI/MainMenu.hpp"
+#include "UI/ScenarioOverlay.hpp"
 #include "UI/Screen.hpp"
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
@@ -76,6 +77,7 @@ Game::Game()
         return scenario.name;
     });
     m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
+    m_scenarioOverlay = std::make_unique<UI::ScenarioOverlay>(UI::ScenarioOverlayData());
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
         onEvent(type, data);
@@ -224,11 +226,21 @@ void Game::render()
     scene.entities = m_entityManager.entities();
     scene.sprites = m_sprites;
 
+    if (m_state == State::Menu) {
+        m_mainMenu->enable();
+    } else {
+        m_mainMenu->disable();
+        m_scenarioOverlay->enable();
+    }
+
     m_renderer.renderScene(scene);
 
-    if (m_state == State::Menu) {
-        UI::UIManager::instance().render(m_renderer);
-    }
+    UI::ScenarioOverlayData overlayData = {
+        .challenge = m_challengeState.happening
+    };
+
+    m_scenarioOverlay->update(overlayData);
+    UI::UIManager::instance().render(m_renderer);
 }
 
 void Game::mainLoopEnd()

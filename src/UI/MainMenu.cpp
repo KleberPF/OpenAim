@@ -14,8 +14,6 @@ using namespace UI;
 MainMenu::MainMenu(const std::vector<std::string>& scenarios)
     : m_screen(UIManager::instance().addScreen())
 {
-    m_screen->active = true;
-
     // Main container
     auto* mainContainer = m_screen->add<Widget>(new Widget({ .x = 0.333, .y = 0.1, .w = 0.333, .h = 0.5 }));
     mainContainer->backgroundColor = { .r = 45, .g = 45, .b = 45 };

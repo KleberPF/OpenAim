@@ -4,9 +4,9 @@
 
 using namespace UI;
 
-void Label::setText(const char* text)
+void Label::setText(const char* text, int fontSize)
 {
-    Text t(&ResourceManager::instance().getFont(LIBERATION), text, 24);
+    Text t(&ResourceManager::instance().getFont(LIBERATION), text, fontSize);
     auto ptr = std::make_unique<TextRenderable>(t);
     m_textRenderable.swap(ptr);
 }
@@ -18,7 +18,7 @@ void Label::render(const Renderer& renderer) const
         return;
     }
 
-    auto text = m_textRenderable->text();
+    const auto& text = m_textRenderable->text();
 
     float textX;
     float textY;

@@ -16,7 +16,7 @@ public:
     {
     }
 
-    void setText(const char* text);
+    void setText(const char* text, int fontSize);
 
     LabelTextAlignment alignment = LabelTextAlignment::Left;
 

@@ -21,6 +21,7 @@ MainMenu::MainMenu(const std::vector<std::string>& scenarios)
     // Title card
     auto* titleCard = mainContainer->add<Label>(new Label({ .x = 0.1, .y = 0.07, .w = 0.8, .h = 0.1 }));
     titleCard->setText("OpenAim");
+    titleCard->alignment = LabelTextAlignment::Center;
     titleCard->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 
     // Dropdown

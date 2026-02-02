@@ -6,42 +6,43 @@ project(OpenAim)
 
 # List of source files
 set(SOURCES
-    src/main.cpp
-    src/glad.c
-    src/Window.cpp
-    src/filereader.cpp
-    src/Shader.cpp
-    src/Camera.cpp
-    src/Entity.cpp
-    src/Game.cpp
-    src/Mesh.cpp
-    src/Model.cpp
-    src/stb_image.c
-    src/stb_vorbis.c
-    src/Renderer.cpp
-    src/ResourceManager.cpp
-    src/InputManager.cpp
-    src/Material.cpp
-    src/utils.cpp
-    src/Sprite.cpp
-    src/Scene.cpp
-    src/Weapon.cpp
-    src/RNG.cpp
-    src/SoundPlayer.cpp
-    src/Sound.cpp
-    src/EntityManager.cpp
-    src/Font.cpp
-    src/Text.cpp
-    src/EventManager.cpp
-    src/TextRenderable.cpp
-    src/UI/UIManager.cpp
-    src/UI/Screen.cpp
-    src/UI/Widget.cpp
-    src/UI/Label.cpp
-    src/UI/Button.cpp
-    src/UI/Dropdown.cpp
-    src/UI/MainMenu.cpp
-    # Add more source files here as needed
+  src/main.cpp
+  src/glad.c
+  src/Window.cpp
+  src/filereader.cpp
+  src/Shader.cpp
+  src/Camera.cpp
+  src/Entity.cpp
+  src/Game.cpp
+  src/Mesh.cpp
+  src/Model.cpp
+  src/stb_image.c
+  src/stb_vorbis.c
+  src/Renderer.cpp
+  src/ResourceManager.cpp
+  src/InputManager.cpp
+  src/Material.cpp
+  src/utils.cpp
+  src/Sprite.cpp
+  src/Scene.cpp
+  src/Weapon.cpp
+  src/RNG.cpp
+  src/SoundPlayer.cpp
+  src/Sound.cpp
+  src/EntityManager.cpp
+  src/Font.cpp
+  src/Text.cpp
+  src/EventManager.cpp
+  src/TextRenderable.cpp
+  src/UI/UIManager.cpp
+  src/UI/Screen.cpp
+  src/UI/Widget.cpp
+  src/UI/Label.cpp
+  src/UI/Button.cpp
+  src/UI/Dropdown.cpp
+  src/UI/MainMenu.cpp
+  src/UI/ScenarioOverlay.cpp
+  # Add more source files here as needed
 )
 
 # Generate compile_commands.json
@@ -83,59 +84,61 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/nlohmann_json)
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype)
 
 # Add an executable target
-if (MSVC)
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+if(MSVC)
+  add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
 else()
-    add_executable(${PROJECT_NAME} ${SOURCES})
+  add_executable(${PROJECT_NAME} ${SOURCES})
 endif()
 
 # Set include directories
 target_include_directories(${PROJECT_NAME}
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/src
+  PUBLIC
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 # Set library directories
 target_link_directories(${PROJECT_NAME}
-    PRIVATE
-        ${CMAKE_CURRENT_SOURCE_DIR}/lib
+  PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/lib
 )
 
 # Add any additional libraries your executable may depend on
 target_link_libraries(${PROJECT_NAME}
-    PRIVATE
-        glfw
-        glm
-        assimp
-        OpenAL::OpenAL
-        nlohmann_json::nlohmann_json
-        freetype
-        # Add more libraries here as needed
+  PRIVATE
+    glfw
+    glm
+    assimp
+    OpenAL::OpenAL
+    nlohmann_json::nlohmann_json
+    freetype
+    # Add more libraries here as needed
 )
 
 # If you have any custom CMake modules, you can include them here
 # include(CMakeModuleFile.cmake)
 
-if (MSVC)
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+if(MSVC)
+  target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 elseif(CMAKE_BUILD_TYPE STREQUAL "Debug")
-    target_compile_options(${PROJECT_NAME} PRIVATE -g)
+  target_compile_options(${PROJECT_NAME} PRIVATE -g)
 else()
-    target_compile_options(${PROJECT_NAME} PRIVATE)
+  target_compile_options(${PROJECT_NAME} PRIVATE)
 endif()
 
 # Optionally, set C++ standard
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 26)
 
-if (MSVC)
-    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32d.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-    else()
-        add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
-    endif()
+if(MSVC)
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32d.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+  else()
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE_DIR:${PROJECT_NAME}>/lib/openal-soft/OpenAL32.dll $<TARGET_FILE_DIR:${PROJECT_NAME}>)
+  endif()
 endif()
 
-add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/resources $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND}
+  -E copy_directory ${CMAKE_SOURCE_DIR}/resources
+  $<TARGET_FILE_DIR:${PROJECT_NAME}>/resources)

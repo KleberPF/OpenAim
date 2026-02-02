@@ -4,6 +4,11 @@
 
 namespace UI {
 
+enum class LabelTextAlignment : uint8_t {
+    Center,
+    Left,
+};
+
 class Label : public Widget {
 public:
     Label(Rect relative)
@@ -12,6 +17,8 @@ public:
     }
 
     void setText(const char* text);
+
+    LabelTextAlignment alignment = LabelTextAlignment::Left;
 
 private:
     void render(const Renderer& renderer) const override;

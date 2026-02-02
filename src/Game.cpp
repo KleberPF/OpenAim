@@ -22,9 +22,11 @@
 #include <stb_image.h>
 
 #include <cmath>
+#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <memory>
+#include <set>
 #include <string>
 
 using json = nlohmann::json;
@@ -331,19 +333,26 @@ void Game::reset()
 
 void Game::parseScenariosFromFile(const std::string& scenarioFolder)
 {
+    std::set<std::filesystem::path> paths;
+
+    // Sort by name
     for (const auto& entry :
         std::filesystem::directory_iterator(scenarioFolder)) {
         if (entry.path().extension() != ".json") {
             continue;
         }
 
+        paths.insert(entry.path());
+    }
+
+    for (const auto& path : paths) {
         try {
-            std::ifstream f(entry.path());
+            std::ifstream f(path);
             json data = json::parse(f);
 
             Scenario scenario;
 
-            std::string filename = entry.path().filename().string();
+            std::string filename = path.filename().string();
             scenario.name = filename.substr(0, filename.find('.'));
 
             std::string weaponType = data["weapon"];
@@ -417,7 +426,7 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
         } catch (...) {
             // probably some JSON format error
             // just skips the file
-            std::cout << "Error parsing file " << entry << '\n';
+            std::cout << "Error parsing file " << path << '\n';
         }
     }
 }

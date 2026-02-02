@@ -7,8 +7,6 @@
 #include "UI/Label.hpp"
 #include "UI/UIManager.hpp"
 
-#include <iostream>
-
 using namespace UI;
 
 MainMenu::MainMenu(const std::vector<std::string>& scenarios)
@@ -28,7 +26,6 @@ MainMenu::MainMenu(const std::vector<std::string>& scenarios)
     auto* dropdown = mainContainer->add(new Dropdown({ .x = 0.1, .y = 0.21, .w = 0.8, .h = 0.1 }));
     dropdown->backgroundColor = { .r = 50, .g = 50, .b = 50 };
     for (const auto& scenario : scenarios) {
-        std::cout << scenario << '\n';
         dropdown->addOption(scenario.c_str());
     }
 

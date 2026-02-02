@@ -7,6 +7,7 @@ namespace UI {
 
 struct ScenarioOverlayData {
     bool challenge = false;
+    float timeRemaining = 0;
 };
 
 class ScenarioOverlay {
@@ -29,6 +30,7 @@ private:
 
     Screen* m_screen;
     Label* m_challenge;
+    Label* m_timeRemaining;
 };
 
 } // namespace UI

@@ -236,7 +236,8 @@ void Game::render()
     m_renderer.renderScene(scene);
 
     UI::ScenarioOverlayData overlayData = {
-        .challenge = m_challengeState.happening
+        .challenge = m_challengeState.happening,
+        .timeRemaining = m_challengeState.timeRemainingSeconds,
     };
 
     m_scenarioOverlay->update(overlayData);

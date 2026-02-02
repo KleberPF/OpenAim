@@ -21,10 +21,12 @@
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
+#include <algorithm>
 #include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <memory>
 #include <set>
 #include <string>
@@ -69,7 +71,11 @@ Game::Game()
     parseScenariosFromFile("./resources/scenarios");
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
-    m_mainMenu = std::make_unique<UI::MainMenu>();
+    std::vector<std::string> scenarioNames;
+    std::ranges::transform(m_scenarios, std::back_inserter(scenarioNames), [](const auto& scenario) {
+        return scenario.name;
+    });
+    m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
         onEvent(type, data);
@@ -431,9 +437,18 @@ void Game::parseScenariosFromFile(const std::string& scenarioFolder)
     }
 }
 
-void Game::createScenario(size_t index)
+void Game::createScenario(const std::string& name)
 {
-    m_currentScenario = &m_scenarios[index];
+    auto scenario = std::ranges::find_if(m_scenarios, [&name](const auto& scenario) {
+        return scenario.name == name;
+    });
+
+    if (scenario == m_scenarios.end()) {
+        // Shouldn't happen so just ignore I guess
+        return;
+    }
+
+    m_currentScenario = &*scenario;
 
     m_weapon.type = m_currentScenario->weaponType;
     m_camera.position = m_currentScenario->playerPos;
@@ -490,13 +505,7 @@ void Game::onEvent(EventType type, void* data)
         auto* event = (NewScenarioEvent*)data;
 
         // TODO: use ids?
-        if (event->scenario == "Clicking") {
-            createScenario(0);
-        } else if (event->scenario == "Switching") {
-            createScenario(1);
-        } else if (event->scenario == "Tracking") {
-            createScenario(2);
-        }
+        createScenario(event->scenario);
 
         m_challengeState.happening = event->challenge;
         changeState(Game::State::Running);

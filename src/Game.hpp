@@ -9,6 +9,7 @@
 #include "UI/MainMenu.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
+
 #include <memory>
 
 // settings
@@ -52,7 +53,7 @@ private:
     void reset();
 
     void parseScenariosFromFile(const std::string& scenarioFolder);
-    void createScenario(size_t index);
+    void createScenario(const std::string& name);
 
     // TODO: I don't like the Game object itself handling events
     void onEvent(EventType type, void* data);

@@ -1,13 +1,14 @@
 #pragma once
 
 #include "UI/Screen.hpp"
+
 #include <string>
 
 namespace UI {
 
 class MainMenu {
 public:
-    MainMenu();
+    MainMenu(const std::vector<std::string>& scenarios);
 
 private:
     Screen* m_screen;

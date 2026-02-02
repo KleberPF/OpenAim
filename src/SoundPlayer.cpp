@@ -67,7 +67,7 @@ SoundPlayer::SoundPlayer()
         // could be a parameter in the play functions later if needed
         alSourcef(source, AL_GAIN, 0.1f);
 
-        m_sources.insert({ sound.name(), source });
+        m_sourcesAndBuffers.insert({ sound.name(), { .source = source, .buffer = buffer } });
     }
 
     if (ALenum error = alGetError(); error != AL_NO_ERROR) {
@@ -78,28 +78,35 @@ SoundPlayer::SoundPlayer()
 
 SoundPlayer::~SoundPlayer()
 {
+    for (auto& [_, sourceAndBuffer] : m_sourcesAndBuffers) {
+        auto& [source, buffer] = sourceAndBuffer;
+        alDeleteSources(1, &source);
+        alDeleteBuffers(1, &buffer);
+    }
+
     alcMakeContextCurrent(nullptr);
+
     alcDestroyContext(m_context);
     alcCloseDevice(m_device);
 }
 
 void SoundPlayer::play(const std::string& soundName)
 {
-    ALuint source = m_sources.at(soundName);
+    ALuint source = m_sourcesAndBuffers.at(soundName).source;
     alSourcef(source, AL_PITCH, 1);
     alSourcePlay(source);
 }
 
 void SoundPlayer::playWithRandomPitch(const std::string& soundName)
 {
-    ALuint source = m_sources.at(soundName);
+    ALuint source = m_sourcesAndBuffers.at(soundName).source;
     alSourcef(source, AL_PITCH, RNG::instance().getFloatInRange(0.9f, 1.1f));
     alSourcePlay(source);
 }
 
 void SoundPlayer::playIfNotAlreadyPlaying(const std::string& soundName)
 {
-    ALuint source = m_sources.at(soundName);
+    ALuint source = m_sourcesAndBuffers.at(soundName).source;
     ALint state = 0;
     alGetSourcei(source, AL_SOURCE_STATE, &state);
     if (state == AL_PLAYING) {

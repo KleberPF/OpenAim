@@ -6,6 +6,11 @@
 #include <map>
 #include <string>
 
+struct ALSourceAndBuffer {
+    ALuint source;
+    ALuint buffer;
+};
+
 class SoundPlayer {
 public:
     ~SoundPlayer();
@@ -22,7 +27,7 @@ public:
 private:
     SoundPlayer();
 
-    std::map<std::string, ALuint> m_sources;
+    std::map<std::string, ALSourceAndBuffer> m_sourcesAndBuffers;
 
     // OpenAL stuff
     ALCdevice* m_device;

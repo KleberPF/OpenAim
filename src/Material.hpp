@@ -6,6 +6,7 @@
 
 #include <array>
 #include <vector>
+#include <functional>
 
 class Texture {
 public:

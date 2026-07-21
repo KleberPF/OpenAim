@@ -4,6 +4,7 @@
 #include "Shader.hpp"
 
 #include <glm/glm.hpp>
+#include <functional>
 
 // Kinda ugly
 struct SpritePosition {

@@ -4,8 +4,16 @@ OpenAim is a small aim trainer made from scratch in C++, using OpenGL as the ren
 
 ## Building on Linux
 
+First, install the dependencies. For Arch those are:
+
 ```
-git clone --recurse-submodules https://github.com/KleberPF/OpenAim.git
+sudo pacman -S glfw glm assimp openal nlohmann-json freetype2
+```
+
+then
+
+```
+git clone https://github.com/KleberPF/OpenAim.git
 cd OpenAim
 mkdir build
 cd build
@@ -21,15 +29,7 @@ To run the game
 
 ## Building on Windows
 
-```
-git clone --recurse-submodules https://github.com/KleberPF/OpenAim.git
-```
-
-Inside Visual Studio, open the CMake project and select the OpenAim.exe target
-
-![image](https://github.com/KleberPF/OpenAim/assets/43550602/17f8bb7a-f460-45a6-9fbf-c8fc51befc11)
-
-![image](https://github.com/KleberPF/OpenAim/assets/43550602/afa865c6-c61e-49b0-b809-b38d74a1b7e3)
+GL :)
 
 ## Media
 

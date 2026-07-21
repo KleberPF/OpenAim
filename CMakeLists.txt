@@ -48,41 +48,6 @@ set(SOURCES
 # Generate compile_commands.json
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-# Add GLFW submodule
-option(GLFW_BUILD_EXAMPLES "" OFF)
-option(GLFW_BUILD_TESTS "" OFF)
-option(GLFW_BUILD_DOCS "" OFF)
-option(GLFW_INSTALL "" OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw)
-
-# Add GLM submodule
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/glm)
-
-# Add assimp submodule
-option(ASSIMP_BUILD_TESTS "" OFF)
-option(ASSIMP_INSTALL "" OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/assimp)
-
-# Add openal-soft submodule
-option(ALSOFT_UTILS "" OFF)
-option(ALSOFT_EXAMPLES "" OFF)
-option(ALSOFT_INSTALL "" OFF)
-option(ALSOFT_INSTALL_CONFIG "" OFF)
-option(ALSOFT_INSTALL_HRTF_DATA "" OFF)
-option(ALSOFT_INSTALL_AMBDEC_PRESETS "" OFF)
-option(ALSOFT_INSTALL_EXAMPLES "" OFF)
-option(ALSOFT_INSTALL_UTILS "" OFF)
-option(ALSOFT_UPDATE_BUILD_VERSION "" OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openal-soft)
-
-# Add nlohmann_json submodule
-option(JSON_BuildTests "" OFF)
-option(JSON_Install "" OFF)
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/nlohmann_json)
-
-# Add freetype submodule
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/freetype)
-
 # Add an executable target
 if(MSVC)
   add_executable(${PROJECT_NAME} WIN32 ${SOURCES})
@@ -99,21 +64,22 @@ target_include_directories(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
-# Set library directories
-target_link_directories(${PROJECT_NAME}
-  PRIVATE
-    ${CMAKE_CURRENT_SOURCE_DIR}/lib
-)
+find_package(glfw3 REQUIRED)
+find_package(glm REQUIRED)
+find_package(assimp REQUIRED)
+find_package(OpenAL REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(Freetype REQUIRED)
 
 # Add any additional libraries your executable may depend on
 target_link_libraries(${PROJECT_NAME}
   PRIVATE
     glfw
-    glm
-    assimp
+    glm::glm
+    assimp::assimp
     OpenAL::OpenAL
     nlohmann_json::nlohmann_json
-    freetype
+    Freetype::Freetype
     # Add more libraries here as needed
 )
 

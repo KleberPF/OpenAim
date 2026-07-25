@@ -215,7 +215,7 @@ void Game::updateShotEntities()
         m_shotsHit++;
     }
 
-    m_totalShots++;
+    m_shotsFired++;
 }
 
 void Game::render()
@@ -238,6 +238,8 @@ void Game::render()
     UI::ScenarioOverlayData overlayData = {
         .challenge = m_challengeState.happening,
         .timeRemaining = m_challengeState.timeRemainingSeconds,
+        .shotsHit = m_shotsHit,
+        .shotsFired = m_shotsFired,
     };
 
     m_scenarioOverlay->update(overlayData);
@@ -343,9 +345,9 @@ void Game::buildPlayArea()
 void Game::reset()
 {
     m_shotsHit = 0;
-    m_totalShots = 0;
+    m_shotsFired = 0;
     m_totalTimeSeconds = 0;
-    m_challengeState = {};
+    m_challengeState = { };
     m_currentScenario = nullptr;
     m_entityManager.removeAllTargets();
 }

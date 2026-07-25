@@ -20,6 +20,14 @@ ScenarioOverlay::ScenarioOverlay()
     m_timeRemaining = mainContainer->add<Label>(new Label({ .x = 0.1, .y = 0.2, .w = 0.8, .h = 0.1 }));
     m_timeRemaining->setText("Time remaining: N/A", 18);
     m_timeRemaining->backgroundColor = { .r = 45, .g = 45, .b = 45 };
+
+    m_shotsHit = mainContainer->add<Label>(new Label({ .x = 0.1, .y = 0.33, .w = 0.8, .h = 0.1 }));
+    m_shotsHit->setText("Shots hit: 0", 18);
+    m_shotsHit->backgroundColor = { .r = 45, .g = 45, .b = 45 };
+
+    m_shotsFired = mainContainer->add<Label>(new Label({ .x = 0.1, .y = 0.46, .w = 0.8, .h = 0.1 }));
+    m_shotsFired->setText("Shots fired: 0", 18);
+    m_shotsFired->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 }
 
 void ScenarioOverlay::update(const ScenarioOverlayData& data)
@@ -33,6 +41,14 @@ void ScenarioOverlay::update(const ScenarioOverlayData& data)
     if (m_lastData.timeRemaining != data.timeRemaining) {
         std::string timeRemaining = std::format("{:.2f}", data.timeRemaining);
         m_timeRemaining->setText(std::format("Time remaining: {}", data.challenge ? timeRemaining : "N/A").c_str(), 18);
+    }
+
+    if (m_lastData.shotsHit != data.shotsHit) {
+        m_shotsHit->setText(std::format("Shots hit: {}", data.shotsHit).c_str(), 18);
+    }
+
+    if (m_lastData.shotsFired != data.shotsFired) {
+        m_shotsFired->setText(std::format("Shots fired: {}", data.shotsFired).c_str(), 18);
     }
 
     m_lastData = data;

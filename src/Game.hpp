@@ -93,7 +93,7 @@ private:
 
     // objective related stuff
     int m_shotsHit = 0;
-    int m_totalShots = 0;
+    int m_shotsFired = 0;
 
     // challenge tracking
     ChallengeState m_challengeState;

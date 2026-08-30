@@ -59,9 +59,9 @@ void EntityManager::updateEntities(float timeElapsedSeconds)
             continue;
         }
 
-        if (it->type == Entity::Type::GONER) {
+        if (it->type == Target::Type::Goner) {
             it = m_entities.erase(it);
-        } else if (it->type == Entity::Type::MOVER) {
+        } else if (it->type == Target::Type::Mover) {
             moveEntityToFreePosition(*it);
             ++it;
         }

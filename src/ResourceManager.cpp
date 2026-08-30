@@ -2,10 +2,13 @@
 
 #include "Material.hpp"
 #include "Model.hpp"
+#include "Scenario.hpp"
 #include "Shader.hpp"
 #include "Sound.hpp"
+#include "Weapon.hpp"
 
 #include <cassert>
+#include <filesystem>
 #include <memory>
 
 namespace {
@@ -77,6 +80,9 @@ ResourceManager::ResourceManager()
     // sounds
     addSound("pistol", "./resources/sounds/pistol.ogg");
     addSound("machine_gun", "./resources/sounds/machine_gun.ogg");
+
+    // scenarios
+    loadScenarios("../resources/lua_scenarios");
 }
 
 ResourceManager& ResourceManager::instance()
@@ -156,4 +162,151 @@ void ResourceManager::addFont(FontId id, Font font)
 Font& ResourceManager::getFont(FontId id)
 {
     return m_fonts.at(id);
+}
+
+void ResourceManager::loadScenarios(const std::string& path)
+{
+    m_lua.open_libraries(sol::lib::base, sol::lib::math);
+
+    // init "enums" used in the lua definition of a scenario
+    std::string enums = R"(
+        Weapon = {
+            Pistol = 0,
+            Machine_Gun = 1,
+        }
+        WinCondition = {
+            ClearTargets = 0,
+            Time = 1,
+        }
+        Shape = {
+            Box = 0,
+            Ball = 1,
+        }
+        Type = {
+            Mover = 0,
+            Goner = 1,
+        }
+    )";
+    m_lua.script(enums);
+
+    auto coordFromTable = [&](const sol::table& table) {
+        return Scenario::Coordinate {
+            .x = table["x"],
+            .y = table["y"],
+            .z = table["z"],
+        };
+    };
+
+    for (const auto& entry : std::filesystem::directory_iterator(path)) {
+        if (entry.path().extension() != ".lua") {
+            continue;
+        }
+
+        sol::table ret = m_lua.script_file(entry.path());
+        if (!ret.valid()) {
+            throw std::invalid_argument("Error when parsing .lua scenario file");
+        }
+
+        Scenario scenario;
+        scenario.name = entry.path().filename().string();
+
+        if (!ret["weapon"].valid()) {
+            throw std::invalid_argument("Scenario has no weapon defined");
+        }
+
+        scenario.weaponType = static_cast<Weapon::Type>(ret["weapon"]);
+
+        if (!ret["player_pos"].valid()) {
+            throw std::invalid_argument("Scenario has no player_pos defined");
+        }
+        scenario.playerPos = coordFromTable(ret["player_pos"]);
+
+        if (ret["win_condition"].valid()) {
+            scenario.winCondition = static_cast<Scenario::WinCondition>(ret["win_condition"]);
+        }
+
+        if (!ret["challenge_duration"].valid()) {
+            throw std::invalid_argument("Scenario has no challenge_duration defined");
+        }
+        scenario.challengeDurationSeconds = ret["challenge_duration"];
+
+        sol::table targets = ret["targets"];
+        if (!targets.valid()) {
+            throw std::invalid_argument("Scenario has no targets defined");
+        }
+
+        int a = targets.size();
+
+        targets.for_each([&](const sol::object&, const sol::object& value) {
+            sol::table luaTarget = value;
+
+            if (!luaTarget.valid()) {
+                throw std::invalid_argument("Some target is invalid");
+            }
+
+            Target target;
+
+            if (!luaTarget["scale"].valid()) {
+                throw std::invalid_argument("Target has no scale defined");
+            }
+            target.scale.x = luaTarget["scale"]["x"];
+            target.scale.y = luaTarget["scale"]["y"];
+            target.scale.z = luaTarget["scale"]["z"];
+
+            if (!luaTarget["shape"].valid()) {
+                throw std::invalid_argument("Target has no shape defined");
+            }
+            target.shape = static_cast<Target::Shape>(luaTarget["shape"]);
+
+            // TODO: can we assume luaTarget["random_spawn"] is considered as a bool here?
+            target.randomSpawn = luaTarget["random_spawn"].valid() && luaTarget["random_spawn"];
+            if (target.randomSpawn) {
+                if (!luaTarget["min_coords"].valid()) {
+                    throw std::invalid_argument("Target with random spawn needs min_coords set");
+                }
+                target.minCoords = coordFromTable(luaTarget["min_coords"]);
+
+                if (!luaTarget["max_coords"].valid()) {
+                    throw std::invalid_argument("Target with random spawn needs max_coords set");
+                }
+                target.maxCoords = coordFromTable(luaTarget["max_coords"]);
+            } else {
+                if (!luaTarget["spawn_coords"].valid()) {
+                    throw std::invalid_argument("Target without random spawn needs spawn_coords set");
+                }
+                target.spawnCoords = coordFromTable(luaTarget["spawn_coords"]);
+            }
+
+            if (!luaTarget["type"].valid()) {
+                throw std::invalid_argument("Target needs a type");
+            }
+            target.type = static_cast<Target::Type>(luaTarget["type"]);
+
+            if (luaTarget["positioner"].valid()) {
+                // This is ugly but I can't find a clean way of doing this
+                target.positioner = [luaTarget](double d) {
+                    sol::table ret = luaTarget["positioner"](d);
+
+                    return Scenario::Coordinate {
+                        .x = ret["x"],
+                        .y = ret["y"],
+                        .z = ret["z"],
+                    };
+                };
+            }
+
+            if (luaTarget["health"].valid()) {
+                target.health = luaTarget["health"];
+            }
+
+            scenario.targets.push_back(target);
+        });
+
+        m_scenarios.push_back(scenario);
+    }
+}
+
+const std::vector<Scenario>& ResourceManager::getAllScenarios() const
+{
+    return m_scenarios;
 }

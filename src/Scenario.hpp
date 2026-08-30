@@ -1,39 +1,54 @@
 #pragma once
 
-#include "Entity.hpp"
 #include "Weapon.hpp"
 
 #include <glm/glm.hpp>
 
-struct Target {
-    enum class Shape {
-        Box,
-        Ball,
-    };
+#include <functional>
+#include <string>
 
-    Entity::Type type = Entity::Type::GONER;
-    Shape shape = Shape::Ball;
-    glm::vec3 scale = glm::vec3(1.0f);
-    glm::vec3 spawnCoords;
-    glm::vec3 minCoords;
-    glm::vec3 maxCoords;
-    bool randomSpawn = true;
-    bool moves = false;
-    float movementAmplitude;
-    float movementSpeed;
-    int health = 1;
-};
-
+struct Target;
 struct Scenario {
-    enum class WinCondition {
+    enum class WinCondition : uint8_t {
         ClearTargets,
         Time,
     };
 
+    struct Coordinate {
+        double x;
+        double y;
+        double z;
+    };
+
     std::string name;
     Weapon::Type weaponType = Weapon::Type::Pistol;
-    glm::vec3 playerPos;
+    Coordinate playerPos;
     WinCondition winCondition = WinCondition::Time;
     float challengeDurationSeconds;
     std::vector<Target> targets;
+};
+
+struct Target {
+    enum class Shape : uint8_t {
+        Box,
+        Ball,
+    };
+
+    enum class Type : uint8_t {
+        Mover, // when dead, move to a random place and regenerate health
+        Goner, // when dead, die for good
+    };
+
+    Type type = Type::Goner;
+    Shape shape = Shape::Ball;
+    glm::vec3 scale = glm::vec3(1.0f);
+    Scenario::Coordinate spawnCoords;
+    Scenario::Coordinate minCoords;
+    Scenario::Coordinate maxCoords;
+    bool randomSpawn = true;
+    int health = 1;
+
+    // Calculates position per frame for moving target
+    // Takes in the current time, spits out a coordinate
+    std::function<Scenario::Coordinate(double)> positioner = nullptr;
 };

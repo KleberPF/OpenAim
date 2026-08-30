@@ -2,10 +2,12 @@
 
 #include "Material.hpp"
 #include "Model.hpp"
+#include "Scenario.hpp"
 #include "Shader.hpp"
 
 #include <glm/glm.hpp>
 
+#include <cstdint>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -29,7 +31,7 @@ using Rotation = glm::vec3;
 
 class CollisionObject {
 public:
-    enum class Type {
+    enum class Type : std::uint8_t {
         AABB,
         SPHERE,
     };
@@ -104,11 +106,6 @@ private:
 
 class Entity {
 public:
-    enum class Type {
-        MOVER, // when dead, move to a random place and regenerate health
-        GONER, // when dead, die for good
-    };
-
     Entity(Model model, const Material& material, const Shader& shader,
         const glm::vec3& pos);
     virtual ~Entity() = default;
@@ -146,7 +143,7 @@ public:
     void setStartingHealth(int health);
     void setDamagedThisFrame();
 
-    void setMovementPattern(std::function<glm::vec3(float)> callback);
+    void setMovementPattern(std::function<Scenario::Coordinate(double)> callback);
 
     // returns whether entity should die
     bool update(float timePassedSeconds);
@@ -161,7 +158,7 @@ public:
     // oscilating around
     glm::vec3 referentialPos;
     bool destroyable = false;
-    Type type = Type::GONER;
+    Target::Type type = Target::Type::Goner;
 
     std::reference_wrapper<const Material> material;
     std::reference_wrapper<const Shader> shader;
@@ -182,7 +179,7 @@ private:
     // This function is used to determine the new position of this entity
     // given the current time of the application
     // If null, we are going to assume this entity isn't moving
-    std::function<glm::vec3(float)> m_calculateNewPos = nullptr;
+    std::function<Scenario::Coordinate(double)> m_calculateNewPos = nullptr;
 
     std::string m_name;
     int m_startingHealth = 1;

@@ -68,7 +68,7 @@ private:
     std::unique_ptr<Skybox> m_skybox;
     Weapon m_weapon;
     std::vector<Scenario> m_scenarios;
-    Scenario* m_currentScenario = nullptr;
+    const Scenario* m_currentScenario = nullptr;
 
     std::unique_ptr<UI::MainMenu> m_mainMenu;
     std::unique_ptr<UI::ScenarioOverlay> m_scenarioOverlay;

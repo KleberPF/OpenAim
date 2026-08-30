@@ -6,8 +6,10 @@ project(OpenAim)
 
 # List of source files
 set(SOURCES
+  src/vendor/glad.c
+  src/vendor/stb_image.c
+  src/vendor/stb_vorbis.c
   src/main.cpp
-  src/glad.c
   src/Window.cpp
   src/filereader.cpp
   src/Shader.cpp
@@ -16,8 +18,6 @@ set(SOURCES
   src/Game.cpp
   src/Mesh.cpp
   src/Model.cpp
-  src/stb_image.c
-  src/stb_vorbis.c
   src/Renderer.cpp
   src/ResourceManager.cpp
   src/InputManager.cpp
@@ -80,6 +80,7 @@ target_link_libraries(${PROJECT_NAME}
     OpenAL::OpenAL
     nlohmann_json::nlohmann_json
     Freetype::Freetype
+    lua
     # Add more libraries here as needed
 )
 

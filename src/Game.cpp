@@ -17,19 +17,13 @@
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
-#include "utils.hpp"
 
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
 #include <algorithm>
-#include <cmath>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
 #include <iterator>
 #include <memory>
-#include <set>
 #include <string>
 
 using json = nlohmann::json;
@@ -69,11 +63,11 @@ Game::Game()
         ResourceManager::instance().getShader("skybox"));
 
     buildPlayArea();
-    parseScenariosFromFile("./resources/scenarios");
+    // parseScenariosFromFile("./resources/scenarios");
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
     std::vector<std::string> scenarioNames;
-    std::ranges::transform(m_scenarios, std::back_inserter(scenarioNames), [](const auto& scenario) {
+    std::ranges::transform(ResourceManager::instance().getAllScenarios(), std::back_inserter(scenarioNames), [](const auto& scenario) {
         return scenario.name;
     });
     m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
@@ -352,113 +346,13 @@ void Game::reset()
     m_entityManager.removeAllTargets();
 }
 
-void Game::parseScenariosFromFile(const std::string& scenarioFolder)
-{
-    std::set<std::filesystem::path> paths;
-
-    // Sort by name
-    for (const auto& entry :
-        std::filesystem::directory_iterator(scenarioFolder)) {
-        if (entry.path().extension() != ".json") {
-            continue;
-        }
-
-        paths.insert(entry.path());
-    }
-
-    for (const auto& path : paths) {
-        try {
-            std::ifstream f(path);
-            json data = json::parse(f);
-
-            Scenario scenario;
-
-            std::string filename = path.filename().string();
-            scenario.name = filename.substr(0, filename.find('.'));
-
-            std::string weaponType = data["weapon"];
-
-            if (caseInsensitiveEquals(weaponType, "pistol")) {
-                scenario.weaponType = Weapon::Type::Pistol;
-            } else if (caseInsensitiveEquals(weaponType, "machine_gun")) {
-                scenario.weaponType = Weapon::Type::Machine_Gun;
-            }
-
-            scenario.playerPos = readVec3FromJSONString(data["playerPos"]);
-
-            if (data.contains("winCondition")
-                && caseInsensitiveEquals(
-                    data["winCondition"], "cleartargets")) {
-                scenario.winCondition = Scenario::WinCondition::ClearTargets;
-            }
-
-            scenario.challengeDurationSeconds = data["challengeDuration"];
-
-            auto targets = data["targets"];
-            for (auto& target : targets) {
-                Target newTarget;
-
-                newTarget.scale = readVec3FromJSONString(target["scale"]);
-
-                std::string shape = target["shape"];
-                if (caseInsensitiveEquals(shape, "box")) {
-                    newTarget.shape = Target::Shape::Box;
-                } else if (caseInsensitiveEquals(shape, "ball")) {
-                    newTarget.shape = Target::Shape::Ball;
-                }
-
-                newTarget.randomSpawn
-                    = target.contains("randomSpawn") && target["randomSpawn"];
-                if (newTarget.randomSpawn) {
-                    newTarget.minCoords
-                        = readVec3FromJSONString(target["minCoords"]);
-                    newTarget.maxCoords
-                        = readVec3FromJSONString(target["maxCoords"]);
-                } else {
-                    newTarget.randomSpawn = false;
-                    newTarget.spawnCoords
-                        = readVec3FromJSONString(target["spawnCoords"]);
-                }
-
-                std::string onDestroy = target["onDestroy"];
-                if (caseInsensitiveEquals(onDestroy, "move")) {
-                    newTarget.type = Entity::Type::MOVER;
-                } else {
-                    newTarget.type = Entity::Type::GONER;
-                }
-
-                if (target.contains("moves")) {
-                    newTarget.moves = target["moves"];
-                    if (newTarget.moves) {
-                        newTarget.movementAmplitude
-                            = target["movementAmplitude"];
-                        newTarget.movementSpeed = target["movementSpeed"];
-                    }
-                }
-
-                if (target.contains("health")) {
-                    newTarget.health = target["health"];
-                }
-
-                scenario.targets.push_back(newTarget);
-            }
-
-            m_scenarios.push_back(std::move(scenario));
-        } catch (...) {
-            // probably some JSON format error
-            // just skips the file
-            std::cout << "Error parsing file " << path << '\n';
-        }
-    }
-}
-
 void Game::createScenario(const std::string& name)
 {
-    auto scenario = std::ranges::find_if(m_scenarios, [&name](const auto& scenario) {
+    auto scenario = std::ranges::find_if(ResourceManager::instance().getAllScenarios(), [&name](const auto& scenario) {
         return scenario.name == name;
     });
 
-    if (scenario == m_scenarios.end()) {
+    if (scenario == ResourceManager::instance().getAllScenarios().end()) {
         // Shouldn't happen so just ignore I guess
         return;
     }
@@ -466,7 +360,10 @@ void Game::createScenario(const std::string& name)
     m_currentScenario = &*scenario;
 
     m_weapon.type = m_currentScenario->weaponType;
-    m_camera.position = m_currentScenario->playerPos;
+    m_camera.position = glm::vec3(
+        m_currentScenario->playerPos.x,
+        m_currentScenario->playerPos.y,
+        m_currentScenario->playerPos.z);
     m_camera.lookForward();
 
     for (size_t i = 0; i < m_currentScenario->targets.size(); i++) {
@@ -479,7 +376,10 @@ void Game::createScenario(const std::string& name)
                 RNG::instance().getFloatInRange(target.minCoords.y, target.maxCoords.y),
                 RNG::instance().getFloatInRange(target.minCoords.z, target.maxCoords.z));
         } else {
-            spawnPoint = target.spawnCoords;
+            spawnPoint = glm::vec3(
+                target.spawnCoords.x,
+                target.spawnCoords.y,
+                target.spawnCoords.z);
         }
 
         const Model* model;
@@ -500,16 +400,8 @@ void Game::createScenario(const std::string& name)
         entity.type = target.type;
         entity.setName("Ball " + std::to_string(i));
         entity.setStartingHealth(target.health);
-        if (target.moves) {
-            float amplitude = target.movementAmplitude;
-            float speed = target.movementSpeed;
-            entity.setMovementPattern(
-                [amplitude, speed](float timePassedSeconds) {
-                    return glm::vec3(
-                        amplitude * std::cos(speed * timePassedSeconds), 0.0f,
-                        0.0f);
-                });
-        }
+        entity.setMovementPattern(target.positioner);
+
         m_entityManager.addEntity(std::move(entity));
     }
 }

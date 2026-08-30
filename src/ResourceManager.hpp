@@ -2,9 +2,14 @@
 
 // Heavily inspired by the LearnOpenGL version
 
+#define SOL_ALL_SAFETIES_ON 1
+#include <assert.hpp>
+#include <sol/sol.hpp>
+
 #include "Font.hpp"
 #include "Material.hpp"
 #include "Model.hpp"
+#include "Scenario.hpp"
 #include "Shader.hpp"
 #include "Sound.hpp"
 
@@ -34,6 +39,7 @@ public:
     const Model& getModel(const std::string& name);
     Material& getMaterial(const std::string& name);
     const std::vector<Sound>& getAllSounds() const;
+    const std::vector<Scenario>& getAllScenarios() const;
     Font& getFont(FontId id);
 
 private:
@@ -47,6 +53,8 @@ private:
     void addSound(const std::string& name, const std::string& path);
     void addFont(FontId id, Font font);
 
+    void loadScenarios(const std::string& path);
+
     std::map<std::string, Shader> m_shaders;
     std::map<std::string, Texture> m_textures;
     // This is weird because Cubemap is a Texture, but it's
@@ -54,7 +62,9 @@ private:
     std::map<std::string, Cubemap> m_cubemaps;
     std::map<std::string, Model> m_models;
     std::map<std::string, Material> m_materials;
+    std::vector<Scenario> m_scenarios;
     std::vector<Sound> m_sounds;
 
     std::map<FontId, Font> m_fonts;
+    sol::state m_lua;
 };

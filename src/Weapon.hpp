@@ -1,12 +1,13 @@
 #pragma once
 
 #include <array>
+#include <cstdint>
 
 class Weapon {
 public:
     Weapon() = default;
 
-    enum class Type {
+    enum class Type : std::uint8_t {
         Pistol,
         Machine_Gun,
         Last,

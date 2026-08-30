@@ -2,6 +2,7 @@
 
 #include "Model.hpp"
 #include "ResourceManager.hpp"
+#include "Scenario.hpp"
 #include "Shader.hpp"
 #include "glm/fwd.hpp"
 #include "utils.hpp"
@@ -284,7 +285,7 @@ void Entity::setDamagedThisFrame()
     m_damagedThisFrame = true;
 }
 
-void Entity::setMovementPattern(std::function<glm::vec3(float)> callback)
+void Entity::setMovementPattern(std::function<Scenario::Coordinate(double)> callback)
 {
     m_calculateNewPos = std::move(callback);
 }
@@ -303,8 +304,11 @@ bool Entity::update(float timePassedSeconds)
     }
 
     if (m_calculateNewPos) {
-        glm::vec3 newPos = m_calculateNewPos(timePassedSeconds);
-        moveRelative(newPos);
+        Scenario::Coordinate newPos = m_calculateNewPos(timePassedSeconds);
+        moveRelative(glm::vec3(
+            newPos.x,
+            newPos.y,
+            newPos.z));
     }
 
     return false;

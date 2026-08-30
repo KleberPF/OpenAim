@@ -82,7 +82,7 @@ ResourceManager::ResourceManager()
     addSound("machine_gun", "../resources/sounds/machine_gun.ogg");
 
     // scenarios
-    loadScenarios("../resources/lua_scenarios");
+    loadScenarios("../resources/scenarios");
 }
 
 ResourceManager& ResourceManager::instance()
@@ -285,13 +285,14 @@ void ResourceManager::loadScenarios(const std::string& path)
             if (luaTarget["positioner"].valid()) {
                 // This is ugly but I can't find a clean way of doing this
                 sol::function positioner = luaTarget["positioner"];
-                target.positioner = [&, positioner](Scenario::Coordinate refPos, Scenario::Coordinate curPos, double d) {
-                    sol::table curPosTable = m_lua.create_table();
+                sol::table curPosTable = m_lua.create_table();
+                sol::table refPosTable = m_lua.create_table();
+
+                target.positioner = [curPosTable, refPosTable, positioner](Scenario::Coordinate refPos, Scenario::Coordinate curPos, double d) mutable {
                     curPosTable["x"] = curPos.x;
                     curPosTable["y"] = curPos.y;
                     curPosTable["z"] = curPos.z;
 
-                    sol::table refPosTable = m_lua.create_table();
                     refPosTable["x"] = refPos.x;
                     refPosTable["y"] = refPos.y;
                     refPosTable["z"] = refPos.z;

@@ -34,16 +34,16 @@ void ResourceManager::shutdown()
 ResourceManager::ResourceManager()
 {
     // shaders
-    addShader("color", "./resources/shaders/sprite.vert", "./resources/shaders/color.frag");
-    addShader("sprite", "./resources/shaders/sprite.vert", "./resources/shaders/sprite.frag");
-    addShader("textured", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
-    addShader("targets", "./resources/shaders/model.vert", "./resources/shaders/model_lighting.frag");
-    addShader("skybox", "./resources/shaders/skybox.vert", "./resources/shaders/skybox.frag");
-    addShader("healthbar", "./resources/shaders/healthbar.vert", "./resources/shaders/healthbar.frag");
-    addShader("text", "./resources/shaders/text.vert", "./resources/shaders/text.frag");
+    addShader("color", "../resources/shaders/sprite.vert", "../resources/shaders/color.frag");
+    addShader("sprite", "../resources/shaders/sprite.vert", "../resources/shaders/sprite.frag");
+    addShader("textured", "../resources/shaders/model.vert", "../resources/shaders/model_lighting.frag");
+    addShader("targets", "../resources/shaders/model.vert", "../resources/shaders/model_lighting.frag");
+    addShader("skybox", "../resources/shaders/skybox.vert", "../resources/shaders/skybox.frag");
+    addShader("healthbar", "../resources/shaders/healthbar.vert", "../resources/shaders/healthbar.frag");
+    addShader("text", "../resources/shaders/text.vert", "../resources/shaders/text.frag");
 
     // fonts
-    addFont(LIBERATION, Font("./resources/fonts/LiberationSans-Regular.ttf"));
+    addFont(LIBERATION, Font("../resources/fonts/LiberationSans-Regular.ttf"));
 
     getFont(LIBERATION)
         .generateGlyphsForFontSize(12)
@@ -52,12 +52,12 @@ ResourceManager::ResourceManager()
         .generateGlyphsForFontSize(36);
 
     // cubemaps
-    addCubemap("skybox", { "./resources/textures/skybox/right.bmp", "./resources/textures/skybox/left.bmp", "./resources/textures/skybox/top.bmp", "./resources/textures/skybox/bottom.bmp", "./resources/textures/skybox/front.bmp", "./resources/textures/skybox/back.bmp" });
+    addCubemap("skybox", { "../resources/textures/skybox/right.bmp", "../resources/textures/skybox/left.bmp", "../resources/textures/skybox/top.bmp", "../resources/textures/skybox/bottom.bmp", "../resources/textures/skybox/front.bmp", "../resources/textures/skybox/back.bmp" });
 
     // textures
-    addTexture("bricks", "./resources/textures/bricks.png", Texture::Type::Diffuse);
-    addTexture("crosshair", "./resources/textures/crosshair.png", Texture::Type::Diffuse);
-    addTexture("white_pixel", "./resources/textures/white_pixel.png", Texture::Type::Diffuse);
+    addTexture("bricks", "../resources/textures/bricks.png", Texture::Type::Diffuse);
+    addTexture("crosshair", "../resources/textures/crosshair.png", Texture::Type::Diffuse);
+    addTexture("white_pixel", "../resources/textures/white_pixel.png", Texture::Type::Diffuse);
 
     // materials
     addMaterial("targets");
@@ -73,13 +73,13 @@ ResourceManager::ResourceManager()
     getMaterial("healthbar").addTexture(getTexture("white_pixel"));
 
     // models
-    addModel("cube", "./resources/objects/cube/cube.obj");
-    addModel("ball", "./resources/objects/ball/ball.obj");
-    addModel("plane", "./resources/objects/plane/plane.obj");
+    addModel("cube", "../resources/objects/cube/cube.obj");
+    addModel("ball", "../resources/objects/ball/ball.obj");
+    addModel("plane", "../resources/objects/plane/plane.obj");
 
     // sounds
-    addSound("pistol", "./resources/sounds/pistol.ogg");
-    addSound("machine_gun", "./resources/sounds/machine_gun.ogg");
+    addSound("pistol", "../resources/sounds/pistol.ogg");
+    addSound("machine_gun", "../resources/sounds/machine_gun.ogg");
 
     // scenarios
     loadScenarios("../resources/lua_scenarios");
@@ -284,8 +284,19 @@ void ResourceManager::loadScenarios(const std::string& path)
 
             if (luaTarget["positioner"].valid()) {
                 // This is ugly but I can't find a clean way of doing this
-                target.positioner = [luaTarget](double d) {
-                    sol::table ret = luaTarget["positioner"](d);
+                sol::function positioner = luaTarget["positioner"];
+                target.positioner = [&, positioner](Scenario::Coordinate refPos, Scenario::Coordinate curPos, double d) {
+                    sol::table curPosTable = m_lua.create_table();
+                    curPosTable["x"] = curPos.x;
+                    curPosTable["y"] = curPos.y;
+                    curPosTable["z"] = curPos.z;
+
+                    sol::table refPosTable = m_lua.create_table();
+                    refPosTable["x"] = refPos.x;
+                    refPosTable["y"] = refPos.y;
+                    refPosTable["z"] = refPos.z;
+
+                    sol::table ret = positioner(refPosTable, curPosTable, d);
 
                     return Scenario::Coordinate {
                         .x = ret["x"],

@@ -285,7 +285,7 @@ void Entity::setDamagedThisFrame()
     m_damagedThisFrame = true;
 }
 
-void Entity::setMovementPattern(std::function<Scenario::Coordinate(double)> callback)
+void Entity::setMovementPattern(PositionerCallback callback)
 {
     m_calculateNewPos = std::move(callback);
 }
@@ -304,8 +304,19 @@ bool Entity::update(float timePassedSeconds)
     }
 
     if (m_calculateNewPos) {
-        Scenario::Coordinate newPos = m_calculateNewPos(timePassedSeconds);
-        moveRelative(glm::vec3(
+        Scenario::Coordinate curCoord = {
+            .x = m_currentPos.x,
+            .y = m_currentPos.y,
+            .z = m_currentPos.z,
+        };
+        Scenario::Coordinate refCoord = {
+            .x = referentialPos.x,
+            .y = referentialPos.y,
+            .z = referentialPos.z,
+        };
+
+        Scenario::Coordinate newPos = m_calculateNewPos(refCoord, curCoord, timePassedSeconds);
+        move(glm::vec3(
             newPos.x,
             newPos.y,
             newPos.z));

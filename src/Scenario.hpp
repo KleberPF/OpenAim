@@ -28,6 +28,9 @@ struct Scenario {
     std::vector<Target> targets;
 };
 
+// (referentialPos, currentPos, timeElapsed)
+using PositionerCallback = std::function<Scenario::Coordinate(Scenario::Coordinate,Scenario::Coordinate,double)>;
+
 struct Target {
     enum class Shape : uint8_t {
         Box,
@@ -50,5 +53,5 @@ struct Target {
 
     // Calculates position per frame for moving target
     // Takes in the current time, spits out a coordinate
-    std::function<Scenario::Coordinate(double)> positioner = nullptr;
+    PositionerCallback positioner = nullptr;
 };

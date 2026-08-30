@@ -143,7 +143,7 @@ public:
     void setStartingHealth(int health);
     void setDamagedThisFrame();
 
-    void setMovementPattern(std::function<Scenario::Coordinate(double)> callback);
+    void setMovementPattern(PositionerCallback callback);
 
     // returns whether entity should die
     bool update(float timePassedSeconds);
@@ -179,7 +179,7 @@ private:
     // This function is used to determine the new position of this entity
     // given the current time of the application
     // If null, we are going to assume this entity isn't moving
-    std::function<Scenario::Coordinate(double)> m_calculateNewPos = nullptr;
+    PositionerCallback m_calculateNewPos = nullptr;
 
     std::string m_name;
     int m_startingHealth = 1;

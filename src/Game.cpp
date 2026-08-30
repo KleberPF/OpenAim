@@ -63,7 +63,7 @@ Game::Game()
         ResourceManager::instance().getShader("skybox"));
 
     buildPlayArea();
-    // parseScenariosFromFile("./resources/scenarios");
+    // parseScenariosFromFile("../resources/scenarios");
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
     std::vector<std::string> scenarioNames;

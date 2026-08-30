@@ -27,8 +27,8 @@ return {
             },
             type = Type.Mover,
             health = 20,
-            positioner = function(d)
-                return { x = 2 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 2 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         },
         {
@@ -51,8 +51,8 @@ return {
             },
             type = Type.Mover,
             health = 20,
-            positioner = function(d)
-                return { x = 2 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 2 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         },
         {
@@ -75,8 +75,8 @@ return {
             },
             type = Type.Mover,
             health = 20,
-            positioner = function(d)
-                return { x = 2 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 2 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         },
         {
@@ -99,8 +99,8 @@ return {
             },
             type = Type.Mover,
             health = 20,
-            positioner = function(d)
-                return { x = 2 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 2 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         },
         {
@@ -123,8 +123,8 @@ return {
             },
             type = Type.Mover,
             health = 20,
-            positioner = function(d)
-                return { x = 2 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 2 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         },
     }

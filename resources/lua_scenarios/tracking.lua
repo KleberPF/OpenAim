@@ -22,8 +22,8 @@ return {
             },
             type = Type.Goner,
             health = 200,
-            positioner = function(d)
-                return { x = 5 * math.sin(2 * d), y = 0, z = 0 }
+            positioner = function(ref, cur, d)
+                return { x = ref.x + 5 * math.sin(2 * d), y = cur.y, z = cur.z }
             end,
         }
     }

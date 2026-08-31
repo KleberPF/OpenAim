@@ -2,6 +2,7 @@
 
 #include "Renderer.hpp"
 #include "UI/Screen.hpp"
+#include "Window.hpp"
 
 #include <memory>
 #include <vector>
@@ -10,7 +11,7 @@ namespace UI {
 
 class UIManager {
 public:
-    static void init(float viewWidth, float viewHeight);
+    static void init(const Window& window);
     static void shutdown();
 
     static UIManager& instance(); // maybe const this?
@@ -24,6 +25,9 @@ public:
     float viewWidth() const;
     float viewHeight() const;
 
+    void setArrowCursor() const;
+    void setIBeamCursor() const;
+
 private:
     UIManager() = default;
 
@@ -32,6 +36,8 @@ private:
     void handleCursorPos(double xpos, double ypos);
 
     void onEvent(EventType type, void* data);
+
+    const Window* m_mainWindow;
 
     float m_viewWidth;
     float m_viewHeight;

@@ -40,7 +40,7 @@ Game::Game()
     ResourceManager::init();
     SoundPlayer::init();
     InputManager::init();
-    UI::UIManager::init(m_window.width, m_window.height);
+    UI::UIManager::init(m_window);
 
     // set up subscribers to events (resize, mouse move, etc)
     InputManager::instance().subscribe();

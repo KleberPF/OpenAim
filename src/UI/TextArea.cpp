@@ -1,0 +1,27 @@
+#include "TextArea.hpp"
+
+#include "ResourceManager.hpp"
+
+using namespace UI;
+
+void TextArea::setText(const char* text, int fontSize)
+{
+    Text t(&ResourceManager::instance().getFont(LIBERATION), text, fontSize);
+    auto ptr = std::make_unique<TextRenderable>(t);
+    m_textRenderable.swap(ptr);
+}
+
+void TextArea::render(const Renderer& renderer) const
+{
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    if (!m_textRenderable) {
+        return;
+    }
+
+    const auto& text = m_textRenderable->text();
+
+    float textX = m_rect.x;
+    float textY = m_rect.y + m_rect.h / 2 - (float)text.height() / 2;
+
+    renderer.renderText(*m_textRenderable, textX, textY);
+}

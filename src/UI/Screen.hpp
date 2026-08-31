@@ -7,6 +7,7 @@
 #include "UI/Widget.hpp"
 
 #include <memory>
+#include <unordered_set>
 #include <vector>
 
 namespace UI {
@@ -35,7 +36,7 @@ private:
     Screen() = default;
 
     Widget* m_clickedWidget = nullptr;
-    Widget* m_hoveredWidget = nullptr;
+    std::unordered_set<Widget*> m_hoveredWidgets;
 
     std::vector<std::unique_ptr<Widget>> m_widgets;
     friend class UIManager;

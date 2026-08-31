@@ -4,6 +4,7 @@
 #include "UI/Widget.hpp"
 
 #include <memory>
+#include <unordered_set>
 
 using namespace UI;
 
@@ -40,31 +41,30 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
 
 void Screen::processMouseMove(double xpos, double ypos)
 {
-    bool insideAnyWidget = false;
+    HoverWalkContext ctx = {
+        .x = xpos,
+        .y = ypos
+    };
 
     for (auto& widget : m_widgets) {
-        if (!widget->m_rect.isInside(xpos, ypos)) {
-            continue;
-        }
+        widget->treeWalk(ctx);
+    }
 
-        insideAnyWidget = true;
-
-        if (m_hoveredWidget == nullptr) {
-            // first frame with mouse inside the widget, trigger onMouseEnter
-            m_hoveredWidget = widget.get();
-            if (widget->onMouseEnter) {
-                widget->onMouseEnter();
-            }
+    // check the newly hovered widgets (hovered this frame, not hovered in the one before)
+    for (auto* widget : ctx.hovered) {
+        if (!m_hoveredWidgets.contains(widget) && widget->onMouseEnter) {
+            widget->onMouseEnter();
         }
     }
 
-    if (!insideAnyWidget) {
-        if (m_hoveredWidget != nullptr && m_hoveredWidget->onMouseLeave != nullptr) {
-            m_hoveredWidget->onMouseLeave();
+    // check which widgets are not being hovered anymore
+    for (auto* widget : m_hoveredWidgets) {
+        if (!ctx.hovered.contains(widget) && widget->onMouseLeave) {
+            widget->onMouseLeave();
         }
-
-        m_hoveredWidget = nullptr;
     }
+
+    m_hoveredWidgets = std::move(ctx.hovered);
 }
 
 void Screen::processResize()

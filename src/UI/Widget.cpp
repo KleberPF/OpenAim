@@ -59,3 +59,16 @@ void Widget::treeWalk(WalkContext& ctx)
         widget->treeWalk(ctx);
     }
 }
+
+void Widget::treeWalk(HoverWalkContext& ctx)
+{
+    if (!isInsideRect(ctx.x, ctx.y)) {
+        return;
+    }
+
+    ctx.hovered.insert(this);
+
+    for (auto& widget : m_widgets) {
+        widget->treeWalk(ctx);
+    }
+}

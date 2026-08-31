@@ -14,7 +14,7 @@ std::unique_ptr<UIManager> s_Instance = nullptr;
 
 } // end namespace
 
-void UIManager::init(float viewWidth, float viewHeight)
+void UIManager::init(const Window& window)
 {
     if (s_Instance != nullptr) {
         return;
@@ -22,8 +22,9 @@ void UIManager::init(float viewWidth, float viewHeight)
 
     s_Instance = std::unique_ptr<UIManager>(new UIManager);
 
-    s_Instance->m_viewWidth = viewWidth;
-    s_Instance->m_viewHeight = viewHeight;
+    s_Instance->m_viewWidth = window.width;
+    s_Instance->m_viewHeight = window.height;
+    s_Instance->m_mainWindow = &window;
 }
 
 void UIManager::shutdown()
@@ -77,6 +78,18 @@ float UIManager::viewWidth() const
 float UIManager::viewHeight() const
 {
     return m_viewHeight;
+}
+
+void UIManager::setArrowCursor() const
+{
+    GLFWcursor* cursor = glfwCreateStandardCursor(GLFW_ARROW_CURSOR);
+    glfwSetCursor(m_mainWindow->ptr(), cursor);
+}
+
+void UIManager::setIBeamCursor() const
+{
+    GLFWcursor* cursor = glfwCreateStandardCursor(GLFW_IBEAM_CURSOR);
+    glfwSetCursor(m_mainWindow->ptr(), cursor);
 }
 
 void UIManager::handleResize(int width, int height)

@@ -22,6 +22,70 @@ return {
                 z = -8
             },
             type = Type.Mover
+        },
+        {
+            shape = Shape.Ball,
+            scale = 0.6,
+            random_spawn = true,
+            min_coords = {
+                x = -8,
+                y = 2,
+                z = -8
+            },
+            max_coords = {
+                x = 8,
+                y = 18,
+                z = -8
+            },
+            type = Type.Mover
+        },
+        {
+            shape = Shape.Ball,
+            scale = 0.6,
+            random_spawn = true,
+            min_coords = {
+                x = -8,
+                y = 2,
+                z = -8
+            },
+            max_coords = {
+                x = 8,
+                y = 18,
+                z = -8
+            },
+            type = Type.Mover
+        },
+        {
+            shape = Shape.Ball,
+            scale = 0.6,
+            random_spawn = true,
+            min_coords = {
+                x = -8,
+                y = 2,
+                z = -8
+            },
+            max_coords = {
+                x = 8,
+                y = 18,
+                z = -8
+            },
+            type = Type.Mover
+        },
+        {
+            shape = Shape.Ball,
+            scale = 0.6,
+            random_spawn = true,
+            min_coords = {
+                x = -8,
+                y = 2,
+                z = -8
+            },
+            max_coords = {
+                x = 8,
+                y = 18,
+                z = -8
+            },
+            type = Type.Mover
         }
     }
 }

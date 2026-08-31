@@ -49,7 +49,7 @@ void UIManager::subscribe()
     EventManager::instance().addListener(EventType::CursorPos, [this](EventType type, void* data) {
         onEvent(type, data);
     });
-    EventManager::instance().addListener(EventType::KeyPress, [this](EventType type, void* data) {
+    EventManager::instance().addListener(EventType::Char, [this](EventType type, void* data) {
         onEvent(type, data);
     });
 }
@@ -127,15 +127,11 @@ void UIManager::handleCursorPos(double xpos, double ypos)
     }
 }
 
-void UIManager::handleKeyPress(int key, bool pressed)
+void UIManager::handleChar(unsigned int codepoint)
 {
-    if (!pressed) {
-        return;
-    }
-
     for (auto& screen : m_screens) {
         if (screen->active) {
-            screen->processKeyPress(key);
+            screen->processChar(codepoint);
         }
     }
 }
@@ -155,9 +151,9 @@ void UIManager::onEvent(EventType type, void* data)
         auto* event = (CursorPosEvent*)data;
         handleCursorPos(event->xpos, event->ypos);
     } break;
-    case EventType::KeyPress: {
-        auto* event = (KeyPressEvent*)data;
-        handleKeyPress(event->key, event->pressed);
+    case EventType::Char: {
+        auto* event = (CharEvent*)data;
+        handleChar(event->codepoint);
     } break;
     default:
         break;

@@ -3,6 +3,7 @@
 #include "UI/UIManager.hpp"
 #include "UI/Widget.hpp"
 
+#include <format>
 #include <print>
 
 namespace UI {
@@ -21,8 +22,12 @@ public:
             std::println("Exited textarea");
             UIManager::instance().setArrowCursor();
         };
-        onKeyPressed = [&](int key) {
-            setText("A", 18);
+        onCharTyped = [&](unsigned int codepoint) {
+            // TODO: bad, improve this
+            std::string currentText = m_textRenderable ? m_textRenderable->text().contents() : "";
+            std::string text = std::format("{}{}", currentText, (char)codepoint);
+
+            setText(text.c_str(), 18);
         };
     }
 

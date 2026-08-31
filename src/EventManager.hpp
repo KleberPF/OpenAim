@@ -13,6 +13,7 @@ enum class EventType : uint8_t {
     KeyPress,
     MouseButton,
     CursorPos,
+    Char,
 
     // Scenario
     StartScenario,
@@ -40,6 +41,7 @@ private:
     static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
     static void mouseButtonCallback(GLFWwindow* window, int button, int action, int mods);
     static void cursorPosCallback(GLFWwindow* window, double xpos, double ypos);
+    static void characterCallback(GLFWwindow* window, unsigned int codepoint);
 
     // Indexed by EventType
     std::vector<std::vector<EventHandler>> m_listeners = std::vector<std::vector<EventHandler>>(std::to_underlying(EventType::Count));

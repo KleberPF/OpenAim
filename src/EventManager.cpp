@@ -82,3 +82,11 @@ void EventManager::cursorPosCallback(GLFWwindow* /*window*/, double xpos, double
     };
     EventManager::instance().triggerEvent(EventType::CursorPos, &event);
 }
+
+void EventManager::characterCallback(GLFWwindow* /*window*/, unsigned int codepoint)
+{
+    auto event = CharEvent {
+        .codepoint = codepoint
+    };
+    EventManager::instance().triggerEvent(EventType::Char, &event);
+}

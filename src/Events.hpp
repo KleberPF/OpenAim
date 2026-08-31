@@ -22,6 +22,10 @@ struct CursorPosEvent {
     double ypos;
 };
 
+struct CharEvent {
+    unsigned int codepoint;
+};
+
 struct NewScenarioEvent {
     std::string scenario;
     bool challenge;

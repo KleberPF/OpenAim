@@ -3,6 +3,7 @@
 #include "EventManager.hpp"
 #include "Events.hpp"
 
+#include <GLFW/glfw3.h>
 #include <glad/glad.h>
 
 #include <iostream>
@@ -37,6 +38,7 @@ Window::Window(int width, int height, std::string title, bool fullscreen)
     glfwSetKeyCallback(m_ptr, EventManager::keyCallback);
     glfwSetMouseButtonCallback(m_ptr, EventManager::mouseButtonCallback);
     glfwSetCursorPosCallback(m_ptr, EventManager::cursorPosCallback);
+    glfwSetCharCallback(m_ptr, EventManager::characterCallback);
 
     glfwSetInputMode(m_ptr, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

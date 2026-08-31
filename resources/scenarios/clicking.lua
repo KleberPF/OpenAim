@@ -1,4 +1,5 @@
 return {
+    name = "1w5t",
     weapon = Weapon.Pistol,
     player_pos = {
         x = 0,

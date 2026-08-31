@@ -1,4 +1,5 @@
 return {
+    name = "Tracking",
     weapon = Weapon.Machine_Gun,
     player_pos = {
         x = 0,

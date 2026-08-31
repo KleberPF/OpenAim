@@ -208,12 +208,14 @@ void ResourceManager::loadScenarios(const std::string& path)
         }
 
         Scenario scenario;
-        scenario.name = entry.path().filename().string();
+        if (!ret["name"].valid()) {
+            throw std::invalid_argument("Scenario has no name defined");
+        }
+        scenario.name = ret["name"];
 
         if (!ret["weapon"].valid()) {
             throw std::invalid_argument("Scenario has no weapon defined");
         }
-
         scenario.weaponType = static_cast<Weapon::Type>(ret["weapon"]);
 
         if (!ret["player_pos"].valid()) {

@@ -7,7 +7,7 @@ using namespace UI;
 void TextArea::setText(const char* text, int fontSize)
 {
     Text t(&ResourceManager::instance().getFont(LIBERATION), text, fontSize);
-    t.color = { .r = 0, .g = 0, .b = 0};
+    t.color = { .r = 0, .g = 0, .b = 0 };
     auto ptr = std::make_unique<TextRenderable>(t);
     m_textRenderable.swap(ptr);
 }
@@ -22,7 +22,7 @@ void TextArea::render(const Renderer& renderer) const
     const auto& text = m_textRenderable->text();
 
     float textX = m_rect.x;
-    float textY = m_rect.y + 3; // arbitrary 3px top margin
+    float textY = m_rect.y + m_textRenderable->text().fontSize() - m_textRenderable->text().height() + 3; // arbitrary 3px top margin
 
     renderer.renderText(*m_textRenderable, textX, textY);
 }

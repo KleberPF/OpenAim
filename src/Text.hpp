@@ -12,6 +12,7 @@ public:
     void setFont(const Font* font);
     void setText(const std::string& text);
 
+    int fontSize() const;
     const std::string& contents() const;
     int width() const;
     int height() const;

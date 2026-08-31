@@ -28,6 +28,11 @@ void Text::setText(const std::string& text)
     }
 }
 
+int Text::fontSize() const
+{
+    return m_fontSize;
+}
+
 const std::string& Text::contents() const
 {
     return m_contents;

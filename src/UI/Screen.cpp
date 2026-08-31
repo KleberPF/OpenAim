@@ -72,6 +72,13 @@ void Screen::processResize()
     }
 }
 
+void Screen::processKeyPress(int key)
+{
+    if (m_clickedWidget && m_clickedWidget->onKeyPressed) {
+        m_clickedWidget->onKeyPressed(key);
+    }
+}
+
 void Screen::processChar(unsigned int codepoint)
 {
     if (m_clickedWidget && m_clickedWidget->onCharTyped) {

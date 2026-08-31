@@ -4,7 +4,6 @@
 #include "UI/Widget.hpp"
 
 #include <format>
-#include <print>
 
 namespace UI {
 
@@ -15,11 +14,9 @@ public:
     {
         backgroundColor = { .r = 255, .g = 255, .b = 255 };
         onMouseEnter = []() {
-            std::println("Entered textarea");
             UIManager::instance().setIBeamCursor();
         };
         onMouseLeave = []() {
-            std::println("Exited textarea");
             UIManager::instance().setArrowCursor();
         };
         onCharTyped = [&](unsigned int codepoint) {
@@ -28,6 +25,20 @@ public:
             std::string text = std::format("{}{}", currentText, (char)codepoint);
 
             setText(text.c_str(), 18);
+        };
+        onKeyPressed = [&](int key) {
+            if (key != GLFW_KEY_BACKSPACE) {
+                return;
+            }
+
+            if (!m_textRenderable || m_textRenderable->text().contents().length() == 0) {
+                return;
+            }
+
+            std::string curText = m_textRenderable->text().contents();
+            curText.pop_back();
+
+            setText(curText.c_str(), 18);
         };
     }
 

@@ -45,6 +45,7 @@ public:
     std::function<void(void)> onClick;
     std::function<void(void)> onMouseEnter;
     std::function<void(void)> onMouseLeave;
+    std::function<void(int)> onKeyPressed;
     std::function<void(int)> onCharTyped;
 
     Color backgroundColor = { .r = 255, .g = 0, .b = 0 }; // TODO: temp

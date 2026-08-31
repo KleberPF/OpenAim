@@ -19,6 +19,7 @@ public:
     void processClick(MouseButton::Value button, bool pressed, double xpos, double ypos);
     void processMouseMove(double xpos, double ypos);
     void processResize();
+    void processKeyPress(int key);
     void processChar(unsigned int codepoint);
 
     template <typename T>

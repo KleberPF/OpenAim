@@ -22,7 +22,7 @@ void TextArea::render(const Renderer& renderer) const
     const auto& text = m_textRenderable->text();
 
     float textX = m_rect.x;
-    float textY = m_rect.y + m_rect.h / 2 - (float)text.height() / 2;
+    float textY = m_rect.y + 3; // arbitrary 3px top margin
 
     renderer.renderText(*m_textRenderable, textX, textY);
 }

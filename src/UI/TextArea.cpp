@@ -12,6 +12,11 @@ void TextArea::setText(const char* text, int fontSize)
     m_textRenderable.swap(ptr);
 }
 
+std::string TextArea::text() const
+{
+    return m_textRenderable ? m_textRenderable->text().contents() : "";
+}
+
 void TextArea::render(const Renderer& renderer) const
 {
     renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());

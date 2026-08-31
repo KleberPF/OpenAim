@@ -78,6 +78,9 @@ Game::Game()
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
         onEvent(type, data);
     });
+    EventManager::instance().addListener(EventType::SettingsUpdate, [this](EventType type, void* data) {
+        onEvent(type, data);
+    });
 }
 
 Game::~Game()
@@ -424,5 +427,9 @@ void Game::onEvent(EventType type, void* data)
 
         m_challengeState.happening = event->challenge;
         changeState(Game::State::Running);
+    } else if (type == EventType::SettingsUpdate) {
+        auto* event = (SettingsUpdateEvent*)data;
+
+        m_camera.setMouseSensitivity(event->mouseSensitivity);
     }
 }

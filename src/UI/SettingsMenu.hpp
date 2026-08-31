@@ -2,8 +2,6 @@
 
 #include "UI/Screen.hpp"
 
-#include <string>
-
 namespace UI {
 
 class SettingsMenu {
@@ -22,7 +20,7 @@ public:
 private:
     Screen* m_screen;
 
-    static void submit();
+    static void submit(float sensitivity);
 };
 
 } // namespace UI

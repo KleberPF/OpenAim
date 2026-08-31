@@ -18,8 +18,8 @@ enum class EventType : uint8_t {
     // Scenario
     StartScenario,
 
-    // Config
-    ConfigUpdate,
+    // Settings
+    SettingsUpdate,
 
     Count
 };

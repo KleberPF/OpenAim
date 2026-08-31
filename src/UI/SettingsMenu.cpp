@@ -1,9 +1,7 @@
 #include "SettingsMenu.hpp"
 
-#include "EventManager.hpp"
 #include "Events.hpp"
 #include "UI/Button.hpp"
-#include "UI/Dropdown.hpp"
 #include "UI/Label.hpp"
 #include "UI/TextArea.hpp"
 #include "UI/UIManager.hpp"
@@ -30,16 +28,17 @@ SettingsMenu::SettingsMenu()
     auto* saveBtn = mainContainer->add<Button>(new Button({ .x = 0.2, .y = 0.7, .w = 0.6, .h = 0.1 }));
     saveBtn->setText("Save");
     saveBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    // saveBtn->onClick = [dropdown]() {
-    //     SettingsMenu::submit(dropdown->selectedOption(), true);
-    // };
+    saveBtn->onClick = [sensTextArea]() {
+        float sens = std::stof(sensTextArea->text());
+        // TODO: text area has no validation right now
+        SettingsMenu::submit(sens);
+    };
 }
 
-void SettingsMenu::submit()
+void SettingsMenu::submit(float sensitivity)
 {
-    // auto event = NewScenarioEvent {
-    //     .scenario = scenarioName,
-    //     .challenge = challenge
-    // };
-    // EventManager::instance().triggerEvent(EventType::StartScenario, &event);
+    auto event = SettingsUpdateEvent {
+        .mouseSensitivity = sensitivity
+    };
+    EventManager::instance().triggerEvent(EventType::SettingsUpdate, &event);
 }

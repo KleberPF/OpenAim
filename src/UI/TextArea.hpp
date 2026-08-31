@@ -43,6 +43,7 @@ public:
     }
 
     void setText(const char* text, int fontSize);
+    std::string text() const;
 
 private:
     void render(const Renderer& renderer) const override;

@@ -21,10 +21,10 @@ public:
         };
         onCharTyped = [&](unsigned int codepoint) {
             // TODO: bad, improve this
-            std::string currentText = m_textRenderable ? m_textRenderable->text().contents() : "";
-            std::string text = std::format("{}{}", currentText, (char)codepoint);
+            // this requires setText("", ...) being called before using the text area
+            std::string text = std::format("{}{}", m_textRenderable->text().contents(), (char)codepoint);
 
-            setText(text.c_str(), 18);
+            setText(text.c_str(), m_textRenderable->text().fontSize());
         };
         onKeyPressed = [&](int key) {
             if (key != GLFW_KEY_BACKSPACE) {
@@ -38,7 +38,7 @@ public:
             std::string curText = m_textRenderable->text().contents();
             curText.pop_back();
 
-            setText(curText.c_str(), 18);
+            setText(curText.c_str(), m_textRenderable->text().fontSize());
         };
     }
 

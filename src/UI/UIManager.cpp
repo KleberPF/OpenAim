@@ -49,6 +49,9 @@ void UIManager::subscribe()
     EventManager::instance().addListener(EventType::CursorPos, [this](EventType type, void* data) {
         onEvent(type, data);
     });
+    EventManager::instance().addListener(EventType::KeyPress, [this](EventType type, void* data) {
+        onEvent(type, data);
+    });
 }
 
 Screen* UIManager::addScreen()
@@ -124,6 +127,19 @@ void UIManager::handleCursorPos(double xpos, double ypos)
     }
 }
 
+void UIManager::handleKeyPress(int key, bool pressed)
+{
+    if (!pressed) {
+        return;
+    }
+
+    for (auto& screen : m_screens) {
+        if (screen->active) {
+            screen->processKeyPress(key);
+        }
+    }
+}
+
 void UIManager::onEvent(EventType type, void* data)
 {
     switch (type) {
@@ -138,6 +154,10 @@ void UIManager::onEvent(EventType type, void* data)
     case EventType::CursorPos: {
         auto* event = (CursorPosEvent*)data;
         handleCursorPos(event->xpos, event->ypos);
+    } break;
+    case EventType::KeyPress: {
+        auto* event = (KeyPressEvent*)data;
+        handleKeyPress(event->key, event->pressed);
     } break;
     default:
         break;

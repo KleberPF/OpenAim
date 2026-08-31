@@ -7,6 +7,7 @@ using namespace UI;
 void TextArea::setText(const char* text, int fontSize)
 {
     Text t(&ResourceManager::instance().getFont(LIBERATION), text, fontSize);
+    t.color = { .r = 0, .g = 0, .b = 0};
     auto ptr = std::make_unique<TextRenderable>(t);
     m_textRenderable.swap(ptr);
 }

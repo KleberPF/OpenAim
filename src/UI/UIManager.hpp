@@ -34,6 +34,7 @@ private:
     void handleResize(int width, int height);
     void handleMouseButton(int key, bool pressed);
     void handleCursorPos(double xpos, double ypos);
+    void handleKeyPress(int key, bool pressed);
 
     void onEvent(EventType type, void* data);
 

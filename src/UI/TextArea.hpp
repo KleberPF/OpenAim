@@ -21,6 +21,9 @@ public:
             std::println("Exited textarea");
             UIManager::instance().setArrowCursor();
         };
+        onKeyPressed = [&](int key) {
+            setText("A", 18);
+        };
     }
 
     void setText(const char* text, int fontSize);

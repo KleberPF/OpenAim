@@ -34,8 +34,6 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
         if (m_clickedWidget != nullptr && m_clickedWidget == ctx.clicked) {
             m_clickedWidget->processClick(ctx.x, ctx.y);
         }
-
-        m_clickedWidget = nullptr;
     }
 }
 
@@ -71,6 +69,13 @@ void Screen::processResize()
 {
     for (auto& widget : m_widgets) {
         widget->updateRect();
+    }
+}
+
+void Screen::processKeyPress(int key)
+{
+    if (m_clickedWidget && m_clickedWidget->onKeyPressed) {
+        m_clickedWidget->onKeyPressed(key);
     }
 }
 

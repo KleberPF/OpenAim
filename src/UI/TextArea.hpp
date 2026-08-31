@@ -23,6 +23,10 @@ public:
             // TODO: bad, improve this
             // this requires setText("", ...) being called before using the text area
             std::string text = std::format("{}{}", m_textRenderable->text().contents(), (char)codepoint);
+            if (validator && !validator(text)) {
+                // update rejected
+                return;
+            }
 
             setText(text.c_str(), m_textRenderable->text().fontSize());
         };
@@ -38,6 +42,10 @@ public:
             std::string curText = m_textRenderable->text().contents();
             curText.pop_back();
 
+            if (validator && !validator(curText)) {
+                // update rejected
+                return;
+            }
             setText(curText.c_str(), m_textRenderable->text().fontSize());
         };
     }

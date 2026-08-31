@@ -24,6 +24,16 @@ SettingsMenu::SettingsMenu()
 
     auto* sensTextArea = sensContainer->add(new TextArea({ .x = 0.75, .y = 0.05, .w = 0.2, .h = 0.9 }));
     sensTextArea->setText("", 24);
+    sensTextArea->validator = [](const std::string& text) {
+        if (text.length() > 5) {
+            return false;
+        }
+
+        // https://stackoverflow.com/questions/29169153/how-do-i-verify-a-string-is-valid-double-even-if-it-has-a-point-in-it
+        char* end = nullptr;
+        double val = strtod(text.c_str(), &end);
+        return end != text.c_str() && *end == '\0' && val != HUGE_VAL;
+    };
 
     auto* saveBtn = mainContainer->add<Button>(new Button({ .x = 0.2, .y = 0.7, .w = 0.6, .h = 0.1 }));
     saveBtn->setText("Save");

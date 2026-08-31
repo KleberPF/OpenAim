@@ -48,6 +48,10 @@ public:
     std::function<void(int)> onKeyPressed;
     std::function<void(int)> onCharTyped;
 
+    // This function is used to determine which type of text is allowed in this
+    // particular text area
+    std::function<bool(const std::string&)> validator;
+
     Color backgroundColor = { .r = 255, .g = 0, .b = 0 }; // TODO: temp
     bool focusable = false;
 

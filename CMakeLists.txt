@@ -41,6 +41,7 @@ set(SOURCES
   src/UI/Button.cpp
   src/UI/Dropdown.cpp
   src/UI/MainMenu.cpp
+  src/UI/SettingsMenu.cpp
   src/UI/ScenarioOverlay.cpp
   src/UI/TextArea.cpp
   # Add more source files here as needed

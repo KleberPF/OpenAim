@@ -14,6 +14,7 @@
 #include "UI/MainMenu.hpp"
 #include "UI/ScenarioOverlay.hpp"
 #include "UI/Screen.hpp"
+#include "UI/SettingsMenu.hpp"
 #include "UI/UIManager.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
@@ -71,6 +72,7 @@ Game::Game()
         return scenario.name;
     });
     m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
+    m_settingsMenu = std::make_unique<UI::SettingsMenu>();
     m_scenarioOverlay = std::make_unique<UI::ScenarioOverlay>();
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
@@ -220,10 +222,16 @@ void Game::render()
     scene.entities = m_entityManager.entities();
     scene.sprites = m_sprites;
 
+    // TODO: replace this with a more robust logic for switching screens
     if (m_state == State::Menu) {
+        m_settingsMenu->disable();
         m_mainMenu->enable();
+    } else if (m_state == State::Paused) {
+        m_mainMenu->disable();
+        m_settingsMenu->enable();
     } else {
         m_mainMenu->disable();
+        m_settingsMenu->disable();
         m_scenarioOverlay->enable();
     }
 

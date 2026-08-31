@@ -8,6 +8,7 @@
 #include "Sprite.hpp"
 #include "UI/MainMenu.hpp"
 #include "UI/ScenarioOverlay.hpp"
+#include "UI/SettingsMenu.hpp"
 #include "Weapon.hpp"
 #include "Window.hpp"
 
@@ -71,6 +72,7 @@ private:
     const Scenario* m_currentScenario = nullptr;
 
     std::unique_ptr<UI::MainMenu> m_mainMenu;
+    std::unique_ptr<UI::SettingsMenu> m_settingsMenu;
     std::unique_ptr<UI::ScenarioOverlay> m_scenarioOverlay;
 
     // mouse input

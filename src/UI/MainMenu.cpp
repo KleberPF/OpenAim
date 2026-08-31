@@ -5,7 +5,6 @@
 #include "UI/Button.hpp"
 #include "UI/Dropdown.hpp"
 #include "UI/Label.hpp"
-#include "UI/TextArea.hpp"
 #include "UI/UIManager.hpp"
 
 using namespace UI;

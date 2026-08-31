@@ -249,9 +249,13 @@ void ResourceManager::loadScenarios(const std::string& path)
             if (!luaTarget["scale"].valid()) {
                 throw std::invalid_argument("Target has no scale defined");
             }
-            target.scale.x = luaTarget["scale"]["x"];
-            target.scale.y = luaTarget["scale"]["y"];
-            target.scale.z = luaTarget["scale"]["z"];
+            if (luaTarget["scale"].is<double>()) {
+                target.scale.x = target.scale.y = target.scale.z = luaTarget["scale"];
+            } else {
+                target.scale.x = luaTarget["scale"]["x"];
+                target.scale.y = luaTarget["scale"]["y"];
+                target.scale.z = luaTarget["scale"]["z"];
+            }
 
             if (!luaTarget["shape"].valid()) {
                 throw std::invalid_argument("Target has no shape defined");

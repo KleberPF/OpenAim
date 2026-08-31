@@ -9,11 +9,7 @@ return {
     targets = {
         {
             shape = Shape.Ball,
-            scale = {
-                x = 0.6,
-                y = 0.6,
-                z = 0.6
-            },
+            scale = 0.6,
             random_spawn = true,
             min_coords = {
                 x = -8,
@@ -33,11 +29,7 @@ return {
         },
         {
             shape = Shape.Ball,
-            scale = {
-                x = 0.6,
-                y = 0.6,
-                z = 0.6
-            },
+            scale = 0.6,
             random_spawn = true,
             min_coords = {
                 x = -8,
@@ -57,11 +49,7 @@ return {
         },
         {
             shape = Shape.Ball,
-            scale = {
-                x = 0.6,
-                y = 0.6,
-                z = 0.6
-            },
+            scale = 0.6,
             random_spawn = true,
             min_coords = {
                 x = -8,
@@ -81,11 +69,7 @@ return {
         },
         {
             shape = Shape.Ball,
-            scale = {
-                x = 0.6,
-                y = 0.6,
-                z = 0.6
-            },
+            scale = 0.6,
             random_spawn = true,
             min_coords = {
                 x = -8,
@@ -105,11 +89,7 @@ return {
         },
         {
             shape = Shape.Ball,
-            scale = {
-                x = 0.6,
-                y = 0.6,
-                z = 0.6
-            },
+            scale = 0.6,
             random_spawn = true,
             min_coords = {
                 x = -8,

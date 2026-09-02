@@ -19,6 +19,7 @@
 #include "Weapon.hpp"
 #include "Window.hpp"
 
+#include <GLFW/glfw3.h>
 #include <nlohmann/json.hpp>
 #include <stb_image.h>
 
@@ -170,6 +171,10 @@ void Game::processInput()
         m_camera.processMouseMovement(xoffset, yoffset);
     }
 
+    // HACK: needed for Wayland (at least for Sway)
+    // Hopefully they merge my PR :)
+    // https://github.com/glfw/glfw/pull/2895
+    glfwSetCursor(m_window.ptr(), nullptr);
     glfwSetInputMode(m_window.ptr(), GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     // camera keyboard processing

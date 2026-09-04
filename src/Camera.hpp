@@ -22,10 +22,10 @@ public:
     glm::vec3 front() const;
     float zoom() const;
 
-    void setMouseSensitivity(float sensitivity);
     void lookForward();
 
     glm::vec3 position;
+    float mouseSensitivity = 2.0f;
 
 private:
     glm::vec3 m_front;
@@ -39,7 +39,6 @@ private:
 
     // options
     float m_movementSpeed = 8.0f;
-    float m_mouseSensitivity = 2.0f;
     float m_zoom = 45.0;
 
     void updateVectors();

@@ -28,7 +28,7 @@ public:
                 return;
             }
 
-            setText(text.c_str(), m_textRenderable->text().fontSize());
+            setText(text);
         };
         onKeyPressed = [&](int key) {
             if (key != GLFW_KEY_BACKSPACE) {
@@ -46,11 +46,12 @@ public:
                 // update rejected
                 return;
             }
-            setText(curText.c_str(), m_textRenderable->text().fontSize());
+            setText(curText);
         };
     }
 
-    void setText(const char* text, int fontSize);
+    void setFontSize(int fontSize);
+    void setText(const std::string& text);
     std::string text() const;
 
 private:
@@ -58,6 +59,8 @@ private:
 
     // Ugly, but it's here so we don't have to recreate the text render data every frame
     std::unique_ptr<TextRenderable> m_textRenderable = nullptr;
+    std::string m_text;
+    int m_fontSize = 18;
 
     friend class Screen;
 };

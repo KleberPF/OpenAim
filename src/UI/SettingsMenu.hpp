@@ -6,7 +6,7 @@ namespace UI {
 
 class SettingsMenu {
 public:
-    SettingsMenu();
+    SettingsMenu(float sensitivity);
 
     void enable()
     {
@@ -19,6 +19,8 @@ public:
 
 private:
     Screen* m_screen;
+    // TODO: ideally we would have a SettingsManager or something
+    float m_currentSensitivity;
 
     static void submit(float sensitivity);
 };

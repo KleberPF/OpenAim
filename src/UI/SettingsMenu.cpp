@@ -8,8 +8,9 @@
 
 using namespace UI;
 
-SettingsMenu::SettingsMenu()
+SettingsMenu::SettingsMenu(float sensitivity)
     : m_screen(UIManager::instance().addScreen())
+    , m_currentSensitivity(sensitivity)
 {
     // Main container
     auto* mainContainer = m_screen->add<Widget>(new Widget({ .x = 0.333, .y = 0.1, .w = 0.333, .h = 0.5 }));
@@ -23,8 +24,13 @@ SettingsMenu::SettingsMenu()
     sensLabel->backgroundColor = { .r = 45, .g = 45, .b = 45 };
 
     auto* sensTextArea = sensContainer->add(new TextArea({ .x = 0.75, .y = 0.05, .w = 0.2, .h = 0.9 }));
-    sensTextArea->setText("", 24);
+    sensTextArea->setFontSize(24);
+    sensTextArea->setText(std::to_string(sensitivity));
     sensTextArea->validator = [](const std::string& text) {
+        if (text.length() == 0) {
+            return true;
+        }
+
         if (text.length() > 5) {
             return false;
         }
@@ -38,10 +44,13 @@ SettingsMenu::SettingsMenu()
     auto* saveBtn = mainContainer->add<Button>(new Button({ .x = 0.2, .y = 0.7, .w = 0.6, .h = 0.1 }));
     saveBtn->setText("Save");
     saveBtn->backgroundColor = { .r = 40, .g = 40, .b = 40 };
-    saveBtn->onClick = [sensTextArea]() {
-        float sens = std::stof(sensTextArea->text());
-        // TODO: text area has no validation right now
-        SettingsMenu::submit(sens);
+    saveBtn->onClick = [&, sensTextArea]() {
+        if (sensTextArea->text().empty()) {
+            sensTextArea->setText(std::to_string(m_currentSensitivity));
+        }
+
+        m_currentSensitivity = std::stof(sensTextArea->text());
+        SettingsMenu::submit(m_currentSensitivity);
     };
 }
 

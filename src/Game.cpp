@@ -73,7 +73,7 @@ Game::Game()
         return scenario.name;
     });
     m_mainMenu = std::make_unique<UI::MainMenu>(scenarioNames);
-    m_settingsMenu = std::make_unique<UI::SettingsMenu>();
+    m_settingsMenu = std::make_unique<UI::SettingsMenu>(m_camera.mouseSensitivity);
     m_scenarioOverlay = std::make_unique<UI::ScenarioOverlay>();
 
     EventManager::instance().addListener(EventType::StartScenario, [this](EventType type, void* data) {
@@ -435,6 +435,6 @@ void Game::onEvent(EventType type, void* data)
     } else if (type == EventType::SettingsUpdate) {
         auto* event = (SettingsUpdateEvent*)data;
 
-        m_camera.setMouseSensitivity(event->mouseSensitivity);
+        m_camera.mouseSensitivity = event->mouseSensitivity;
     }
 }

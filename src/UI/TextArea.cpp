@@ -4,9 +4,17 @@
 
 using namespace UI;
 
-void TextArea::setText(const char* text, int fontSize)
+void TextArea::setFontSize(int fontSize)
 {
-    Text t(&ResourceManager::instance().getFont(LIBERATION), text, fontSize);
+    m_fontSize = fontSize;
+
+    // need to reconstruct text object
+    setText(m_text);
+}
+
+void TextArea::setText(const std::string& text)
+{
+    Text t(&ResourceManager::instance().getFont(LIBERATION), text, m_fontSize);
     t.color = { .r = 0, .g = 0, .b = 0 };
     auto ptr = std::make_unique<TextRenderable>(t);
     m_textRenderable.swap(ptr);

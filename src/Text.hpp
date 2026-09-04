@@ -7,7 +7,7 @@
 
 class Text {
 public:
-    Text(const Font* font, const char* text, int fontSize);
+    Text(const Font* font, const std::string& text, int fontSize);
 
     void setFont(const Font* font);
     void setText(const std::string& text);

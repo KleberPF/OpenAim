@@ -47,8 +47,8 @@ void Camera::processKeyboard(CameraMovement direction, float deltaTime)
 
 void Camera::processMouseMovement(float xoffset, float yoffset)
 {
-    xoffset *= m_mouseSensitivity / 100;
-    yoffset *= m_mouseSensitivity / 100;
+    xoffset *= mouseSensitivity / 100;
+    yoffset *= mouseSensitivity / 100;
 
     m_yaw += xoffset;
     m_pitch += yoffset;
@@ -71,11 +71,6 @@ glm::vec3 Camera::front() const
 float Camera::zoom() const
 {
     return m_zoom;
-}
-
-void Camera::setMouseSensitivity(float sensitivity)
-{
-    m_mouseSensitivity = sensitivity;
 }
 
 void Camera::lookForward()

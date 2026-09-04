@@ -4,7 +4,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-Text::Text(const Font* font, const char* text, int fontSize)
+Text::Text(const Font* font, const std::string& text, int fontSize)
     : m_fontSize(fontSize)
     , m_contents(text)
     , m_font(font)

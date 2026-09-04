@@ -2,6 +2,8 @@
 
 #include "ResourceManager.hpp"
 
+#include <cstdint>
+
 using namespace UI;
 
 void TextArea::setFontSize(int fontSize)
@@ -25,9 +27,9 @@ std::string TextArea::text() const
     return m_textRenderable ? m_textRenderable->text().contents() : "";
 }
 
-void TextArea::render(const Renderer& renderer) const
+void TextArea::render(const Renderer& renderer, double time) const
 {
-    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor);
     if (!m_textRenderable) {
         return;
     }
@@ -38,4 +40,11 @@ void TextArea::render(const Renderer& renderer) const
     float textY = m_rect.y + m_textRenderable->text().fontSize() - m_textRenderable->text().height() + 3; // arbitrary 3px top margin
 
     renderer.renderText(*m_textRenderable, textX, textY);
+
+    // if focused, render the blinking cursor at the end of the line
+    uint64_t t = time;
+    if (focused && t % 2 == 0) {
+        const int offset = 2;
+        renderer.renderRectangle(textX + m_textRenderable->text().width(), textY - offset, 2, m_textRenderable->text().height() + offset, m_textRenderable->text().color);
+    }
 }

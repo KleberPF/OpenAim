@@ -11,9 +11,9 @@ void Button::setText(const char* text)
     m_textRenderable.swap(ptr);
 }
 
-void Button::render(const Renderer& renderer) const
+void Button::render(const Renderer& renderer, double /*time*/) const
 {
-    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor);
     if (m_textRenderable) {
         // Center text inside widget
         // TODO: figure out how to make this configurable

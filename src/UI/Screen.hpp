@@ -30,14 +30,19 @@ public:
         return widget;
     }
 
-    void render(const Renderer& renderer);
+    void render(const Renderer& renderer, double time);
 
     bool active = false;
 
 private:
     Screen() = default;
 
+    // Used to keep track of which widget was clicked previously
+    // when LMB is released
     Widget* m_clickedWidget = nullptr;
+    // Used to keep track of which widget was last fully interacted
+    // with (LMB pressed and released)
+    Widget* m_focusedWidget = nullptr;
     std::unordered_set<Widget*> m_hoveredWidgets;
 
     std::vector<std::unique_ptr<Widget>> m_widgets;

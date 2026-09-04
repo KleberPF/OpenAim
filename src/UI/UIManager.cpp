@@ -3,6 +3,7 @@
 #include "EventManager.hpp"
 #include "Events.hpp"
 #include "InputManager.hpp"
+#include <GLFW/glfw3.h>
 
 #include <cassert>
 
@@ -68,10 +69,11 @@ Screen* UIManager::addScreen()
 
 void UIManager::render(Renderer& renderer)
 {
+    double now = glfwGetTime();
     renderer.orthoProjection = glm::ortho(0.0f, m_viewWidth, m_viewHeight, 0.0f);
     for (auto& screen : m_screens) {
         if (screen->active) {
-            screen->render(renderer);
+            screen->render(renderer, now);
         }
     }
 }

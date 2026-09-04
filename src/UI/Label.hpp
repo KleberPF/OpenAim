@@ -21,7 +21,7 @@ public:
     LabelTextAlignment alignment = LabelTextAlignment::Left;
 
 private:
-    void render(const Renderer& renderer) const override;
+    void render(const Renderer& renderer, double time) const override;
 
     // Ugly, but it's here so we don't have to recreate the text render data every frame
     std::unique_ptr<TextRenderable> m_textRenderable = nullptr;

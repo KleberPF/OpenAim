@@ -17,7 +17,7 @@ public:
     std::string selectedOption();
 
 private:
-    void render(const Renderer& renderer) const override;
+    void render(const Renderer& renderer, double time) const override;
     void updateRect() override;
     bool isInsideRect(float x, float y) override;
     void processClick(float x, float y) override;

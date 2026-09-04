@@ -202,13 +202,13 @@ void Renderer::renderSkybox(
     glDepthFunc(GL_LESS);
 }
 
-void Renderer::renderRectangle(float x, float y, float width, float height, glm::vec3 color) const
+void Renderer::renderRectangle(float x, float y, float width, float height, const Color& color) const
 {
     glDepthFunc(GL_ALWAYS);
 
     const Shader& shader = ResourceManager::instance().getShader("color");
     shader.use();
-    shader.setVec3("color", color);
+    shader.setVec3("color", color.toOpenGLFormat());
 
     glm::mat4 model = glm::translate(glm::identity<glm::mat4>(), glm::vec3(x, y, 0));
     model = glm::scale(model, glm::vec3(width, height, 0));

@@ -26,12 +26,12 @@ void Widget::updateRect()
     }
 }
 
-void Widget::render(const Renderer& renderer) const
+void Widget::render(const Renderer& renderer, double time) const
 {
-    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor);
 
     for (const auto& widget : m_widgets) {
-        widget->render(renderer);
+        widget->render(renderer, time);
     }
 }
 

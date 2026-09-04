@@ -18,10 +18,10 @@ std::string Dropdown::selectedOption()
     return m_options[m_selectedIndex].text().contents();
 }
 
-void Dropdown::render(const Renderer& renderer) const
+void Dropdown::render(const Renderer& renderer, double /*time*/) const
 {
     // Main box
-    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor);
 
     // Text for the selected item
     auto text = m_options[m_selectedIndex].text();
@@ -35,7 +35,7 @@ void Dropdown::render(const Renderer& renderer) const
 
         for (size_t i = 0; i < m_options.size(); i++) {
             float yOffset = m_rect.y + (i + 1) * m_rect.h;
-            renderer.renderRectangle(m_rect.x, yOffset, m_rect.w, m_rect.h, dropdownBackground.toOpenGLFormat());
+            renderer.renderRectangle(m_rect.x, yOffset, m_rect.w, m_rect.h, dropdownBackground);
 
             auto text = m_options[i].text();
             float textX = m_rect.x + m_rect.w / 2 - (float)text.width() / 2;

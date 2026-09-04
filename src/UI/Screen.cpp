@@ -29,12 +29,21 @@ void Screen::processClick(MouseButton::Value button, bool pressed, double xpos, 
     if (pressed) {
         // Mouse button was pressed and we determined which widget it hit
         m_clickedWidget = ctx.clicked;
-    } else {
-        // Mouse button was released and we need to check if it was a valid click
-        if (m_clickedWidget != nullptr && m_clickedWidget == ctx.clicked) {
-            m_clickedWidget->processClick(ctx.x, ctx.y);
-        }
+        return;
     }
+
+    if (m_clickedWidget == nullptr || m_clickedWidget != ctx.clicked) {
+        return;
+    }
+
+    // Mouse button was released and we need to check if it was a valid click
+    if (m_focusedWidget != nullptr && m_focusedWidget != m_clickedWidget) {
+        m_focusedWidget->focused = false;
+    }
+
+    m_focusedWidget = m_clickedWidget;
+    m_focusedWidget->focused = true;
+    m_clickedWidget->processClick(ctx.x, ctx.y);
 }
 
 void Screen::processMouseMove(double xpos, double ypos)
@@ -86,9 +95,9 @@ void Screen::processChar(unsigned int codepoint)
     }
 }
 
-void Screen::render(const Renderer& renderer)
+void Screen::render(const Renderer& renderer, double time)
 {
     for (auto& widget : m_widgets) {
-        widget->render(renderer);
+        widget->render(renderer, time);
     }
 }

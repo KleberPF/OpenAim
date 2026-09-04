@@ -11,9 +11,9 @@ void Label::setText(const char* text, int fontSize)
     m_textRenderable.swap(ptr);
 }
 
-void Label::render(const Renderer& renderer) const
+void Label::render(const Renderer& renderer, double /*time*/) const
 {
-    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor.toOpenGLFormat());
+    renderer.renderRectangle(m_rect.x, m_rect.y, m_rect.w, m_rect.h, backgroundColor);
     if (!m_textRenderable) {
         return;
     }

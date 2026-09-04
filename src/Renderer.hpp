@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Color.hpp"
 #include "Material.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
@@ -18,7 +19,7 @@ public:
     void renderScene(const Scene& scene);
     void renderText(const TextRenderable& renderable, float x, float y) const;
 
-    void renderRectangle(float x, float y, float width, float height, glm::vec3 color) const;
+    void renderRectangle(float x, float y, float width, float height, const Color& color) const;
 
     // TODO: temporary approach
     glm::mat4 orthoProjection = glm::ortho(0.0f, 800.0f, 600.0f, 0.0f);

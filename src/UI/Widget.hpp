@@ -53,7 +53,7 @@ public:
     std::function<bool(const std::string&)> validator;
 
     Color backgroundColor = { .r = 255, .g = 0, .b = 0 }; // TODO: temp
-    bool focusable = false;
+    bool focused = false;
 
     template <typename T>
     T* add(T* widget)
@@ -66,7 +66,7 @@ public:
     }
 
 protected:
-    virtual void render(const Renderer& renderer) const;
+    virtual void render(const Renderer& renderer, double time) const;
     virtual void updateRect();
     virtual bool isInsideRect(float x, float y);
     virtual void processClick(float x, float y);

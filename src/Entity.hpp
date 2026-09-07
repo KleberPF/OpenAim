@@ -1,14 +1,12 @@
 #pragma once
 
-#include "Material.hpp"
-#include "Model.hpp"
+#include "Geometry.hpp"
 #include "Scenario.hpp"
-#include "Shader.hpp"
+#include "HealthBar.hpp"
 
 #include <glm/glm.hpp>
 
 #include <cstdint>
-#include <functional>
 #include <memory>
 #include <optional>
 
@@ -106,8 +104,7 @@ private:
 
 class Entity {
 public:
-    Entity(Model model, const Material& material, const Shader& shader,
-        const glm::vec3& pos);
+    Entity(Geometry geometry, const glm::vec3& pos);
     virtual ~Entity() = default;
 
     Entity(const Entity& entity) = delete;
@@ -116,9 +113,7 @@ public:
     Entity(Entity&& entity) = default;
     Entity& operator=(Entity&& entity) = default;
 
-    glm::mat4 modelMatrix() const;
-    glm::mat3 normalMatrix() const;
-    glm::mat4 buildHealthbarModelMatrix() const;
+    // glm::mat4 buildHealthbarModelMatrix() const;
 
     float getHealthPercentage() const;
     glm::vec3 getHealthBarColor() const;
@@ -151,7 +146,9 @@ public:
     bool shouldRenderHealthBar() const;
 
     void render() const;
-    void renderHealthBar() const;
+
+    const Geometry& geometry() const;
+    HealthBar& healthBar();
 
     // This holds a reference position used for entity movement.
     // For example, the point where the entity is circling or
@@ -160,20 +157,7 @@ public:
     bool destroyable = false;
     Target::Type type = Target::Type::Goner;
 
-    std::reference_wrapper<const Material> material;
-    std::reference_wrapper<const Shader> shader;
-
-    std::reference_wrapper<Material> healthbarMaterial;
-    std::reference_wrapper<const Shader> healthbarShader;
-
 private:
-    // both are meant to be called after a move, resize or rotation
-    void updateMatrices();
-
-    glm::mat4 m_modelMatrix;
-    glm::mat3 m_normalMatrix;
-    glm::mat4 m_healthbarModelMatrix;
-
     std::unique_ptr<CollisionObject> m_collisionObject = nullptr;
 
     // This function is used to determine the new position of this entity
@@ -199,7 +183,6 @@ private:
     // This holds the actual position the entity is in
     glm::vec3 m_currentPos;
 
-    Model m_model;
-
-    Model m_healthbarQuad;
+    Geometry m_geometry;
+    HealthBar m_healthBar;
 };

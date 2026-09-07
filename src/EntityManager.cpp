@@ -68,7 +68,7 @@ void EntityManager::updateEntities(float timeElapsedSeconds)
     }
 }
 
-const std::vector<Entity>& EntityManager::entities() const
+std::vector<Entity>& EntityManager::entities()
 {
     return m_entities;
 }

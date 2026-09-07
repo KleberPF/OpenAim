@@ -34,6 +34,8 @@ set(SOURCES
   src/Text.cpp
   src/EventManager.cpp
   src/TextRenderable.cpp
+  src/Geometry.cpp
+  src/HealthBar.cpp
   src/UI/UIManager.cpp
   src/UI/Screen.cpp
   src/UI/Widget.cpp

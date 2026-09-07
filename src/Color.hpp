@@ -2,8 +2,7 @@
 
 #include <glm/glm.hpp>
 
-struct Color
-{
+struct Color {
     int r;
     int g;
     int b;
@@ -43,3 +42,9 @@ inline Color operator-(const Color& lhs, const Color& rhs)
     result -= rhs;
     return result;
 }
+
+constexpr Color COLOR_RED = { .r = 255, .g = 0, .b = 0 };
+constexpr Color COLOR_GREEN = { .r = 0, .g = 255, .b = 0 };
+constexpr Color COLOR_BLUE = { .r = 0, .g = 0, .b = 255 };
+constexpr Color COLOR_BLACK = { .r = 0, .g = 0, .b = 0 };
+constexpr Color COLOR_WHITE = { .r = 255, .g = 255, .b = 255 };

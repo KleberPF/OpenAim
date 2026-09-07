@@ -1,9 +1,8 @@
 #include "Entity.hpp"
 
-#include "Model.hpp"
+#include "Geometry.hpp"
 #include "ResourceManager.hpp"
 #include "Scenario.hpp"
-#include "Shader.hpp"
 #include "glm/fwd.hpp"
 #include "utils.hpp"
 
@@ -146,43 +145,20 @@ float CollisionSphere::radius() const
     return m_radius;
 }
 
-Entity::Entity(Model model, const Material& material, const Shader& shader,
-    const glm::vec3& pos)
+Entity::Entity(Geometry geometry, const glm::vec3& pos)
     : referentialPos(pos)
-    , material(material)
-    , shader(shader)
-    , healthbarMaterial(ResourceManager::instance().getMaterial("healthbar"))
-    , healthbarShader(ResourceManager::instance().getShader("healthbar"))
     , m_currentPos(pos)
-    , m_model(std::move(model))
-    , m_healthbarQuad(ResourceManager::instance().getModel("plane"))
+    , m_geometry(geometry)
+    , m_healthBar(
+          Geometry(
+              ResourceManager::instance().getModel("plane"),
+              ResourceManager::instance().getMaterial("healthbar"),
+              ResourceManager::instance().getShader("healthbar"),
+              glm::vec3(0)))
 {
-}
-
-glm::mat4 Entity::modelMatrix() const
-{
-    return m_modelMatrix;
-}
-
-glm::mat3 Entity::normalMatrix() const
-{
-    return m_normalMatrix;
-}
-
-glm::mat4 Entity::buildHealthbarModelMatrix() const
-{
-    // translation
-    auto model = glm::identity<glm::mat4>();
-    model = glm::translate(
-        model, m_currentPos + glm::vec3(0.0f, m_size.y / 2 + 0.1f, 0.0f));
-
-    // rotation
-    model *= anglesToRotationMatrix(Rotation(90.0f, 0.0f, 0.0f));
-
-    // scaling
-    model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.1f));
-
-    return model;
+    // Makes the healthbar face forward
+    m_healthBar.setRotation(Rotation(90.0f, 0.0f, 0.0f));
+    m_healthBar.setSize(glm::vec3(0.5f, 0.0f, 0.1f));
 }
 
 float Entity::getHealthPercentage() const
@@ -213,7 +189,9 @@ void Entity::setRotation(float x, float y, float z)
         m_collisionObject->setRotation(m_rotation.value());
     }
 
-    updateMatrices();
+    m_geometry.setRotation(m_rotation.value());
+    // Health bar should always be rotated the same (I think?)
+    // m_healthBar.setRotation(m_currentPos);
 }
 
 void Entity::move(const glm::vec3& newPos)
@@ -223,7 +201,9 @@ void Entity::move(const glm::vec3& newPos)
         m_collisionObject->move(newPos);
     }
 
-    updateMatrices();
+    m_geometry.setPosition(m_currentPos);
+    // offset healthbar to be on top of the entity
+    m_healthBar.setPosition(m_currentPos + glm::vec3(0.0f, m_size.y / 2 + 0.1f, 0.0f));
 }
 
 void Entity::moveRelative(const glm::vec3& newPos)
@@ -261,7 +241,9 @@ void Entity::setSize(const glm::vec3& size)
         m_collisionObject->setSize(size);
     }
 
-    updateMatrices();
+    m_geometry.setSize(m_size);
+    // Health bar has a fixed size
+    // m_healthBar.setSize(glm::vec3(0.5f, 0.0f, 0.1f));
 }
 
 const std::string& Entity::getName() const
@@ -322,6 +304,8 @@ bool Entity::update(float timePassedSeconds)
             newPos.z));
     }
 
+    m_healthBar.update(getHealthPercentage());
+
     return false;
 }
 
@@ -332,28 +316,15 @@ bool Entity::shouldRenderHealthBar() const
 
 void Entity::render() const
 {
-    m_model.render();
+    m_geometry.render();
 }
 
-void Entity::renderHealthBar() const
+const Geometry& Entity::geometry() const
 {
-    m_healthbarQuad.render();
+    return m_geometry;
 }
 
-void Entity::updateMatrices()
+HealthBar& Entity::healthBar()
 {
-    // translation
-    m_modelMatrix = glm::identity<glm::mat4>();
-    m_modelMatrix = glm::translate(m_modelMatrix, m_currentPos);
-
-    // rotation
-    if (m_rotation.has_value()) {
-        m_modelMatrix *= anglesToRotationMatrix(m_rotation.value());
-    }
-
-    // scaling
-    m_modelMatrix = glm::scale(m_modelMatrix, m_size);
-
-    // update normal
-    m_normalMatrix = glm::mat3(glm::transpose(glm::inverse(m_modelMatrix)));
+    return m_healthBar;
 }

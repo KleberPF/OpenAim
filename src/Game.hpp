@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "EntityManager.hpp"
 #include "EventManager.hpp"
+#include "Geometry.hpp"
 #include "Renderer.hpp"
 #include "Scenario.hpp"
 #include "Sprite.hpp"
@@ -70,6 +71,8 @@ private:
     Weapon m_weapon;
     std::vector<Scenario> m_scenarios;
     const Scenario* m_currentScenario = nullptr;
+    // For now I don't see a reason to have a manager or something for this
+    std::vector<Geometry> m_geometries;
 
     std::unique_ptr<UI::MainMenu> m_mainMenu;
     std::unique_ptr<UI::SettingsMenu> m_settingsMenu;

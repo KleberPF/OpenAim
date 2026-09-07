@@ -4,6 +4,7 @@
 #include "Entity.hpp"
 #include "EventManager.hpp"
 #include "Events.hpp"
+#include "Geometry.hpp"
 #include "InputManager.hpp"
 #include "RNG.hpp"
 #include "ResourceManager.hpp"
@@ -225,10 +226,11 @@ void Game::updateShotEntities()
 void Game::render()
 {
     Scene scene(m_camera, m_window.width, m_window.height);
-    scene.globalLightSource = m_globalLightSource;
-    scene.skybox = *m_skybox;
-    scene.entities = m_entityManager.entities();
-    scene.sprites = m_sprites;
+    scene.globalLightSource = &m_globalLightSource;
+    scene.skybox = m_skybox.get();
+    scene.entities = &m_entityManager.entities();
+    scene.sprites = &m_sprites;
+    scene.geometries = &m_geometries;
 
     // TODO: replace this with a more robust logic for switching screens
     if (m_state == State::Menu) {
@@ -296,60 +298,48 @@ void Game::changeState(State newState)
 
 void Game::buildPlayArea()
 {
-    Entity floor(ResourceManager::instance().getModel("plane"),
+    Geometry floor(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"), glm::vec3(0));
-    floor.addCollisionObject(CollisionObject::Type::AABB);
     floor.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    floor.setName("Floor");
-    m_entityManager.addEntity(std::move(floor));
+    m_geometries.push_back(floor);
 
-    Entity frontWall(ResourceManager::instance().getModel("plane"),
+    Geometry frontWall(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"),
         glm::vec3(0.0f, 10.0f, -10.0f));
-    frontWall.addCollisionObject(CollisionObject::Type::AABB);
-    frontWall.setRotation(90, 0, 0);
+    frontWall.setRotation(glm::vec3(90, 0, 0));
     frontWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    frontWall.setName("Front Wall");
-    m_entityManager.addEntity(std::move(frontWall));
+    m_geometries.push_back(frontWall);
 
-    Entity leftWall(ResourceManager::instance().getModel("plane"),
+    Geometry leftWall(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"),
         glm::vec3(-10.0f, 10.0f, 0.0f));
-    leftWall.addCollisionObject(CollisionObject::Type::AABB);
-    leftWall.setRotation(90, 90, 0);
+    leftWall.setRotation(glm::vec3(90, 90, 0));
     leftWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    leftWall.setName("Left Wall");
-    m_entityManager.addEntity(std::move(leftWall));
+    m_geometries.push_back(leftWall);
 
-    Entity rightWall(ResourceManager::instance().getModel("plane"),
+    Geometry rightWall(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"), glm::vec3(10.0f, 10.0f, 0.0f));
-    rightWall.addCollisionObject(CollisionObject::Type::AABB);
-    rightWall.setRotation(90, -90, 0);
+    rightWall.setRotation(glm::vec3(90, -90, 0));
     rightWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    rightWall.setName("Right Wall");
-    m_entityManager.addEntity(std::move(rightWall));
+    m_geometries.push_back(rightWall);
 
-    Entity ceiling(ResourceManager::instance().getModel("plane"),
+    Geometry ceiling(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"), glm::vec3(0.0f, 20.0f, 0.0f));
-    ceiling.addCollisionObject(CollisionObject::Type::AABB);
-    ceiling.setRotation(180, 0, 0);
+    ceiling.setRotation(glm::vec3(180, 0, 0));
     ceiling.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    ceiling.setName("Ceiling");
-    m_entityManager.addEntity(std::move(ceiling));
+    m_geometries.push_back(ceiling);
 
-    Entity backWall(ResourceManager::instance().getModel("plane"),
+    Geometry backWall(ResourceManager::instance().getModel("plane"),
         ResourceManager::instance().getMaterial("bricks"),
         ResourceManager::instance().getShader("textured"), glm::vec3(0.0f, 10.0f, 10.0f));
-    backWall.addCollisionObject(CollisionObject::Type::AABB);
-    backWall.setRotation(90, 180, 0);
+    backWall.setRotation(glm::vec3(90, 180, 0));
     backWall.setSize(glm::vec3(20.0f, 0.0f, 20.0f));
-    backWall.setName("Back Wall");
-    m_entityManager.addEntity(std::move(backWall));
+    m_geometries.push_back(backWall);
 }
 
 void Game::reset()
@@ -408,8 +398,10 @@ void Game::createScenario(const std::string& name)
             collisionObjType = CollisionObject::Type::SPHERE;
         }
 
-        Entity entity(*model, ResourceManager::instance().getMaterial("targets"),
+        Geometry geometry(*model, ResourceManager::instance().getMaterial("targets"),
             ResourceManager::instance().getShader("targets"), spawnPoint);
+        Entity entity(geometry, spawnPoint);
+
         entity.addCollisionObject(collisionObjType);
         entity.setSize(target.scale);
         entity.destroyable = true;

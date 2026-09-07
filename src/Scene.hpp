@@ -2,12 +2,12 @@
 
 #include "Camera.hpp"
 #include "Entity.hpp"
+#include "Geometry.hpp"
 #include "Material.hpp"
 #include "Sprite.hpp"
 
 #include <glm/glm.hpp>
 
-#include <functional>
 #include <optional>
 #include <vector>
 
@@ -44,8 +44,9 @@ struct Scene {
     const Camera& camera;
     int viewportWidth;
     int viewportHeight;
-    std::optional<std::reference_wrapper<LightSource>> globalLightSource;
-    std::optional<std::reference_wrapper<Skybox>> skybox;
-    std::optional<std::reference_wrapper<const std::vector<Entity>>> entities;
-    std::optional<std::reference_wrapper<std::vector<Sprite>>> sprites;
+    const LightSource* globalLightSource = nullptr;
+    const Skybox* skybox = nullptr;
+    std::vector<Entity>* entities = nullptr;
+    const std::vector<Sprite>* sprites = nullptr;
+    const std::vector<Geometry>* geometries = nullptr;
 };

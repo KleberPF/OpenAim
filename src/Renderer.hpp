@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Color.hpp"
+#include "Geometry.hpp"
 #include "Material.hpp"
 #include "Scene.hpp"
 #include "Shader.hpp"
@@ -27,10 +28,11 @@ public:
 private:
     // Should probably change this later, having to always pass the scene
     // is kinda ugly
-    static void renderEntity(const Scene& scene, const Entity& entity);
+    static void renderEntity(const Scene& scene, Entity& entity);
     void renderSprite(const Scene& scene, const Sprite& sprite) const;
     void renderSkybox(
         const Scene& scene, const Shader& shader, const Cubemap& cubemap) const;
+    static void renderGeometry(const Scene& scene, const Geometry& geometry);
 
     // clang-format off
     std::array<float, 24> m_rectangleVertices = { 

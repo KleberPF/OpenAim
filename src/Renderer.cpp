@@ -1,11 +1,11 @@
 #include "Renderer.hpp"
 
 #include "Entity.hpp"
+#include "Geometry.hpp"
 #include "Material.hpp"
 #include "ResourceManager.hpp"
 #include "Shader.hpp"
 #include "glad/glad.h"
-#include "utils.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -82,53 +82,15 @@ Renderer::~Renderer()
     glDeleteBuffers(1, &m_skyboxVbo);
 }
 
-void Renderer::renderEntity(const Scene& scene, const Entity& entity)
+void Renderer::renderEntity(const Scene& scene, Entity& entity)
 {
-    const Shader& shader = entity.shader.get();
-    shader.use();
+    const Geometry& geometry = entity.geometry();
+    renderGeometry(scene, geometry);
 
-    // lighting stuff
-    if (scene.globalLightSource.has_value()) {
-        shader.setVec3("viewPos", scene.camera.position);
-        shader.setVec3(
-            "light.direction", scene.globalLightSource->get().direction);
-        shader.setVec3("light.ambient", scene.globalLightSource->get().ambient);
-        shader.setVec3("light.diffuse", scene.globalLightSource->get().diffuse);
-        shader.setVec3(
-            "light.specular", scene.globalLightSource->get().specular);
-    }
-
-    glm::mat4 view = scene.camera.buildViewMatrix();
-    shader.setMat4("view", view);
-
-    auto model = entity.modelMatrix();
-    shader.setMat4("model", model);
-    shader.setMat3("normal", entity.normalMatrix());
-
-    glm::mat4 projection = glm::perspective(glm::radians(scene.camera.zoom()),
-        (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
-
-    glm::mat4 mvp = projection * view * model;
-    shader.setMat4("mvp", mvp);
-
-    entity.material.get().bind(shader);
-    entity.render();
-
+    // TODO: temp
     if (entity.shouldRenderHealthBar()) {
-        const Shader& healthbarShader = entity.healthbarShader;
-        Material& healthbarMaterial = entity.healthbarMaterial;
-
-        healthbarShader.use();
-
-        model = entity.buildHealthbarModelMatrix();
-        mvp = projection * view * model;
-
-        healthbarShader.setMat4("mvp", mvp);
-        healthbarShader.setFloat(
-            "healthPercentage", entity.getHealthPercentage());
-        healthbarMaterial.setColor(entity.getHealthBarColor());
-        healthbarMaterial.bind(healthbarShader);
-        entity.renderHealthBar();
+        entity.healthBar().updateMaterial();
+        renderGeometry(scene, entity.healthBar().geometry());
     }
 }
 
@@ -202,6 +164,37 @@ void Renderer::renderSkybox(
     glDepthFunc(GL_LESS);
 }
 
+void Renderer::renderGeometry(const Scene& scene, const Geometry& geometry)
+{
+    const Shader* shader = geometry.m_shader;
+    shader->use();
+
+    // lighting stuff
+    if (scene.globalLightSource) {
+        shader->setVec3("viewPos", scene.camera.position);
+        shader->setVec3("light.direction", scene.globalLightSource->direction);
+        shader->setVec3("light.ambient", scene.globalLightSource->ambient);
+        shader->setVec3("light.diffuse", scene.globalLightSource->diffuse);
+        shader->setVec3("light.specular", scene.globalLightSource->specular);
+    }
+
+    glm::mat4 view = scene.camera.buildViewMatrix();
+    shader->setMat4("view", view);
+
+    glm::mat4 model = geometry.m_modelMatrix;
+    shader->setMat4("model", model);
+    shader->setMat3("normal", geometry.m_normalMatrix);
+
+    glm::mat4 projection = glm::perspective(glm::radians(scene.camera.zoom()),
+        (float)scene.viewportWidth / scene.viewportHeight, 0.1F, 100.0F);
+
+    glm::mat4 mvp = projection * view * model;
+    shader->setMat4("mvp", mvp);
+
+    geometry.m_material->bind(*shader);
+    geometry.render();
+}
+
 void Renderer::renderRectangle(float x, float y, float width, float height, const Color& color) const
 {
     glDepthFunc(GL_ALWAYS);
@@ -248,19 +241,24 @@ void Renderer::renderScene(const Scene& scene)
     glClearColor(0.3, 0.3, 0.3, 1.0);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (scene.entities.has_value()) {
-        for (const auto& entity : scene.entities->get()) {
+    if (scene.entities) {
+        for (auto& entity : *scene.entities) {
             renderEntity(scene, entity);
         }
     }
 
-    if (scene.skybox.has_value()) {
-        renderSkybox(
-            scene, scene.skybox->get().shader, scene.skybox->get().cubemap);
+    if (scene.skybox) {
+        renderSkybox(scene, scene.skybox->shader, scene.skybox->cubemap);
     }
 
-    if (scene.sprites.has_value()) {
-        for (auto& sprite : scene.sprites->get()) {
+    if (scene.geometries) {
+        for (const auto& geometry : *scene.geometries) {
+            renderGeometry(scene, geometry);
+        }
+    }
+
+    if (scene.sprites) {
+        for (const auto& sprite : *scene.sprites) {
             renderSprite(scene, sprite);
         }
     }

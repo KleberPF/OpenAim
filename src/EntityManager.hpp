@@ -21,7 +21,7 @@ public:
     bool updateShotEntities(const glm::vec3& eyePos, const glm::vec3& eyeDir);
     void updateEntities(float timeElapsedSeconds);
 
-    const std::vector<Entity>& entities() const;
+    std::vector<Entity>& entities();
 
 private:
     static CollisionResult areEntitiesColliding(

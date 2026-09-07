@@ -8,18 +8,14 @@ void EntityManager::addEntity(Entity entity)
     m_entities.push_back(std::move(entity));
 }
 
-void EntityManager::removeAllTargets()
+void EntityManager::removeAllEntities()
 {
-    m_entities.erase(
-        std::remove_if(m_entities.begin(), m_entities.end(),
-            [](const Entity& entity) { return entity.destroyable; }),
-        m_entities.end());
+    m_entities.clear();
 }
 
-size_t EntityManager::targetCount() const
+size_t EntityManager::entityCount() const
 {
-    return std::count_if(m_entities.begin(), m_entities.end(),
-        [](const Entity& entity) { return entity.destroyable; });
+    return m_entities.size();
 }
 
 bool EntityManager::updateShotEntities(
@@ -41,7 +37,7 @@ bool EntityManager::updateShotEntities(
         }
     }
 
-    if (closestEntityIt != m_entities.end() && closestEntityIt->destroyable) {
+    if (closestEntityIt != m_entities.end()) {
         closestEntityIt->setDamagedThisFrame();
         return true;
     }

@@ -277,7 +277,7 @@ bool Entity::update(float timePassedSeconds)
     bool damaged = m_damagedThisFrame;
     m_damagedThisFrame = false;
 
-    if (damaged) {
+    if (damaged && destroyable) {
         m_currentHealth--;
         if (m_currentHealth <= 0) {
             m_currentHealth = m_startingHealth;

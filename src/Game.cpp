@@ -66,7 +66,6 @@ Game::Game()
         ResourceManager::instance().getShader("skybox"));
 
     buildPlayArea();
-    // parseScenariosFromFile("../resources/scenarios");
 
     // Build UI (TODO: temp, move this, create a menu manager or something)
     std::vector<std::string> scenarioNames;
@@ -124,7 +123,7 @@ void Game::mainLoopBegin()
     if ((m_currentScenario
             && m_currentScenario->winCondition
                 == Scenario::WinCondition::ClearTargets
-            && m_entityManager.targetCount() == 0)
+            && m_entityManager.entityCount() == 0)
         || (m_challengeState.timeRemainingSeconds <= 0)) {
         changeState(Game::State::ChallengeEnded);
         // to prevent rounding issues
@@ -349,7 +348,7 @@ void Game::reset()
     m_totalTimeSeconds = 0;
     m_challengeState = { };
     m_currentScenario = nullptr;
-    m_entityManager.removeAllTargets();
+    m_entityManager.removeAllEntities();
 }
 
 void Game::createScenario(const std::string& name)
@@ -404,7 +403,7 @@ void Game::createScenario(const std::string& name)
 
         entity.addCollisionObject(collisionObjType);
         entity.setSize(target.scale);
-        entity.destroyable = true;
+        entity.destroyable = target.destroyable;
         entity.type = target.type;
         entity.setName("Ball " + std::to_string(i));
         entity.setStartingHealth(target.health);

@@ -29,7 +29,7 @@ struct Scenario {
 };
 
 // (referentialPos, currentPos, timeElapsed)
-using PositionerCallback = std::function<Scenario::Coordinate(Scenario::Coordinate,Scenario::Coordinate,double)>;
+using PositionerCallback = std::function<Scenario::Coordinate(Scenario::Coordinate, Scenario::Coordinate, double)>;
 
 struct Target {
     enum class Shape : uint8_t {
@@ -48,10 +48,12 @@ struct Target {
     Scenario::Coordinate spawnCoords;
     Scenario::Coordinate minCoords;
     Scenario::Coordinate maxCoords;
-    bool randomSpawn = true;
     int health = 1;
 
     // Calculates position per frame for moving target
     // Takes in the current time, spits out a coordinate
     PositionerCallback positioner = nullptr;
+
+    bool randomSpawn = true;
+    bool destroyable = true;
 };

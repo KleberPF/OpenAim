@@ -283,10 +283,16 @@ void ResourceManager::loadScenarios(const std::string& path)
                 target.spawnCoords = coordFromTable(luaTarget["spawn_coords"]);
             }
 
-            if (!luaTarget["type"].valid()) {
-                throw std::invalid_argument("Target needs a type");
+            if (luaTarget["destroyable"].valid()) {
+                target.destroyable = luaTarget["destroyable"];
             }
-            target.type = static_cast<Target::Type>(luaTarget["type"]);
+
+            if (target.destroyable) {
+                if (!luaTarget["type"].valid()) {
+                    throw std::invalid_argument("Target needs a type");
+                }
+                target.type = static_cast<Target::Type>(luaTarget["type"]);
+            }
 
             if (luaTarget["positioner"].valid()) {
                 // This is ugly but I can't find a clean way of doing this

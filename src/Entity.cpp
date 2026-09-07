@@ -269,7 +269,7 @@ void Entity::setDamagedThisFrame()
 
 void Entity::setMovementPattern(PositionerCallback callback)
 {
-    m_calculateNewPos = std::move(callback);
+    m_positioner = std::move(callback);
 }
 
 bool Entity::update(float timePassedSeconds)
@@ -285,7 +285,7 @@ bool Entity::update(float timePassedSeconds)
         }
     }
 
-    if (m_calculateNewPos) {
+    if (m_positioner) {
         Scenario::Coordinate curCoord = {
             .x = m_currentPos.x,
             .y = m_currentPos.y,
@@ -297,7 +297,7 @@ bool Entity::update(float timePassedSeconds)
             .z = referentialPos.z,
         };
 
-        Scenario::Coordinate newPos = m_calculateNewPos(refCoord, curCoord, timePassedSeconds);
+        Scenario::Coordinate newPos = m_positioner(refCoord, curCoord, timePassedSeconds);
         move(glm::vec3(
             newPos.x,
             newPos.y,

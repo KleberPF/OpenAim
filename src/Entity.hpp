@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Geometry.hpp"
-#include "Scenario.hpp"
 #include "HealthBar.hpp"
+#include "Scenario.hpp"
 
 #include <glm/glm.hpp>
 
@@ -163,7 +163,7 @@ private:
     // This function is used to determine the new position of this entity
     // given the current time of the application
     // If null, we are going to assume this entity isn't moving
-    PositionerCallback m_calculateNewPos = nullptr;
+    PositionerCallback m_positioner = nullptr;
 
     std::string m_name;
     int m_startingHealth = 1;
@@ -182,6 +182,7 @@ private:
 
     // This holds the actual position the entity is in
     glm::vec3 m_currentPos;
+    glm::vec3 m_velocity;
 
     Geometry m_geometry;
     HealthBar m_healthBar;
